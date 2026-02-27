@@ -36,6 +36,37 @@ export class UsersService {
     }
   }
 
+  async findByIdOrFail(id: string): Promise<User> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { id, is_deleted: false },
+        attributes: {
+          exclude: [
+            'password_hash',
+            'totp_secret',
+            'mfa_code',
+            'mfa_code_expires',
+            'recovery_codes',
+            'password_reset_token',
+            'password_reset_expires',
+            'failed_login_attempts',
+            'locked_until',
+            'is_deleted',
+            'google_id',
+          ],
+        },
+      });
+      if (!user) {
+        throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
+      }
+      return user;
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      console.error('UsersService.findByIdOrFail error:', error);
+      throw new InternalServerErrorException('Failed to find user.');
+    }
+  }
+
   async findByIdWithPassword(id: string): Promise<User | null> {
     try {
       return await this.userRepository.findOne({
@@ -212,7 +243,7 @@ export class UsersService {
         attributes: [
           'id', 'email', 'first_name', 'last_name',
           [literal("first_name || ' ' || last_name"), 'name'],
-          'phone', 'avatar_url', 'is_active', 'email_verified', 'auth_provider', 'last_login_at', 'created_at',
+          'phone', 'avatar_url', 'is_active', 'created_at',
         ],
         order: [[query.sort_by, query.sort_order]],
         limit: query.limit,

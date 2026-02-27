@@ -381,14 +381,12 @@ const UIComponentsPage = () => {
   return (
     <div className="space-y-8">
       {/* Page Header */}
-      <div>
-        <Breadcrumb items={breadcrumbItems} />
-        <PageHeader
-          title="UI Components"
-          subtitle="A showcase of all available UI components"
-          className="mt-4"
-        />
-      </div>
+      <PageHeader
+        title="UI Components"
+        subtitle="A showcase of all available UI components"
+        breadcrumb={{ items: breadcrumbItems }}
+        sticky
+      />
 
       {/* Alerts Section */}
       <section>

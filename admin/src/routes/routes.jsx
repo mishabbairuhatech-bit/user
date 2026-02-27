@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AdminLayout } from '@layouts';
 import { LoginPage } from '@pages/auth';
-import { DashboardPage, UIComponentsPage } from '@/pages/admin';
+import { DashboardPage, UIComponentsPage, UsersPage, UserDetailPage } from '@/pages/admin';
 import PrivateRoute from './PrivateRoute';
 
 const AppRoutes = () => {
@@ -22,6 +22,8 @@ const AppRoutes = () => {
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="ui-components" element={<UIComponentsPage />} />
+        <Route path="users" element={<UsersPage />} />
+        <Route path="users/:id" element={<UserDetailPage />} />
       </Route>
 
       {/* Redirect root to login or dashboard */}
