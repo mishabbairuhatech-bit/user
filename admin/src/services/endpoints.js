@@ -1,0 +1,44 @@
+const API = {
+  // Auth
+  LOGIN: "auth/login",
+  LOGOUT: "auth/logout",
+  LOGOUT_ALL: "auth/logout-all",
+  GET_ME: "auth/me",
+  REFRESH_TOKEN: "auth/refresh",
+  FORGOT_PASSWORD: "auth/forgot-password",
+  RESET_PASSWORD: "auth/reset-password",
+  CHANGE_PASSWORD: "auth/change-password",
+
+  // Auth - MFA
+  MFA_VERIFY: "auth/mfa/verify",
+
+  // Auth - Google OAuth
+  GOOGLE_AUTH: "auth/google",
+  GOOGLE_CALLBACK: "auth/google/callback",
+
+  // MFA
+  MFA_EMAIL_ENABLE: "mfa/email/enable",
+  MFA_TOTP_SETUP: "mfa/totp/setup",
+  MFA_TOTP_VERIFY: "mfa/totp/verify",
+  MFA_DISABLE: "mfa/disable",
+  MFA_RECOVERY_CODES: "mfa/recovery-codes",
+
+  // Sessions
+  SESSIONS_LIST: "sessions",
+  SESSION_DELETE: "sessions", // append /:id
+
+  // Passkey
+  PASSKEY_REGISTER_OPTIONS: "passkey/register/options",
+  PASSKEY_REGISTER_VERIFY: "passkey/register/verify",
+  PASSKEY_AUTH_OPTIONS: "passkey/auth/options",
+  PASSKEY_AUTH_VERIFY: "passkey/auth/verify",
+  PASSKEY_LIST: "passkey/list",
+  PASSKEY_DELETE: "passkey", // append /:id
+
+  // Users
+  USERS_LIST: "users",
+  USERS_ME: "users/me",
+  USERS_ME_UPDATE: "users/me",
+};
+
+export default API;
