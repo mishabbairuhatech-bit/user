@@ -53,24 +53,20 @@ const UserDetailPanel = ({ userId, onClose }) => {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-4">
-        {/* Avatar + Name */}
+        {/* Avatar + Name + Status */}
         <div className="flex items-center gap-3 mb-5">
           <Avatar src={user.avatar_url} name={fullName} size="lg" />
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{fullName}</p>
             <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
           </div>
+          <Badge variant={user.is_active ? 'success' : 'danger'} type="soft" size="sm" dot>
+            {user.is_active ? 'Active' : 'Inactive'}
+          </Badge>
         </div>
 
-        {/* Plain detail rows */}
+        {/* Detail rows */}
         <div className="space-y-3.5">
-          <Row label="Status" value={
-            <Badge variant={user.is_active ? 'success' : 'danger'} type="soft" size="sm" dot>
-              {user.is_active ? 'Active' : 'Inactive'}
-            </Badge>
-          } />
-          <Row label="Email" value={user.email} />
-          <Row label="Phone" value={user.phone || '-'} />
           <Row label="Timezone" value={user.timezone || '-'} />
           <Row label="Language" value={user.language || '-'} />
           <Row label="Email Verified" value={
@@ -90,7 +86,6 @@ const UserDetailPanel = ({ userId, onClose }) => {
           } />
           <Row label="Last Login" value={formatDate(user.last_login_at)} />
           <Row label="Created" value={formatDate(user.created_at)} />
-          <Row label="Updated" value={formatDate(user.updated_at)} />
         </div>
       </div>
     </div>

@@ -27,7 +27,7 @@ const Textarea = forwardRef(({
         rows={rows}
         className={`
           w-full px-3 py-2 border rounded-xl shadow-sm
-          bg-white dark:bg-[#1f1f1f]
+          bg-white dark:bg-[#121212]
           text-black dark:text-[rgba(255,255,255,0.85)]
           placeholder-gray-400 dark:placeholder-gray-500
           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500

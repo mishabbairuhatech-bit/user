@@ -87,7 +87,7 @@ const Pagination = forwardRef(({
             disabled={disabled}
             className={`
               flex items-center gap-1.5 px-2.5 py-1.5 text-xs border border-gray-300 dark:border-[#424242] rounded-md
-              bg-white dark:bg-[#1f1f1f] hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors
+              bg-white dark:bg-[#121212] hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors
               ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
             `}
           >
@@ -95,7 +95,7 @@ const Pagination = forwardRef(({
             <ChevronDown className={`w-3 h-3 text-gray-500 dark:text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
           </button>
           {isDropdownOpen && (
-            <div className="absolute top-full left-0 mt-1 bg-white dark:bg-[#1f1f1f] border border-gray-200 dark:border-[#424242] rounded-md shadow-lg z-50 min-w-full">
+            <div className="absolute top-full left-0 mt-1 bg-white dark:bg-[#121212] border border-gray-200 dark:border-[#424242] rounded-md shadow-lg z-50 min-w-full">
               {pageSizeOptions.map((size) => (
                 <button
                   key={size}
@@ -163,7 +163,7 @@ const Pagination = forwardRef(({
             transition-colors duration-200
             ${currentPage === 1 || disabled
               ? 'opacity-50 cursor-not-allowed bg-gray-50 dark:bg-[#2a2a2a] text-gray-400'
-              : 'cursor-pointer bg-white dark:bg-[#1f1f1f] text-gray-900 dark:text-[rgba(255,255,255,0.85)] hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'
+              : 'cursor-pointer bg-white dark:bg-[#121212] text-gray-900 dark:text-[rgba(255,255,255,0.85)] hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'
             }
           `}
         >
@@ -181,7 +181,7 @@ const Pagination = forwardRef(({
             transition-colors duration-200
             ${currentPage === totalPages || disabled
               ? 'opacity-50 cursor-not-allowed bg-gray-50 dark:bg-[#2a2a2a] text-gray-400'
-              : 'cursor-pointer bg-white dark:bg-[#1f1f1f] text-gray-900 dark:text-[rgba(255,255,255,0.85)] hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'
+              : 'cursor-pointer bg-white dark:bg-[#121212] text-gray-900 dark:text-[rgba(255,255,255,0.85)] hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'
             }
           `}
         >

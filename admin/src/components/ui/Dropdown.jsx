@@ -38,9 +38,9 @@ const DropdownTrigger = ({ children, className = '' }) => {
       type="button"
       className={`
         inline-flex items-center justify-center gap-2 px-4 py-2
-        text-sm font-medium text-gray-700 dark:text-[rgba(255,255,255,0.85)] bg-white dark:bg-[#1f1f1f] border border-gray-300 dark:border-[#424242]
+        text-sm font-medium text-gray-700 dark:text-[rgba(255,255,255,0.85)] bg-white dark:bg-[#121212] border border-gray-300 dark:border-[#424242]
         rounded-xl hover:bg-gray-50 dark:hover:bg-[#2a2a2a] focus:outline-none focus:ring-2
-        focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-[#1f1f1f]
+        focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-[#121212]
         ${className}
       `}
       onClick={() => setIsOpen(!isOpen)}
@@ -66,7 +66,7 @@ const DropdownMenu = ({ children, align = 'left', className = '' }) => {
     <div
       className={`
         absolute z-50 mt-2 min-w-48 py-1
-        bg-white dark:bg-[#1f1f1f] border border-gray-200 dark:border-[#424242] rounded-xl shadow-lg
+        bg-white dark:bg-[#121212] border border-gray-200 dark:border-[#424242] rounded-xl shadow-lg
         ${alignmentClasses[align]}
         ${className}
       `}

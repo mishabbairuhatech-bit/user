@@ -20,7 +20,7 @@ const UsersPage = () => {
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
-    const checkScreen = () => setIsDesktop(window.innerWidth >= 1024);
+    const checkScreen = () => setIsDesktop(window.innerWidth >= 1280);
     checkScreen();
     window.addEventListener('resize', checkScreen);
     return () => window.removeEventListener('resize', checkScreen);
@@ -155,7 +155,7 @@ const UsersPage = () => {
       </div>
 
       {/* Table + Detail Panel */}
-      <div className="bg-white dark:bg-[#1f1f1f] rounded-2xl border border-gray-100 dark:border-[#424242] shadow-sm overflow-hidden flex">
+      <div className="bg-white dark:bg-[#121212] rounded-2xl border border-gray-100 dark:border-[#424242] shadow-sm overflow-hidden flex">
         {/* Table */}
         <div className={`min-w-0 transition-all duration-300 ${selectedUserId && isDesktop ? 'flex-1' : 'w-full'}`}>
           <Table

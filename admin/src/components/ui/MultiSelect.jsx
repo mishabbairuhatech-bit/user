@@ -159,7 +159,7 @@ const MultiSelect = forwardRef(({
         ref={ref}
         className={`
           w-full border rounded-xl shadow-sm cursor-pointer overflow-hidden
-          bg-white dark:bg-[#1f1f1f] flex items-center
+          bg-white dark:bg-[#121212] flex items-center
           ${sizes.input}
           ${disabled ? 'bg-gray-100 dark:bg-[#2a2a2a] cursor-not-allowed' : ''}
           ${error ? 'border-red-500 focus-within:ring-red-500 focus-within:border-red-500' : 'border-gray-300 dark:border-[#424242] focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500'}
@@ -189,7 +189,7 @@ const MultiSelect = forwardRef(({
 
       {isOpen && !disabled && (
         <div
-          className={`absolute z-50 top-full mt-1 bg-white dark:bg-[#1f1f1f] border border-gray-200 dark:border-[#424242] rounded-xl shadow-xl max-h-60 overflow-y-auto w-full ${alignRight ? 'right-0' : 'left-0'}`}
+          className={`absolute z-50 top-full mt-1 bg-white dark:bg-[#121212] border border-gray-200 dark:border-[#424242] rounded-xl shadow-xl max-h-60 overflow-y-auto w-full ${alignRight ? 'right-0' : 'left-0'}`}
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           <style>{`

@@ -34,8 +34,8 @@
 /* Dark mode variables */
 .dark {
   --bg-primary: #141414;
-  --bg-secondary: #1f1f1f;
-  --bg-card: #1f1f1f;
+  --bg-secondary: #121212;
+  --bg-card: #121212;
   --text-primary: rgba(255, 255, 255, 0.85);
   --text-secondary: rgba(255, 255, 255, 0.65);
   --border-color: #424242;
