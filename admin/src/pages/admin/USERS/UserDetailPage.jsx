@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
-import { PageHeader, Badge, Avatar, Button, Spinner } from '@components/ui';
+import { PageHeader, Badge, Avatar, Button, Card, Spinner } from '@components/ui';
 import api from '@services/api';
 import API from '@services/endpoints';
 import QUERY_KEY from '@services/queryKeys';
@@ -60,45 +60,45 @@ const UserDetailPage = () => {
         </Button>
       </PageHeader>
 
-      {/* Avatar + Name */}
-      <div className="flex items-center gap-4">
-        <Avatar src={user.avatar_url} name={fullName} size="xl" />
-        <div className="min-w-0">
-          <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">{fullName}</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
-        </div>
-      </div>
+      <Card>
+        <Card.Body>
+          {/* Avatar + Name + Status */}
+          <div className="flex items-center gap-4 mb-6">
+            <Avatar src={user.avatar_url} name={fullName} size="xl" />
+            <div className="min-w-0 flex-1">
+              <p className="text-lg font-semibold text-gray-900 dark:text-white truncate">{fullName}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
+            </div>
+            <Badge variant={user.is_active ? 'success' : 'danger'} type="soft" size="sm" dot>
+              {user.is_active ? 'Active' : 'Inactive'}
+            </Badge>
+          </div>
 
-      {/* Plain detail rows */}
-      <div className="space-y-3.5">
-        <Row label="Status" value={
-          <Badge variant={user.is_active ? 'success' : 'danger'} type="soft" size="sm" dot>
-            {user.is_active ? 'Active' : 'Inactive'}
-          </Badge>
-        } />
-        <Row label="Email" value={user.email} />
-        <Row label="Phone" value={user.phone || '-'} />
-        <Row label="Timezone" value={user.timezone || '-'} />
-        <Row label="Language" value={user.language || '-'} />
-        <Row label="Email Verified" value={
-          <Badge variant={user.email_verified ? 'success' : 'warning'} type="soft" size="sm">
-            {user.email_verified ? 'Verified' : 'Unverified'}
-          </Badge>
-        } />
-        <Row label="MFA" value={
-          <Badge variant={user.mfa_enabled ? 'success' : 'default'} type="soft" size="sm">
-            {user.mfa_enabled ? (user.mfa_method === 'totp' ? 'TOTP' : 'Email') : 'Disabled'}
-          </Badge>
-        } />
-        <Row label="Provider" value={
-          <Badge variant={user.auth_provider === 'google' ? 'info' : 'default'} type="soft" size="sm">
-            {user.auth_provider === 'google' ? 'Google' : 'Local'}
-          </Badge>
-        } />
-        <Row label="Last Login" value={formatDate(user.last_login_at)} />
-        <Row label="Created" value={formatDate(user.created_at)} />
-        <Row label="Updated" value={formatDate(user.updated_at)} />
-      </div>
+          {/* Detail rows */}
+          <div className="space-y-3.5">
+            <Row label="Phone" value={user.phone || '-'} />
+            <Row label="Timezone" value={user.timezone || '-'} />
+            <Row label="Language" value={user.language || '-'} />
+            <Row label="Email Verified" value={
+              <Badge variant={user.email_verified ? 'success' : 'warning'} type="soft" size="sm">
+                {user.email_verified ? 'Verified' : 'Unverified'}
+              </Badge>
+            } />
+            <Row label="MFA" value={
+              <Badge variant={user.mfa_enabled ? 'success' : 'default'} type="soft" size="sm">
+                {user.mfa_enabled ? (user.mfa_method === 'totp' ? 'TOTP' : 'Email') : 'Disabled'}
+              </Badge>
+            } />
+            <Row label="Provider" value={
+              <Badge variant={user.auth_provider === 'google' ? 'info' : 'default'} type="soft" size="sm">
+                {user.auth_provider === 'google' ? 'Google' : 'Local'}
+              </Badge>
+            } />
+            <Row label="Last Login" value={formatDate(user.last_login_at)} />
+            <Row label="Created" value={formatDate(user.created_at)} />
+          </div>
+        </Card.Body>
+      </Card>
     </div>
   );
 };

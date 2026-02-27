@@ -102,11 +102,11 @@ const Input = forwardRef(({
                 text-base text-gray-400 dark:text-gray-500
                 transition-all duration-200 origin-left
                 peer-focus:top-0 peer-focus:translate-y-[-50%] peer-focus:scale-[0.8] peer-focus:px-1.5
-                peer-focus:bg-white peer-focus:dark:bg-[#141414]
+                peer-focus:bg-white peer-focus:dark:bg-[#121212]
                 peer-focus:text-primary-500
                 peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:translate-y-[-50%]
                 peer-[:not(:placeholder-shown)]:scale-[0.8] peer-[:not(:placeholder-shown)]:px-1.5
-                peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:dark:bg-[#141414]
+                peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:dark:bg-[#121212]
                 ${error ? 'peer-focus:text-red-500 peer-[:not(:placeholder-shown)]:text-red-500' : 'peer-[:not(:placeholder-shown)]:text-gray-500 peer-[:not(:placeholder-shown)]:dark:text-gray-400'}
               `}
             >
@@ -153,7 +153,7 @@ const Input = forwardRef(({
       <div
         className={`
           w-full border rounded-xl shadow-sm
-          bg-white dark:bg-[#1f1f1f] flex items-center
+          bg-white dark:bg-[#121212] flex items-center
           ${sizes.input}
           ${disabled ? 'bg-gray-100 dark:bg-[#2a2a2a] cursor-not-allowed' : ''}
           ${error ? 'border-red-500 focus-within:ring-red-500 focus-within:border-red-500' : 'border-gray-300 dark:border-[#424242] focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500'}

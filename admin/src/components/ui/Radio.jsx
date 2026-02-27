@@ -42,8 +42,8 @@ const Radio = forwardRef(({
           transition-colors duration-200
           ${disabled ? 'cursor-not-allowed opacity-50' : ''}
           ${checked
-            ? 'bg-white dark:bg-[#1f1f1f] border-primary-500'
-            : 'bg-white dark:bg-[#1f1f1f] border-gray-300 dark:border-[#424242] hover:border-primary-500'
+            ? 'bg-white dark:bg-[#121212] border-primary-500'
+            : 'bg-white dark:bg-[#121212] border-gray-300 dark:border-[#424242] hover:border-primary-500'
           }
         `}
         onClick={() => !disabled && onChange && onChange(value)}

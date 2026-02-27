@@ -3,28 +3,28 @@ import { AlertCircle, CheckCircle, Info, AlertTriangle, X } from 'lucide-react';
 
 const variants = {
   info: {
-    container: 'bg-blue-50 dark:bg-[#2a2a2a] border-blue-200 dark:border-[#424242]',
+    container: 'bg-blue-50 dark:bg-[#121212] border-blue-200 dark:border-[#424242]',
     icon: 'text-blue-500 dark:text-blue-400',
     title: 'text-blue-800 dark:text-blue-400',
     message: 'text-blue-700 dark:text-blue-300',
     Icon: Info,
   },
   success: {
-    container: 'bg-green-50 dark:bg-[#2a2a2a] border-green-200 dark:border-[#424242]',
+    container: 'bg-green-50 dark:bg-[#121212] border-green-200 dark:border-[#424242]',
     icon: 'text-green-500 dark:text-green-400',
     title: 'text-green-800 dark:text-green-400',
     message: 'text-green-700 dark:text-green-300',
     Icon: CheckCircle,
   },
   warning: {
-    container: 'bg-yellow-50 dark:bg-[#2a2a2a] border-yellow-200 dark:border-[#424242]',
+    container: 'bg-yellow-50 dark:bg-[#121212] border-yellow-200 dark:border-[#424242]',
     icon: 'text-yellow-500 dark:text-yellow-400',
     title: 'text-yellow-800 dark:text-yellow-400',
     message: 'text-yellow-700 dark:text-yellow-300',
     Icon: AlertTriangle,
   },
   danger: {
-    container: 'bg-red-50 dark:bg-[#2a2a2a] border-red-200 dark:border-[#424242]',
+    container: 'bg-red-50 dark:bg-[#121212] border-red-200 dark:border-[#424242]',
     icon: 'text-red-500 dark:text-red-400',
     title: 'text-red-800 dark:text-red-400',
     message: 'text-red-700 dark:text-red-300',

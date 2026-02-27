@@ -59,12 +59,12 @@ const Switch = forwardRef(({
         className={`
           relative inline-flex items-center rounded-full border-2
           transition-colors duration-200 ease-in-out
-          focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-[#1f1f1f]
+          focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-[#121212]
           ${sizeStyles.track}
           ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
           ${checked
             ? 'bg-primary-500 border-primary-500'
-            : 'bg-white dark:bg-[#1f1f1f] border-gray-300 dark:border-[#424242]'}
+            : 'bg-white dark:bg-[#121212] border-gray-300 dark:border-[#424242]'}
         `}
         onClick={() => !disabled && onChange && onChange(!checked)}
         {...props}
@@ -99,7 +99,7 @@ const Switch = forwardRef(({
             inline-block rounded-full shadow transform
             transition-all duration-200 ease-in-out
             ${sizeStyles.thumb}
-            ${checked ? `bg-white ${sizeStyles.translate}` : 'bg-gray-400 dark:bg-[#606060] translate-x-0.5'}
+            ${checked ? `bg-white ${sizeStyles.translate}` : 'bg-gray-400 dark:bg-[#424242] translate-x-0.5'}
           `}
         />
       </button>

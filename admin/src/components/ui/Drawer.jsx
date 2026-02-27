@@ -134,7 +134,7 @@ const Drawer = forwardRef(({
       {/* Drawer Panel */}
       <div
         className={`
-          absolute bg-white dark:bg-[#1f1f1f] shadow-2xl flex flex-col
+          absolute bg-white dark:bg-[#121212] shadow-2xl flex flex-col
           transition-transform duration-300 ease-out
           ${placementClass.container}
           ${sizeClass}
@@ -144,7 +144,7 @@ const Drawer = forwardRef(({
       >
         {/* Header */}
         {(title || closable) && (
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-[#424242]">
+          <div className="flex items-center justify-between px-4 h-12 border-b border-gray-200 dark:border-[#424242]">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-[rgba(255,255,255,0.85)]">{title}</h3>
             {closable && (
               <button

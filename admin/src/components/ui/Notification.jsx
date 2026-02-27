@@ -37,7 +37,7 @@ const variantConfig = {
   },
   default: {
     icon: Bell,
-    iconBg: 'bg-gray-100 dark:bg-gray-800',
+    iconBg: 'bg-gray-100 dark:bg-[#2a2a2a]',
     iconColor: 'text-gray-600 dark:text-gray-400',
   },
   security: {
@@ -87,7 +87,7 @@ const Notification = forwardRef(({
       className={`
         relative flex items-start gap-3 p-4 rounded-xl border transition-all duration-200
         ${read
-          ? 'bg-white dark:bg-[#1f1f1f] border-gray-200 dark:border-[#424242]'
+          ? 'bg-white dark:bg-[#121212] border-gray-200 dark:border-[#424242]'
           : 'bg-primary-50/50 dark:bg-primary-900/10 border-primary-200 dark:border-primary-800/50'
         }
         ${onClick ? 'cursor-pointer hover:shadow-md' : ''}

@@ -64,7 +64,7 @@ const Modal = ({
           ref={modalRef}
           tabIndex={-1}
           className={`
-            relative w-full ${sizes[size]} bg-white dark:bg-[#1f1f1f] rounded-xl shadow-xl border border-transparent dark:border-[#424242]
+            relative w-full ${sizes[size]} bg-white dark:bg-[#121212] rounded-xl shadow-xl border border-transparent dark:border-[#424242]
             transform transition-all
             ${className}
           `}

@@ -91,28 +91,28 @@ const ToastContainer = ({ toasts, position, onRemove }) => {
 const variantConfig = {
   success: {
     icon: CheckCircle,
-    bg: 'bg-white dark:bg-[#1f1f1f]',
+    bg: 'bg-white dark:bg-[#121212]',
     border: 'border-success-500',
     iconColor: 'text-success-500',
     bar: 'bg-success-500',
   },
   danger: {
     icon: AlertCircle,
-    bg: 'bg-white dark:bg-[#1f1f1f]',
+    bg: 'bg-white dark:bg-[#121212]',
     border: 'border-danger-500',
     iconColor: 'text-danger-500',
     bar: 'bg-danger-500',
   },
   warning: {
     icon: AlertTriangle,
-    bg: 'bg-white dark:bg-[#1f1f1f]',
+    bg: 'bg-white dark:bg-[#121212]',
     border: 'border-warning-500',
     iconColor: 'text-warning-500',
     bar: 'bg-warning-500',
   },
   info: {
     icon: Info,
-    bg: 'bg-white dark:bg-[#1f1f1f]',
+    bg: 'bg-white dark:bg-[#121212]',
     border: 'border-info-500',
     iconColor: 'text-info-500',
     bar: 'bg-info-500',

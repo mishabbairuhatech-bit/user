@@ -154,7 +154,7 @@ const Avatar = forwardRef(({
       {status && (
         <span
           className={`
-            absolute bottom-0 right-0 block rounded-full ring-2 ring-white dark:ring-[#1f1f1f]
+            absolute bottom-0 right-0 block rounded-full ring-2 ring-white dark:ring-[#121212]
             ${statusColors[status] || statusColors.offline}
             ${statusSizes[size]}
           `}
@@ -218,7 +218,7 @@ const AvatarGroup = forwardRef(({
             status={avatar.status}
             showTooltip={showTooltip}
             tooltipContent={avatar.tooltipContent || avatar.name}
-            className="ring-2 ring-white dark:ring-[#1f1f1f]"
+            className="ring-2 ring-white dark:ring-[#121212]"
           />
         ))}
 
@@ -230,7 +230,7 @@ const AvatarGroup = forwardRef(({
                 ${rounded ? 'rounded-full' : 'rounded-xl'}
                 ${sizes[size]}
                 bg-primary-500 text-white font-medium
-                ring-2 ring-white dark:ring-[#1f1f1f]
+                ring-2 ring-white dark:ring-[#121212]
                 transition-transform duration-200 hover:scale-110 hover:z-10
               `}
             >
@@ -250,7 +250,7 @@ const AvatarGroup = forwardRef(({
   return (
     <div ref={ref} className={`flex items-center ${spacingClasses[spacing]} ${className}`} {...props}>
       {visibleAvatars.map((child, index) => (
-        <div key={index} className="ring-2 ring-white dark:ring-[#1f1f1f] rounded-full">
+        <div key={index} className="ring-2 ring-white dark:ring-[#121212] rounded-full">
           {child}
         </div>
       ))}
@@ -261,7 +261,7 @@ const AvatarGroup = forwardRef(({
             rounded-full
             ${sizes[size]}
             bg-primary-500 text-white font-medium
-            ring-2 ring-white dark:ring-[#1f1f1f]
+            ring-2 ring-white dark:ring-[#121212]
           `}
         >
           +{remainingCount}

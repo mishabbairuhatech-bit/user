@@ -427,7 +427,7 @@ const FileUpload = forwardRef(({
                 inputRef.current?.click();
               }}
               disabled={disabled}
-              className={`${sizes.button} font-medium text-gray-700 dark:text-[rgba(255,255,255,0.85)] bg-white dark:bg-[#1f1f1f] border border-gray-300 dark:border-[#424242] rounded-xl hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors`}
+              className={`${sizes.button} font-medium text-gray-700 dark:text-[rgba(255,255,255,0.85)] bg-white dark:bg-[#121212] border border-gray-300 dark:border-[#424242] rounded-xl hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors`}
             >
               {selectButtonText}
             </button>
@@ -451,7 +451,7 @@ const FileUpload = forwardRef(({
             return (
               <div
                 key={fileItem.id}
-                className={`flex items-center ${sizes.fileItem} bg-white dark:bg-[#1f1f1f] border border-gray-200 dark:border-[#424242] rounded-xl`}
+                className={`flex items-center ${sizes.fileItem} bg-white dark:bg-[#121212] border border-gray-200 dark:border-[#424242] rounded-xl`}
               >
                 {/* File Icon */}
                 {fileItem.preview ? (

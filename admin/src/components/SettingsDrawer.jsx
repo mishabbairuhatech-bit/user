@@ -28,7 +28,7 @@ const SettingsDrawer = () => {
     <button
       onClick={onChange}
       className={`relative w-10 h-[22px] rounded-full transition-colors ${
-        enabled ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'
+        enabled ? 'bg-primary-600' : 'bg-gray-300 dark:bg-[#424242]'
       }`}
     >
       <span
@@ -112,7 +112,7 @@ const SettingsDrawer = () => {
                     key={color.value}
                     onClick={() => updateSetting('primaryColor', color.value)}
                     className={`w-6 h-6 rounded-full flex items-center justify-center transition-transform ${
-                      isActive ? 'ring-2 ring-offset-1 dark:ring-offset-[#1f1f1f]' : 'hover:scale-110'
+                      isActive ? 'ring-2 ring-offset-1 dark:ring-offset-[#121212]' : 'hover:scale-110'
                     }`}
                     style={{ backgroundColor: color.color, ringColor: color.color }}
                     title={color.name}

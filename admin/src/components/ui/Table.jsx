@@ -132,7 +132,7 @@ const Table = forwardRef(({
 
   const getFixedClassName = (column, isHeader = false) => {
     if (!column.fixed) return '';
-    const bgColor = isHeader ? 'bg-gray-50 dark:bg-[#2a2a2a]' : 'bg-white dark:bg-[#1f1f1f]';
+    const bgColor = isHeader ? 'bg-gray-50 dark:bg-[#2a2a2a]' : 'bg-white dark:bg-[#121212]';
     const shadow = column.fixed === 'left'
       ? 'shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] dark:shadow-[2px_0_5px_-2px_rgba(0,0,0,0.3)]'
       : 'shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.1)] dark:shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.3)]';
@@ -212,7 +212,7 @@ const Table = forwardRef(({
             ))}
           </tr>
         </thead>
-        <tbody className="bg-white dark:bg-[#1f1f1f]">
+        <tbody className="bg-white dark:bg-[#121212]">
           {loading ? (
             <tr>
               <td colSpan={totalColumns} className="px-6 py-12 text-center">
@@ -239,7 +239,7 @@ const Table = forwardRef(({
                   className={`
                     transition-colors border-b border-gray-200 dark:border-[#424242]
                     ${onRowClick ? 'cursor-pointer' : ''}
-                    ${striped && rowIndex % 2 === 1 ? 'bg-gray-50/50 dark:bg-[#2a2a2a]/50' : 'bg-white dark:bg-[#1f1f1f]'}
+                    ${striped && rowIndex % 2 === 1 ? 'bg-gray-50/50 dark:bg-[#2a2a2a]/50' : 'bg-white dark:bg-[#121212]'}
                     hover:bg-gray-50/50 dark:hover:bg-[#2a2a2a]/50
                   `}
                   onClick={() => onRowClick && onRowClick(row)}
@@ -357,7 +357,7 @@ const Table = forwardRef(({
   };
 
   return (
-    <div ref={ref} className={`bg-white dark:bg-[#1f1f1f] rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-[#424242] ${className}`} {...props}>
+    <div ref={ref} className={`bg-white dark:bg-[#121212] rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-[#424242] ${className}`} {...props}>
       {/* Header */}
       {showHeader && (
         <div className="px-6 py-4 border-b border-gray-200 dark:border-[#424242] flex flex-wrap items-center justify-between gap-4">
@@ -371,7 +371,7 @@ const Table = forwardRef(({
                 <button
                   type="button"
                   onClick={() => setViewMode('list')}
-                  className={`p-2 transition-colors ${viewMode === 'list' ? 'bg-primary-50 dark:bg-[#2a2a2a] text-primary-600 dark:text-primary-400' : 'bg-white dark:bg-[#1f1f1f] text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'}`}
+                  className={`p-2 transition-colors ${viewMode === 'list' ? 'bg-primary-50 dark:bg-[#2a2a2a] text-primary-600 dark:text-primary-400' : 'bg-white dark:bg-[#121212] text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'}`}
                   title="List view"
                 >
                   <List className="w-4 h-4" />
@@ -380,7 +380,7 @@ const Table = forwardRef(({
                   <button
                     type="button"
                     onClick={() => setViewMode('grid')}
-                    className={`p-2 transition-colors ${viewMode === 'grid' ? 'bg-primary-50 dark:bg-[#2a2a2a] text-primary-600 dark:text-primary-400' : 'bg-white dark:bg-[#1f1f1f] text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'}`}
+                    className={`p-2 transition-colors ${viewMode === 'grid' ? 'bg-primary-50 dark:bg-[#2a2a2a] text-primary-600 dark:text-primary-400' : 'bg-white dark:bg-[#121212] text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'}`}
                     title="Grid view"
                   >
                     <LayoutGrid className="w-4 h-4" />
@@ -390,7 +390,7 @@ const Table = forwardRef(({
                   <button
                     type="button"
                     onClick={() => setViewMode('kanban')}
-                    className={`p-2 transition-colors ${viewMode === 'kanban' ? 'bg-primary-50 dark:bg-[#2a2a2a] text-primary-600 dark:text-primary-400' : 'bg-white dark:bg-[#1f1f1f] text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'}`}
+                    className={`p-2 transition-colors ${viewMode === 'kanban' ? 'bg-primary-50 dark:bg-[#2a2a2a] text-primary-600 dark:text-primary-400' : 'bg-white dark:bg-[#121212] text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'}`}
                     title="Kanban view"
                   >
                     <Columns3 className="w-4 h-4" />

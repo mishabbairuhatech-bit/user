@@ -178,7 +178,7 @@ const DatePicker = forwardRef(({
         ref={ref}
         className={`
           relative w-full border rounded-xl shadow-sm cursor-pointer
-          bg-white dark:bg-[#1f1f1f]
+          bg-white dark:bg-[#121212]
           ${sizes.input}
           ${disabled ? 'bg-gray-100 dark:bg-[#2a2a2a] cursor-not-allowed' : ''}
           ${error ? 'border-red-500 focus-within:ring-red-500 focus-within:border-red-500' : 'border-gray-300 dark:border-[#424242] focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500'}
@@ -208,7 +208,7 @@ const DatePicker = forwardRef(({
         </div>
 
         {isOpen && !disabled && (
-          <div className={`absolute z-50 top-full mt-1 bg-white dark:bg-[#1f1f1f] border border-gray-200 dark:border-[#424242] rounded-xl shadow-xl p-3 w-[280px] ${alignRight ? "right-0" : "left-0"}`}>
+          <div className={`absolute z-50 top-full mt-1 bg-white dark:bg-[#121212] border border-gray-200 dark:border-[#424242] rounded-xl shadow-xl p-3 w-[280px] ${alignRight ? "right-0" : "left-0"}`}>
             <div className="flex items-center justify-between mb-3">
               <button
                 type="button"
