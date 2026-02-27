@@ -1,0 +1,16 @@
+export const REPOSITORY = {
+  USERS: 'USERS_REPOSITORY',
+  LOGIN_SESSIONS: 'LOGIN_SESSIONS_REPOSITORY',
+  PASSWORD_HISTORIES: 'PASSWORD_HISTORIES_REPOSITORY',
+  PASSKEYS: 'PASSKEYS_REPOSITORY',
+} as const;
+
+export const AUTH_PROVIDER = {
+  LOCAL: 'local',
+  GOOGLE: 'google',
+} as const;
+
+export const MFA_METHOD = {
+  EMAIL: 'email',
+  TOTP: 'totp',
+} as const;

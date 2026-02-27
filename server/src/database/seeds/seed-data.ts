@@ -1,0 +1,32 @@
+export const SEED_USERS = [
+  {
+    email: 'admin@example.com',
+    password: 'Admin@1234',
+    first_name: 'Admin',
+    last_name: 'User',
+    phone: '+1234567890',
+    timezone: 'America/New_York',
+    language: 'en',
+    email_verified: true,
+  },
+  {
+    email: 'john@example.com',
+    password: 'John@1234',
+    first_name: 'John',
+    last_name: 'Doe',
+    phone: '+1987654321',
+    timezone: 'Europe/London',
+    language: 'en',
+    email_verified: true,
+  },
+  {
+    email: 'jane@example.com',
+    password: 'Jane@1234',
+    first_name: 'Jane',
+    last_name: 'Smith',
+    phone: '+1122334455',
+    timezone: 'Asia/Tokyo',
+    language: 'en',
+    email_verified: false,
+  },
+];
