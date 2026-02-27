@@ -1,11 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 
-const positions = {
-  top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
-  bottom: 'top-full left-1/2 -translate-x-1/2 mt-2',
-  left: 'right-full top-1/2 -translate-y-1/2 mr-2',
-  right: 'left-full top-1/2 -translate-y-1/2 ml-2',
-};
+const GAP = 8;
 
 const colorClasses = {
   dark: {
@@ -74,10 +70,10 @@ const colorClasses = {
 };
 
 const arrowPositions = {
-  top: 'top-full left-1/2 -translate-x-1/2 border-x-transparent border-b-transparent',
-  bottom: 'bottom-full left-1/2 -translate-x-1/2 border-x-transparent border-t-transparent',
-  left: 'left-full top-1/2 -translate-y-1/2 border-y-transparent border-r-transparent',
-  right: 'right-full top-1/2 -translate-y-1/2 border-y-transparent border-l-transparent',
+  top: 'border-x-transparent border-b-transparent',
+  bottom: 'border-x-transparent border-t-transparent',
+  left: 'border-y-transparent border-r-transparent',
+  right: 'border-y-transparent border-l-transparent',
 };
 
 const sizeClasses = {
@@ -99,7 +95,49 @@ const Tooltip = ({
   className = '',
 }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0 });
+  const [arrowCoords, setArrowCoords] = useState({ top: 0, left: 0 });
+  const triggerRef = useRef(null);
+  const tooltipRef = useRef(null);
   const timeoutRef = useRef(null);
+
+  const calcPosition = useCallback(() => {
+    if (!triggerRef.current || !tooltipRef.current) return;
+    const rect = triggerRef.current.getBoundingClientRect();
+    const tip = tooltipRef.current.getBoundingClientRect();
+
+    let top = 0, left = 0, arrowTop = 0, arrowLeft = 0;
+
+    switch (position) {
+      case 'top':
+        top = rect.top - tip.height - GAP;
+        left = rect.left + rect.width / 2 - tip.width / 2;
+        arrowTop = tip.height - 1;
+        arrowLeft = tip.width / 2 - 4;
+        break;
+      case 'bottom':
+        top = rect.bottom + GAP;
+        left = rect.left + rect.width / 2 - tip.width / 2;
+        arrowTop = -7;
+        arrowLeft = tip.width / 2 - 4;
+        break;
+      case 'left':
+        top = rect.top + rect.height / 2 - tip.height / 2;
+        left = rect.left - tip.width - GAP;
+        arrowTop = tip.height / 2 - 4;
+        arrowLeft = tip.width - 1;
+        break;
+      case 'right':
+        top = rect.top + rect.height / 2 - tip.height / 2;
+        left = rect.right + GAP;
+        arrowTop = tip.height / 2 - 4;
+        arrowLeft = -7;
+        break;
+    }
+
+    setCoords({ top, left });
+    setArrowCoords({ top: arrowTop, left: arrowLeft });
+  }, [position]);
 
   const showTooltip = () => {
     if (disabled) return;
@@ -109,17 +147,17 @@ const Tooltip = ({
   };
 
   const hideTooltip = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setIsVisible(false);
   };
 
   useEffect(() => {
+    if (isVisible) calcPosition();
+  }, [isVisible, calcPosition]);
+
+  useEffect(() => {
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);
 
@@ -127,6 +165,7 @@ const Tooltip = ({
 
   return (
     <div
+      ref={triggerRef}
       className="relative inline-flex"
       onMouseEnter={showTooltip}
       onMouseLeave={hideTooltip}
@@ -134,29 +173,33 @@ const Tooltip = ({
       onBlur={hideTooltip}
     >
       {children}
-      {isVisible && (
-        <div
-          role="tooltip"
-          className={`
-            absolute z-50 px-2 py-1.5 font-normal
-            rounded-md shadow-lg
-            leading-snug w-max
-            ${colorClasses[color]?.bg || colorClasses.dark.bg}
-            ${sizeClasses[size] || sizeClasses.md}
-            ${positions[position]}
-            ${className}
-          `}
-        >
-          {content}
+      {isVisible &&
+        createPortal(
           <div
+            ref={tooltipRef}
+            role="tooltip"
+            style={{ position: 'fixed', top: coords.top, left: coords.left }}
             className={`
-              absolute w-0 h-0 border-4
-              ${arrowPositions[position]}
-              ${colorClasses[color]?.arrow[position] || colorClasses.dark.arrow[position]}
+              z-[9999] px-2 py-1.5 font-normal
+              rounded-md shadow-lg
+              leading-snug w-max pointer-events-none
+              ${colorClasses[color]?.bg || colorClasses.dark.bg}
+              ${sizeClasses[size] || sizeClasses.md}
+              ${className}
             `}
-          />
-        </div>
-      )}
+          >
+            {content}
+            <div
+              style={{ position: 'absolute', top: arrowCoords.top, left: arrowCoords.left }}
+              className={`
+                w-0 h-0 border-4
+                ${arrowPositions[position]}
+                ${colorClasses[color]?.arrow[position] || colorClasses.dark.arrow[position]}
+              `}
+            />
+          </div>,
+          document.body
+        )}
     </div>
   );
 };

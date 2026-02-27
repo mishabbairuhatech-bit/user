@@ -1,17 +1,15 @@
-import { Controller, Get, Patch, Body, Query, UseGuards, NotFoundException } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { RequestUser } from '../common/interfaces/jwt-payload.interface';
+import { UserById } from '../common/decorators/user-by-id.decorator';
 import { PaginationQueryDto } from '../common/dto';
-import { ERROR_MESSAGES } from '../common/constants/error-messages';
 
 @ApiTags('Users')
-// @ApiBearerAuth('access-token')
+@ApiBearerAuth('access-token')
 @Controller('users')
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
@@ -28,12 +26,8 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'User profile returned.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
-  async getMe(@CurrentUser() user: RequestUser) {
-    const found = await this.usersService.findById(user.id);
-    if (!found) {
-      throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
-    }
-    return found;
+  async getMe(@UserById() userId: string) {
+    return await this.usersService.findByIdOrFail(userId);
   }
 
   @Patch('me')
@@ -41,7 +35,16 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Profile updated successfully.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
-  async updateMe(@CurrentUser() user: RequestUser, @Body() dto: UpdateUserDto) {
-    return await this.usersService.updateProfile(user.id, dto);
+  async updateMe(@UserById() userId: string, @Body() dto: UpdateUserDto) {
+    return await this.usersService.updateProfile(userId, dto);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get user details by ID' })
+  @ApiParam({ name: 'id', description: 'User UUID' })
+  @ApiResponse({ status: 200, description: 'User details returned.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  async findOne(@Param('id') id: string) {
+    return await this.usersService.findByIdOrFail(id);
   }
 }

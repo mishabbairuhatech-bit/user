@@ -165,6 +165,11 @@ export const SettingsProvider = ({ children }) => {
     root.style.fontSize = sizes[settings.fontSize] || '16px';
   }, [settings.fontSize]);
 
+  // Apply border radius
+  useEffect(() => {
+    document.documentElement.setAttribute('data-radius', settings.borderRadius);
+  }, [settings.borderRadius]);
+
   const updateSetting = (key, value) => {
     setSettings(prev => ({ ...prev, [key]: value }));
   };

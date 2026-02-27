@@ -179,7 +179,7 @@ const Table = forwardRef(({
   const renderTableContent = () => (
     <div className="overflow-x-auto scrollbar-hide">
       <table className={`w-max min-w-full table-fixed ${bordered ? 'border border-gray-200 dark:border-[#424242]' : ''}`}>
-        <thead className="bg-gray-50 dark:bg-[#2a2a2a] border-y border-gray-200 dark:border-[#424242]">
+        <thead className="bg-gray-50 dark:bg-[#2a2a2a] border-gray-200 dark:border-[#424242]">
           <tr>
             {selectable && (
               <th scope="col" className={`${headerPaddingClass} w-12`}>
@@ -248,7 +248,7 @@ const Table = forwardRef(({
                     <td className={`${paddingClass} w-12`} onClick={(e) => e.stopPropagation()}>
                       <Checkbox
                         checked={isSelected}
-                        onChange={() => handleSelectRow({ stopPropagation: () => {} }, row)}
+                        onChange={() => handleSelectRow({ stopPropagation: () => { } }, row)}
                         size="md"
                       />
                     </td>
@@ -357,7 +357,7 @@ const Table = forwardRef(({
   };
 
   return (
-    <div ref={ref} className={`bg-white dark:bg-[#1f1f1f] rounded-2xl shadow-sm border border-gray-100 dark:border-[#424242] ${className}`} {...props}>
+    <div ref={ref} className={`bg-white dark:bg-[#1f1f1f] rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-[#424242] ${className}`} {...props}>
       {/* Header */}
       {showHeader && (
         <div className="px-6 py-4 border-b border-gray-200 dark:border-[#424242] flex flex-wrap items-center justify-between gap-4">
@@ -407,7 +407,7 @@ const Table = forwardRef(({
 
       {/* Footer with Pagination */}
       {showFooter && (
-        <div className="px-6 py-4 border-t border-gray-200 dark:border-[#424242]">
+        <div className="px-6 py-4 border-gray-200 dark:border-[#424242]">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

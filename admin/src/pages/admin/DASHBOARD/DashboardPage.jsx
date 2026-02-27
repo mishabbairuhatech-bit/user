@@ -175,6 +175,8 @@ const DashboardPage = () => {
       <PageHeader
         title="Dashboard"
         subtitle="Plan, prioritize, and accomplish your tasks with ease."
+        breadcrumb={{ items: [{ label: 'Dashboard' }] }}
+        sticky
       >
         <Button variant="primary" prefixIcon={Plus}>
           Add Project

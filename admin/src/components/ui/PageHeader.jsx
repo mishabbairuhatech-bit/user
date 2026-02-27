@@ -1,30 +1,30 @@
-/**
- * PageHeader Component
- * A reusable page header with title, subtitle, and optional action buttons
- *
- * @param {string} title - The main heading text
- * @param {string} subtitle - Optional description text below the title
- * @param {React.ReactNode} children - Optional action buttons/elements on the right side
- * @param {string} className - Optional additional CSS classes
- */
+import Breadcrumb from './Breadcrumb';
 
 const PageHeader = ({
   title,
   subtitle,
   children,
+  breadcrumb,
+  sticky = false,
   className = ''
 }) => {
-  return (
-    <div className={className}>
-      {/* Title row with actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+  const content = (
+    <>
+      {breadcrumb && (
+        <Breadcrumb
+          items={breadcrumb.items || []}
+          homeHref={breadcrumb.homeHref || '/admin/dashboard'}
+          homeLabel={breadcrumb.homeLabel || 'Dashboard'}
+          showHome={breadcrumb.showHome !== false}
+        />
+      )}
+      <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 ${breadcrumb ? 'mt-2' : ''}`}>
         <div>
-          <h1 className="text-xl md:text-2xl lg:text-[32px] font-bold text-gray-900 tracking-tight">
+          <h1 className="text-base md:text-lg lg:text-xl font-bold text-gray-900 tracking-tight">
             {title}
           </h1>
-          {/* Subtitle below */}
           {subtitle && (
-            <p className="text-gray-500 mt-1 text-xs md:text-sm lg:text-[15px]">
+            <p className="text-gray-500 mt-1 text-[11px] md:text-xs lg:text-[13px]">
               {subtitle}
             </p>
           )}
@@ -36,6 +36,20 @@ const PageHeader = ({
           </div>
         )}
       </div>
+    </>
+  );
+
+  if (sticky) {
+    return (
+      <div className={`sticky top-0 z-10 bg-white dark:bg-[#121212] pb-4 -mt-4 pt-4 lg:-mt-6 lg:pt-6 -mx-4 px-4 lg:-mx-6 lg:px-6 ${className}`}>
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <div className={className}>
+      {content}
     </div>
   );
 };

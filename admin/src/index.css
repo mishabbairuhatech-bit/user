@@ -125,3 +125,54 @@ body {
     transform: translateX(0) scale(1);
   }
 }
+
+/* ===== Border Radius Overrides ===== */
+
+/* None — remove all rounding */
+[data-radius="none"] .rounded,
+[data-radius="none"] .rounded-md,
+[data-radius="none"] .rounded-lg,
+[data-radius="none"] .rounded-xl,
+[data-radius="none"] .rounded-2xl,
+[data-radius="none"] .rounded-3xl {
+  border-radius: 0 !important;
+}
+[data-radius="none"] .rounded-full:not(img):not([class*="w-6"]):not([class*="w-7"]):not([class*="w-8"]):not([class*="w-10"]) {
+  border-radius: 0 !important;
+}
+
+/* Small — subtle rounding */
+[data-radius="small"] .rounded-lg {
+  border-radius: 4px !important;
+}
+[data-radius="small"] .rounded-xl {
+  border-radius: 6px !important;
+}
+[data-radius="small"] .rounded-2xl {
+  border-radius: 8px !important;
+}
+[data-radius="small"] .rounded-3xl {
+  border-radius: 10px !important;
+}
+
+/* Rounded — default Tailwind values, no overrides needed */
+
+/* Full — extra round */
+[data-radius="full"] .rounded {
+  border-radius: 8px !important;
+}
+[data-radius="full"] .rounded-md {
+  border-radius: 10px !important;
+}
+[data-radius="full"] .rounded-lg {
+  border-radius: 14px !important;
+}
+[data-radius="full"] .rounded-xl {
+  border-radius: 18px !important;
+}
+[data-radius="full"] .rounded-2xl {
+  border-radius: 22px !important;
+}
+[data-radius="full"] .rounded-3xl {
+  border-radius: 28px !important;
+}
