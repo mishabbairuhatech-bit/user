@@ -37,6 +37,7 @@ const API = {
 
   // Users
   USERS_LIST: "users",
+  USERS_CREATE: "users",
   USERS_DETAIL: "users", // append /:id
   USERS_ME: "users/me",
   USERS_ME_UPDATE: "users/me",

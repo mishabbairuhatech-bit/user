@@ -95,7 +95,7 @@ const Pagination = forwardRef(({
             <ChevronDown className={`w-3 h-3 text-gray-500 dark:text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
           </button>
           {isDropdownOpen && (
-            <div className="absolute top-full left-0 mt-1 bg-white dark:bg-[#121212] border border-gray-200 dark:border-[#424242] rounded-md shadow-lg z-50 min-w-full">
+            <div className="absolute bottom-full left-0 mb-1 bg-white dark:bg-[#121212] border border-gray-200 dark:border-[#424242] rounded-md shadow-lg z-50 min-w-full">
               {pageSizeOptions.map((size) => (
                 <button
                   key={size}

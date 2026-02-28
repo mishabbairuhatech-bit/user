@@ -41,7 +41,7 @@ const PageHeader = ({
 
   if (sticky) {
     return (
-      <div className={`sticky top-0 z-10 bg-white dark:bg-[#121212] pb-4 -mt-4 pt-4 lg:-mt-6 lg:pt-6 -mx-4 px-4 lg:-mx-6 lg:px-6 ${className}`}>
+      <div className={`sticky top-0 z-10 bg-white dark:bg-[#121212] pb-1 -mt-4 pt-4 lg:-mt-6 lg:pt-6 -mx-4 px-4 lg:-mx-6 lg:px-6 ${className}`}>
         {content}
       </div>
     );

@@ -1,8 +1,10 @@
-import { Injectable, Inject, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, InternalServerErrorException, ConflictException } from '@nestjs/common';
 import { Op, WhereOptions, literal } from 'sequelize';
+import * as bcrypt from 'bcrypt';
 import { REPOSITORY } from '../common/constants/app.constants';
 import { ERROR_MESSAGES } from '../common/constants/error-messages';
 import { User } from './entities/user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationQueryDto, PaginatedResponseDto } from '../common/dto';
 
@@ -12,6 +14,36 @@ export class UsersService {
     @Inject(REPOSITORY.USERS)
     private readonly userRepository: typeof User,
   ) {}
+
+  async create(dto: CreateUserDto): Promise<User> {
+    try {
+      const existing = await this.userRepository.findOne({
+        where: { email: dto.email.toLowerCase(), is_deleted: false },
+      });
+      if (existing) {
+        throw new ConflictException('A user with this email already exists.');
+      }
+
+      const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '12', 10);
+      const passwordHash = await bcrypt.hash(dto.password, saltRounds);
+
+      const user = await this.userRepository.create({
+        email: dto.email.toLowerCase(),
+        password_hash: passwordHash,
+        first_name: dto.first_name,
+        last_name: dto.last_name,
+        phone: dto.phone || null,
+        timezone: dto.timezone || 'UTC',
+        language: dto.language || 'en',
+      } as any);
+
+      return this.findByIdOrFail(user.id);
+    } catch (error) {
+      if (error instanceof ConflictException) throw error;
+      console.error('UsersService.create error:', error);
+      throw new InternalServerErrorException('Failed to create user.');
+    }
+  }
 
   async findByEmail(email: string): Promise<User | null> {
     try {

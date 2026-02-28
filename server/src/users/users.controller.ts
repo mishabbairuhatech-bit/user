@@ -1,6 +1,7 @@
-import { Controller, Get, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { UserById } from '../common/decorators/user-by-id.decorator';
@@ -19,6 +20,14 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async findAll(@Query() query: PaginationQueryDto) {
     return await this.usersService.findAll(query);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Create a new user' })
+  @ApiResponse({ status: 201, description: 'User created successfully.' })
+  @ApiResponse({ status: 409, description: 'Email already exists.' })
+  async create(@Body() dto: CreateUserDto) {
+    return await this.usersService.create(dto);
   }
 
   @Get('me')

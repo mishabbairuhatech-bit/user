@@ -12,6 +12,7 @@ const Table = forwardRef(({
   sortDirection = null,
   onSort = null,
   onRowClick = null,
+  activeRowId = null,
   selectable = false,
   selectedRows = [],
   onSelectRow = null,
@@ -239,8 +240,10 @@ const Table = forwardRef(({
                   className={`
                     transition-colors border-b border-gray-200 dark:border-[#424242]
                     ${onRowClick ? 'cursor-pointer' : ''}
-                    ${striped && rowIndex % 2 === 1 ? 'bg-gray-50/50 dark:bg-[#2a2a2a]/50' : 'bg-white dark:bg-[#121212]'}
-                    hover:bg-gray-50/50 dark:hover:bg-[#2a2a2a]/50
+                    ${activeRowId && row.id === activeRowId
+                      ? 'bg-gray-100 dark:bg-[#2a2a2a]'
+                      : striped && rowIndex % 2 === 1 ? 'bg-gray-50/50 dark:bg-[#2a2a2a]/50' : 'bg-white dark:bg-[#121212]'}
+                    ${activeRowId && row.id === activeRowId ? '' : 'hover:bg-gray-50/50 dark:hover:bg-[#2a2a2a]/50'}
                   `}
                   onClick={() => onRowClick && onRowClick(row)}
                 >
