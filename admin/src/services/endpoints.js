@@ -17,9 +17,12 @@ const API = {
   GOOGLE_CALLBACK: "auth/google/callback",
 
   // MFA
-  MFA_EMAIL_ENABLE: "mfa/email/enable",
+  MFA_EMAIL_SETUP: "mfa/email/setup",
+  MFA_EMAIL_VERIFY: "mfa/email/verify",
+  MFA_EMAIL_DISABLE: "mfa/email/disable",
   MFA_TOTP_SETUP: "mfa/totp/setup",
   MFA_TOTP_VERIFY: "mfa/totp/verify",
+  MFA_TOTP_DISABLE: "mfa/totp/disable",
   MFA_DISABLE: "mfa/disable",
   MFA_RECOVERY_CODES: "mfa/recovery-codes",
 

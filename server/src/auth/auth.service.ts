@@ -34,7 +34,7 @@ export class AuthService {
     private readonly sessionsService: SessionsService,
     private readonly passwordHistoryService: PasswordHistoryService,
     private readonly emailService: EmailService,
-  ) {}
+  ) { }
 
   async validateUser(email: string, password: string): Promise<User | null> {
     try {
@@ -162,8 +162,7 @@ export class AuthService {
       if (isRecoveryCode) {
         valid = await this.verifyRecoveryCode(user, dto.code.trim());
       } else {
-        const mfaMethod = user.mfa_method || 'email';
-        if (mfaMethod === 'totp') {
+        if (user.totp_mfa_enabled) {
           const { authenticator } = await import('otplib');
           valid = authenticator.verify({ token: dto.code, secret: user.totp_secret });
         } else {

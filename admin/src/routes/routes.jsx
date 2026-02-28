@@ -3,12 +3,21 @@ import { AdminLayout } from '@layouts';
 import { LoginPage } from '@pages/auth';
 import { DashboardPage, UIComponentsPage, UsersPage, UserDetailPage, UserCreatePage, SettingsPage } from '@/pages/admin';
 import PrivateRoute from './PrivateRoute';
+import PublicRoute from './PublicRoute';
+import RootRedirect from './RootRedirect';
 
 const AppRoutes = () => {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <LoginPage />
+          </PublicRoute>
+        }
+      />
 
       {/* Protected Routes */}
       <Route
@@ -28,8 +37,8 @@ const AppRoutes = () => {
         <Route path="settings" element={<SettingsPage />} />
       </Route>
 
-      {/* Redirect root to login or dashboard */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      {/* Redirect root to dashboard if authenticated, otherwise to login */}
+      <Route path="/" element={<RootRedirect />} />
 
       {/* 404 */}
       <Route path="*" element={<Navigate to="/login" replace />} />

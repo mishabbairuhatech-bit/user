@@ -58,6 +58,19 @@ export class DatabaseModule implements OnModuleInit {
           this.logger.warn(`Table "${tableName}" missing — creating...`);
           await model.sync();
           this.logger.log(`Table "${tableName}" created.`);
+        } else {
+          // Table exists, sync with alter to add any missing columns
+          try {
+            await model.sync({ alter: true });
+            this.logger.log(`Table "${tableName}" synced.`);
+          } catch (error: any) {
+            // Ignore "column already exists" errors (PostgreSQL code 42701)
+            if (error?.parent?.code === '42701') {
+              this.logger.log(`Table "${tableName}" synced (columns already exist).`);
+            } else {
+              throw error;
+            }
+          }
         }
       }
 

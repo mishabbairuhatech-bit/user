@@ -37,12 +37,14 @@ const Button = forwardRef(({
   disabled = false,
   loading = false,
   type = 'button',
+  icon: Icon,
   prefixIcon: PrefixIcon,
   suffixIcon: SuffixIcon,
   iconOnly = false,
   ...props
 }, ref) => {
   const sizes = sizeClasses[size] || sizeClasses.md;
+  const IconComponent = Icon || PrefixIcon;
 
   return (
     <button
@@ -51,10 +53,9 @@ const Button = forwardRef(({
       disabled={disabled || loading}
       className={`
         inline-flex items-center justify-center font-medium rounded-3xl
-        outline-none ring-0 shadow-none
-        focus:outline-none focus:ring-0 focus:shadow-none
-        focus-visible:outline-none focus-visible:ring-0 focus-visible:shadow-none
-        active:outline-none active:ring-0
+        outline-none
+        focus:outline-none
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#141414]
         transition-all duration-200
         active:scale-[0.97]
         disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
@@ -70,8 +71,8 @@ const Button = forwardRef(({
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
         </svg>
-      ) : PrefixIcon ? (
-        <PrefixIcon className={`${sizes.icon} ${children ? 'mr-2' : ''}`} />
+      ) : IconComponent ? (
+        <IconComponent className={`${sizes.icon} ${children ? 'mr-2' : ''}`} />
       ) : null}
       {children}
       {SuffixIcon && !loading && (

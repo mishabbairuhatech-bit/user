@@ -87,6 +87,15 @@ export class User extends Model {
   @Column({ type: DataType.STRING(10), allowNull: true })
   mfa_method: string;
 
+  // Separate flags for each MFA method
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  email_mfa_enabled: boolean;
+
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  totp_mfa_enabled: boolean;
+
   @Column({ type: DataType.STRING(6), allowNull: true })
   mfa_code: string;
 

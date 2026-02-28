@@ -4,12 +4,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { REPOSITORY } from '../common/constants/app.constants';
 import { ERROR_MESSAGES } from '../common/constants/error-messages';
 import { LoginSession } from './entities/login-session.entity';
+import { GeolocationService } from '../common/services/geolocation.service';
 
 @Injectable()
 export class SessionsService {
   constructor(
     @Inject(REPOSITORY.LOGIN_SESSIONS)
     private readonly sessionRepository: typeof LoginSession,
+    private readonly geolocationService: GeolocationService,
   ) {}
 
   async createSession(data: {
@@ -25,8 +27,15 @@ export class SessionsService {
       const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
 
       const deviceInfo = this.parseUserAgent(data.userAgent);
+      const location = this.geolocationService.lookup(data.ip);
+      const now = new Date();
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7);
+
+      console.log('Creating session with geolocation data:', {
+        ip: data.ip,
+        location,
+      });
 
       const session = await this.sessionRepository.create({
         id: sessionId,
@@ -38,8 +47,16 @@ export class SessionsService {
         user_agent: data.userAgent,
         os: deviceInfo.os,
         browser: deviceInfo.browser,
+        city: location?.city || null,
+        region: location?.region || null,
+        country: location?.country || null,
+        country_code: location?.country_code || null,
+        latitude: location?.latitude || null,
+        longitude: location?.longitude || null,
+        timezone: location?.timezone || null,
         is_active: true,
-        last_activity_at: new Date(),
+        login_at: now,
+        last_activity_at: now,
         expires_at: expiresAt,
       });
 
@@ -72,6 +89,12 @@ export class SessionsService {
           'ip_address',
           'os',
           'browser',
+          'city',
+          'region',
+          'country',
+          'country_code',
+          'timezone',
+          'login_at',
           'last_activity_at',
           'created_at',
         ],
