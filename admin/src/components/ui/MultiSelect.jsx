@@ -7,8 +7,8 @@ const sizeClasses = {
     label: 'text-[10px]',
     icon: 'w-3.5 h-3.5',
     iconWrapper: 'px-1.5',
-    chip: 'px-1.5 py-0.5 text-[10px]',
-    chipIcon: 'w-2.5 h-2.5',
+    chip: 'px-1 py-0.5 text-[9px]',
+    chipIcon: 'w-2 h-2',
     placeholder: 'px-2',
   },
   md: {
@@ -16,8 +16,8 @@ const sizeClasses = {
     label: 'text-xs',
     icon: 'w-4 h-4',
     iconWrapper: 'px-2',
-    chip: 'px-2 py-1 text-xs',
-    chipIcon: 'w-3 h-3',
+    chip: 'px-1.5 py-0.5 text-[10px]',
+    chipIcon: 'w-2.5 h-2.5',
     placeholder: 'px-3',
   },
   lg: {
@@ -25,8 +25,8 @@ const sizeClasses = {
     label: 'text-sm',
     icon: 'w-5 h-5',
     iconWrapper: 'px-2.5',
-    chip: 'px-2.5 py-1.5 text-sm',
-    chipIcon: 'w-3.5 h-3.5',
+    chip: 'px-2 py-1 text-xs',
+    chipIcon: 'w-3 h-3',
     placeholder: 'px-4',
   }
 };
@@ -119,11 +119,11 @@ const MultiSelect = forwardRef(({
     }
 
     return (
-      <div className="flex flex-wrap items-center gap-1 p-1.5">
+      <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-1 px-1">
         {selectedOptions.map(option => (
           <span
             key={option.value}
-            className={`inline-flex items-center gap-1 bg-primary-100 dark:bg-[#2a2a2a] dark:border dark:border-[#424242] text-primary-700 dark:text-primary-400 rounded-md ${sizes.chip}`}
+            className={`inline-flex items-center gap-1 bg-primary-100 dark:bg-[#2a2a2a] dark:border dark:border-[#424242] text-primary-700 dark:text-primary-400 rounded-md whitespace-nowrap flex-shrink-0 ${sizes.chip}`}
           >
             {option.label}
             <X
@@ -158,7 +158,7 @@ const MultiSelect = forwardRef(({
       <div
         ref={ref}
         className={`
-          w-full border rounded-xl shadow-sm cursor-pointer overflow-hidden
+          w-full border rounded-xl shadow-sm cursor-pointer
           bg-white dark:bg-[#121212] flex items-center
           ${sizes.input}
           ${disabled ? 'bg-gray-100 dark:bg-[#2a2a2a] cursor-not-allowed' : ''}
@@ -168,7 +168,7 @@ const MultiSelect = forwardRef(({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         {...props}
       >
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 overflow-hidden">
           {renderSelectedItems()}
         </div>
         <div
