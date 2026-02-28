@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutGrid,
@@ -13,9 +13,13 @@ import {
   PanelRight,
   Palette,
   X,
+  CircleDollarSign,
+  Paintbrush,
+  ChevronRight,
+  LogOut,
 } from 'lucide-react';
 import { useAuth } from '@hooks';
-import { Tooltip } from '@components/ui';
+import { Tooltip, Dropdown } from '@components/ui';
 
 const menuItems = [
   { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutGrid },
@@ -38,6 +42,19 @@ const generalItems = [
 const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) => {
   const { logout, user } = useAuth();
   const [logoHovered, setLogoHovered] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleMobileNavClick = () => {
     if (isMobile && onCloseMobile) {
@@ -263,30 +280,156 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
       {/* Bottom — User Profile */}
       <div className={`flex-shrink-0 border-t border-gray-100 dark:border-[#2a2a2a] ${isCollapsed ? 'p-2 flex justify-center' : 'p-3'}`}>
         {isCollapsed ? (
-          <Tooltip content={user?.first_name || 'User'} position="right">
-            <div className="w-8 h-8 rounded-full overflow-hidden">
-              <img
-                src={user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'}
-                alt={user?.first_name || 'User'}
-                className="w-full h-full object-cover"
-              />
+          <div ref={userMenuRef} className="relative">
+            <div
+              onClick={() => setUserMenuOpen(!userMenuOpen)}
+              className="w-8 h-8 rounded-full overflow-hidden cursor-pointer bg-primary-700 flex items-center justify-center text-white text-sm font-medium hover:ring-2 hover:ring-primary-500 transition-all"
+            >
+              {user?.first_name ? user.first_name.charAt(0).toUpperCase() : 'M'}
             </div>
-          </Tooltip>
+
+            {/* Dropdown Menu for Collapsed State */}
+            {userMenuOpen && (
+              <div className="absolute bottom-full left-0 mb-2 w-64 py-1 bg-white dark:bg-[#121212] border border-gray-200 dark:border-[#424242] rounded-xl shadow-lg z-50">
+                {/* User Info Header */}
+                <div className="px-4 py-3 border-b border-gray-200 dark:border-[#424242] flex items-center gap-3">
+                  <div className="w-7 h-7 rounded-full bg-primary-700 flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
+                    {user?.first_name ? user.first_name.charAt(0).toUpperCase() : 'M'}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      {user?.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : 'mishab'}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      @{user?.username || 'mishabbairuhatech'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Menu Items */}
+                <button
+                  onClick={() => setUserMenuOpen(false)}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-left text-gray-700 dark:text-[rgba(255,255,255,0.85)] hover:bg-gray-100 dark:hover:bg-[#2a2a2a]"
+                >
+                  <CircleDollarSign className="w-4 h-4" />
+
+                </button>
+                <button
+                  onClick={() => setUserMenuOpen(false)}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-left text-gray-700 dark:text-[rgba(255,255,255,0.85)] hover:bg-gray-100 dark:hover:bg-[#2a2a2a]"
+                >
+                  <Paintbrush className="w-4 h-4" />
+                  Keyboard shortcuts
+                </button>
+                <button
+                  onClick={() => setUserMenuOpen(false)}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-left text-gray-700 dark:text-[rgba(255,255,255,0.85)] hover:bg-gray-100 dark:hover:bg-[#2a2a2a]"
+                >
+                  <HelpCircle className="w-4 h-4" />
+                  <span className="flex-1">Help</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+
+                <div className="my-1 border-t border-gray-200 dark:border-[#424242]" />
+
+                <button
+                  onClick={() => {
+                    logout();
+                    setUserMenuOpen(false);
+                  }}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Log out
+                </button>
+              </div>
+            )}
+          </div>
         ) : (
-          <div className="flex items-center gap-3 px-1">
-            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-              <img
-                src={user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'}
-                alt={user?.first_name || 'User'}
-                className="w-full h-full object-cover"
-              />
+          <div
+            ref={userMenuRef}
+            className="relative w-full"
+          >
+            <div
+              onClick={() => setUserMenuOpen(!userMenuOpen)}
+              className="flex items-center gap-3 px-1 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2a2a2a] transition-colors cursor-pointer"
+            >
+              <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-primary-700 flex items-center justify-center text-white text-sm font-medium">
+                {user?.first_name ? user.first_name.charAt(0).toUpperCase() : 'M'}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                  {user?.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : 'mishab'}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  @{user?.username || 'mishabbairuhatech'}
+                </p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                {user?.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : 'User'}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email || ''}</p>
-            </div>
+
+            {/* Dropdown Menu */}
+            {userMenuOpen && (
+              <div className="absolute bottom-full left-0 right-0 mb-2 py-1 bg-white dark:bg-[#121212] border border-gray-200 dark:border-[#424242] rounded-xl shadow-lg z-50">
+                {/* User Info Header */}
+                <div className="px-4 py-3 border-b border-gray-200 dark:border-[#424242] flex items-center gap-3">
+                  <div className="w-7 h-7 rounded-full bg-primary-700 flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
+                    {user?.first_name ? user.first_name.charAt(0).toUpperCase() : 'M'}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      {user?.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : 'mishab'}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      @{user?.username || 'mishabbairuhatech'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Menu Items */}
+                <button
+                  onClick={() => setUserMenuOpen(false)}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-left text-gray-700 dark:text-[rgba(255,255,255,0.85)] hover:bg-gray-100 dark:hover:bg-[#2a2a2a]"
+                >
+                  <CircleDollarSign className="w-4 h-4" />
+                  Terms and policy
+                </button>
+                <button
+                  onClick={() => setUserMenuOpen(false)}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-left text-gray-700 dark:text-[rgba(255,255,255,0.85)] hover:bg-gray-100 dark:hover:bg-[#2a2a2a]"
+                >
+                  <Paintbrush className="w-4 h-4" />
+                  Keyboard shortcuts
+                </button>
+                <button
+                  onClick={() => setUserMenuOpen(false)}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-left text-gray-700 dark:text-[rgba(255,255,255,0.85)] hover:bg-gray-100 dark:hover:bg-[#2a2a2a]"
+                >
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </button>
+                <button
+                  onClick={() => setUserMenuOpen(false)}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-left text-gray-700 dark:text-[rgba(255,255,255,0.85)] hover:bg-gray-100 dark:hover:bg-[#2a2a2a]"
+                >
+                  <HelpCircle className="w-4 h-4" />
+                  <span className="flex-1">Help</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+
+                <div className="my-1 border-t border-gray-200 dark:border-[#424242]" />
+
+                <button
+                  onClick={() => {
+                    logout();
+                    setUserMenuOpen(false);
+                  }}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Log out
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
