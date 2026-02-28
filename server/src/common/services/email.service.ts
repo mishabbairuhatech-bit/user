@@ -69,4 +69,29 @@ export class EmailService {
       this.logger.error(`Failed to send MFA code to ${to}`, error);
     }
   }
+
+  async sendMfaVerificationEmail(to: string, userName: string, code: string): Promise<void> {
+    try {
+      await this.transporter.sendMail({
+        from: this.configService.smtpFrom,
+        to,
+        subject: 'Verify Your Email for MFA Setup',
+        html: `
+          <h2>Email Verification</h2>
+          <p>Hello ${userName},</p>
+          <p>You are setting up email-based multi-factor authentication (MFA).</p>
+          <p>To verify your email address and complete the setup, please use this code:</p>
+          <h1 style="letter-spacing: 5px; font-size: 32px; text-align: center; background: #f3f4f6; padding: 20px; border-radius: 8px;">${code}</h1>
+          <p>This code will expire in 5 minutes.</p>
+          <p>If you did not request this, please ignore this email or contact support if you're concerned about your account security.</p>
+          <br>
+          <p style="color: #666; font-size: 12px;">This is an automated message. Please do not reply to this email.</p>
+        `,
+      });
+      this.logger.log(`MFA verification email sent to ${to}`);
+    } catch (error) {
+      console.error('EmailService.sendMfaVerificationEmail error:', error);
+      this.logger.error(`Failed to send MFA verification email to ${to}`, error);
+    }
+  }
 }

@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { ArrowUpRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { ArrowUpRight, Shield, Key } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthLayout } from '@layouts';
 import { Button, Input, Checkbox } from '@components/ui';
 import { useAuth } from '@hooks';
+import api from '@services/api';
+import API from '@services/endpoints';
+import { startAuthentication } from '@simplewebauthn/browser';
 
 // Google Icon Component
 const GoogleIcon = () => (
@@ -21,7 +24,19 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [apiError, setApiError] = useState('');
+
+  // MFA state
+  const [mfaRequired, setMfaRequired] = useState(false);
+  const [mfaToken, setMfaToken] = useState('');
+  const [mfaMethod, setMfaMethod] = useState('');
+  const [mfaCode, setMfaCode] = useState('');
+
+  // Passkey state
+  const [showPasskeyLogin, setShowPasskeyLogin] = useState(false);
+  const [passkeyEmail, setPasskeyEmail] = useState('');
+
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -33,7 +48,15 @@ const LoginPage = () => {
     setIsLoading(true);
     setApiError('');
     try {
-      await login(data.email, data.password);
+      const result = await login(data.email, data.password);
+
+      // Check if MFA is required
+      if (result?.mfa_required) {
+        setMfaRequired(true);
+        setMfaToken(result.mfa_token);
+        setMfaMethod(result.mfa_method);
+        setApiError('');
+      }
     } catch (error) {
       const msg = error.response?.data?.message || 'Login failed. Please try again.';
       setApiError(msg);
@@ -42,9 +65,214 @@ const LoginPage = () => {
     }
   };
 
+  const onMfaSubmit = async (e) => {
+    e.preventDefault();
+    if (!mfaCode || mfaCode.length < 6) {
+      setApiError('Please enter a valid code');
+      return;
+    }
+
+    setIsLoading(true);
+    setApiError('');
+    try {
+      await api.post(API.MFA_VERIFY, {
+        mfa_token: mfaToken,
+        code: mfaCode,
+        device_name: 'Web Browser',
+        device_type: 'web',
+      });
+
+      // Fetch user after MFA verification
+      const meRes = await api.get(API.GET_ME);
+      navigate('/admin/dashboard');
+    } catch (error) {
+      const msg = error.response?.data?.message || 'Invalid code. Please try again.';
+      setApiError(msg);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleBackToLogin = () => {
+    setMfaRequired(false);
+    setMfaToken('');
+    setMfaMethod('');
+    setMfaCode('');
+    setApiError('');
+  };
+
   const handleGoogleLogin = () => {
     window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/auth/google`;
   };
+
+  const handlePasskeyLogin = async () => {
+    if (!passkeyEmail || !passkeyEmail.includes('@')) {
+      setApiError('Please enter a valid email address');
+      return;
+    }
+
+    setIsLoading(true);
+    setApiError('');
+
+    try {
+      // Get authentication options from server
+      const optionsRes = await api.post(API.PASSKEY_AUTH_OPTIONS, { email: passkeyEmail });
+      const { options, challenge_id } = optionsRes.data.data || optionsRes.data;
+
+      // Start WebAuthn authentication
+      const authResp = await startAuthentication(options);
+
+      // Verify authentication with server (server sets auth cookies)
+      await api.post(API.PASSKEY_AUTH_VERIFY, {
+        challenge_id,
+        response: authResp,
+        device_name: 'Web Browser',
+        device_type: 'web',
+      });
+
+      // Fetch user data after successful authentication
+      await api.get(API.GET_ME);
+
+      // Login successful - navigate to dashboard
+      navigate('/admin/dashboard');
+    } catch (err) {
+      if (err.name === 'NotAllowedError') {
+        setApiError('Passkey authentication was cancelled');
+      } else {
+        const msg = err.response?.data?.message || 'Passkey login failed. Please try again.';
+        setApiError(msg);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Show Passkey Login screen
+  if (showPasskeyLogin) {
+    const handlePasskeySubmit = (e) => {
+      e.preventDefault();
+      handlePasskeyLogin();
+    };
+
+    return (
+      <AuthLayout>
+        <div className="mb-8 text-center">
+          <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900/20">
+            <Key className="w-8 h-8 text-primary-600 dark:text-primary-400" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Login with Passkey</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Use your device's biometric authentication for secure, passwordless login
+          </p>
+        </div>
+
+        {apiError && (
+          <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm">
+            {apiError}
+          </div>
+        )}
+
+        <form onSubmit={handlePasskeySubmit} className="space-y-5">
+          <Input
+            label="Email address"
+            type="email"
+            value={passkeyEmail}
+            onChange={(e) => setPasskeyEmail(e.target.value)}
+            placeholder="Enter your email"
+            variant="floating"
+            autoFocus
+          />
+
+          <Button
+            type="submit"
+            className="w-full"
+            size="md"
+            loading={isLoading}
+          >
+            Continue with Passkey
+          </Button>
+
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full"
+            size="md"
+            onClick={() => {
+              setShowPasskeyLogin(false);
+              setPasskeyEmail('');
+              setApiError('');
+            }}
+          >
+            Back to Login
+          </Button>
+        </form>
+      </AuthLayout>
+    );
+  }
+
+  // Show MFA verification screen
+  if (mfaRequired) {
+    return (
+      <AuthLayout>
+        <div className="mb-8 text-center">
+          <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/20">
+            <Shield className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Verify Your Identity</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {mfaMethod === 'EMAIL'
+              ? 'Enter the 6-digit code sent to your email'
+              : mfaMethod === 'TOTP'
+              ? 'Enter the 6-digit code from your authenticator app'
+              : 'Enter your verification code'}
+          </p>
+        </div>
+
+        {apiError && (
+          <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm">
+            {apiError}
+          </div>
+        )}
+
+        <form onSubmit={onMfaSubmit} className="space-y-5">
+          <Input
+            label="Verification Code"
+            type="text"
+            maxLength={8}
+            value={mfaCode}
+            onChange={(e) => setMfaCode(e.target.value.replace(/\s/g, ''))}
+            placeholder="000000"
+            variant="floating"
+            className="text-center text-2xl tracking-widest"
+            autoFocus
+          />
+
+          <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
+            Use a recovery code if you can't access your {mfaMethod === 'EMAIL' ? 'email' : 'authenticator app'}
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full"
+            size="md"
+            loading={isLoading}
+          >
+            Verify
+          </Button>
+
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full"
+            size="md"
+            onClick={handleBackToLogin}
+          >
+            Back to Login
+          </Button>
+        </form>
+      </AuthLayout>
+    );
+  }
 
   return (
     <AuthLayout>
@@ -58,11 +286,22 @@ const LoginPage = () => {
       <Button
         variant="outline"
         size="md"
-        className="w-full mb-6"
+        className="w-full mb-3"
         onClick={handleGoogleLogin}
         prefixIcon={GoogleIcon}
       >
         Login with Google
+      </Button>
+
+      {/* Passkey Login Button */}
+      <Button
+        variant="outline"
+        size="md"
+        className="w-full mb-6"
+        onClick={() => setShowPasskeyLogin(true)}
+        prefixIcon={() => <Key className="w-5 h-5" />}
+      >
+        Login with Passkey
       </Button>
 
       {/* Divider */}
@@ -89,6 +328,12 @@ const LoginPage = () => {
           type="email"
           variant="floating"
           error={errors.email?.message}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleSubmit(onSubmit)();
+            }
+          }}
           {...register('email', {
             required: 'Email is required',
             pattern: {
@@ -103,6 +348,12 @@ const LoginPage = () => {
           type="password"
           variant="floating"
           error={errors.password?.message}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleSubmit(onSubmit)();
+            }
+          }}
           {...register('password', {
             required: 'Password is required',
             minLength: {

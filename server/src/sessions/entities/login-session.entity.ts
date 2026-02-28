@@ -44,9 +44,33 @@ export class LoginSession extends Model {
   @Column({ type: DataType.STRING(50), allowNull: true })
   browser: string;
 
+  @Column({ type: DataType.STRING(100), allowNull: true })
+  city: string;
+
+  @Column({ type: DataType.STRING(100), allowNull: true })
+  region: string;
+
+  @Column({ type: DataType.STRING(100), allowNull: true })
+  country: string;
+
+  @Column({ type: DataType.STRING(10), allowNull: true })
+  country_code: string;
+
+  @Column({ type: DataType.FLOAT, allowNull: true })
+  latitude: number;
+
+  @Column({ type: DataType.FLOAT, allowNull: true })
+  longitude: number;
+
+  @Column({ type: DataType.STRING(50), allowNull: true })
+  timezone: string;
+
   @Default(true)
   @Column(DataType.BOOLEAN)
   is_active: boolean;
+
+  @Column({ type: DataType.DATE, allowNull: true })
+  login_at: Date;
 
   @Column({ type: DataType.DATE, allowNull: true })
   last_activity_at: Date;

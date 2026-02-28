@@ -14,14 +14,24 @@ import { RequestUser } from '../common/interfaces/jwt-payload.interface';
 export class MfaController {
   constructor(private readonly mfaService: MfaService) {}
 
-  @Post('email/enable')
+  @Post('email/setup')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Enable email-based MFA' })
-  @ApiResponse({ status: 200, description: 'Email MFA enabled successfully.' })
+  @ApiOperation({ summary: 'Setup email-based MFA (sends verification code)' })
+  @ApiResponse({ status: 200, description: 'Verification code sent to email.' })
   @ApiResponse({ status: 400, description: 'MFA already enabled.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  async enableEmailMfa(@CurrentUser() user: RequestUser) {
-    return await this.mfaService.enableEmailMfa(user.id);
+  async setupEmailMfa(@CurrentUser() user: RequestUser) {
+    return await this.mfaService.setupEmailMfa(user.id);
+  }
+
+  @Post('email/verify')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verify email code to activate email-based MFA' })
+  @ApiResponse({ status: 200, description: 'Email MFA activated. Returns recovery codes.' })
+  @ApiResponse({ status: 400, description: 'Invalid code or no pending setup.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  async verifyEmailMfa(@CurrentUser() user: RequestUser, @Body() dto: VerifyTotpSetupDto) {
+    return await this.mfaService.verifyAndActivateEmailMfa(user.id, dto.code);
   }
 
   @Post('totp/setup')
@@ -44,10 +54,30 @@ export class MfaController {
     return await this.mfaService.verifyAndActivateTotp(user.id, dto.code);
   }
 
+  @Post('email/disable')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Disable email MFA (requires password confirmation)' })
+  @ApiResponse({ status: 200, description: 'Email MFA disabled successfully.' })
+  @ApiResponse({ status: 400, description: 'Invalid password or email MFA not enabled.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  async disableEmailMfa(@CurrentUser() user: RequestUser, @Body() dto: DisableMfaDto) {
+    return await this.mfaService.disableEmailMfa(user.id, dto.password);
+  }
+
+  @Post('totp/disable')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Disable TOTP MFA (requires password confirmation)' })
+  @ApiResponse({ status: 200, description: 'TOTP MFA disabled successfully.' })
+  @ApiResponse({ status: 400, description: 'Invalid password or TOTP MFA not enabled.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  async disableTotpMfa(@CurrentUser() user: RequestUser, @Body() dto: DisableMfaDto) {
+    return await this.mfaService.disableTotpMfa(user.id, dto.password);
+  }
+
   @Post('disable')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Disable MFA (requires password confirmation)' })
-  @ApiResponse({ status: 200, description: 'MFA disabled successfully.' })
+  @ApiOperation({ summary: 'Disable all MFA methods (requires password confirmation)' })
+  @ApiResponse({ status: 200, description: 'All MFA disabled successfully.' })
   @ApiResponse({ status: 400, description: 'Invalid password or MFA not enabled.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async disableMfa(@CurrentUser() user: RequestUser, @Body() dto: DisableMfaDto) {

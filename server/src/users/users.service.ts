@@ -221,7 +221,7 @@ export class UsersService {
 
   async updateMfaSettings(
     userId: string,
-    data: Partial<Pick<User, 'mfa_enabled' | 'mfa_method' | 'mfa_code' | 'mfa_code_expires' | 'totp_secret' | 'recovery_codes'>>,
+    data: Partial<Pick<User, 'mfa_enabled' | 'email_mfa_enabled' | 'totp_mfa_enabled' | 'mfa_method' | 'mfa_code' | 'mfa_code_expires' | 'totp_secret' | 'recovery_codes'>>,
   ): Promise<void> {
     try {
       await this.userRepository.update(data as any, { where: { id: userId } });

@@ -13,6 +13,7 @@ import {
   Square
 } from 'lucide-react';
 import { Card, Button, Avatar, PageHeader } from '@components/ui';
+import { useAuth } from '@hooks';
 
 // Stats data
 const stats = [
@@ -136,6 +137,7 @@ const StripedBar = ({ height, isHighlight }) => {
 };
 
 const DashboardPage = () => {
+  const { user } = useAuth();
   const [time, setTime] = useState({ hours: 1, minutes: 24, seconds: 8 });
 
   // Timer effect
@@ -174,7 +176,7 @@ const DashboardPage = () => {
       {/* Page Header */}
       <PageHeader
         title="Dashboard"
-        subtitle="Plan, prioritize, and accomplish your tasks with ease."
+        subtitle={user ? `Welcome back, ${user.first_name || user.email}! Plan, prioritize, and accomplish your tasks with ease.` : "Plan, prioritize, and accomplish your tasks with ease."}
         breadcrumb={{ items: [{ label: 'Dashboard' }] }}
         sticky
       >

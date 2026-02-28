@@ -79,7 +79,7 @@ const Modal = ({
               {showCloseButton && (
                 <button
                   type="button"
-                  className="p-1 text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-[#2a2a2a]"
+                  className={`p-1 text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-[#2a2a2a] ${!title ? 'ml-auto' : ''}`}
                   onClick={onClose}
                 >
                   <X className="w-5 h-5" />
