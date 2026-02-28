@@ -71,9 +71,8 @@ const AdminLayout = () => {
 
   const sidebarEl = !isMobile && (
     <aside
-      className={`${isSidebarCollapsed || isTablet ? 'w-[60px]' : 'w-[260px]'} flex-shrink-0 h-full ${
-        isRight ? 'border-l' : 'border-r'
-      } border-gray-200 dark:border-[#2a2a2a] transition-all duration-300`}
+      className={`${isSidebarCollapsed || isTablet ? 'w-[60px]' : 'w-[260px]'} flex-shrink-0 h-full ${isRight ? 'border-l' : 'border-r'
+        } border-gray-200 dark:border-[#2a2a2a] transition-all duration-300`}
     >
       <Sidebar
         isCollapsed={isSidebarCollapsed || isTablet}
@@ -89,7 +88,7 @@ const AdminLayout = () => {
     <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
       <Header isMobile={isMobile} onMenuClick={toggleMobileMenu} />
       <main className="flex-1 overflow-y-auto scrollbar-hide">
-        <div className="p-4 lg:p-6">
+        <div className="p-4 lg:p-6 max-w-7xl mx-auto">
           <Outlet />
         </div>
       </main>
@@ -106,15 +105,13 @@ const AdminLayout = () => {
             onClick={closeMobileMenu}
           />
           <div
-            className={`fixed ${isRight ? 'right-0' : 'left-0'} top-0 bottom-0 w-[260px] z-50 ${
-              isRight ? 'border-l' : 'border-r'
-            } border-gray-200 dark:border-[#2a2a2a] bg-white dark:bg-[#171717] transition-transform duration-300 ${
-              isDrawerVisible
+            className={`fixed ${isRight ? 'right-0' : 'left-0'} top-0 bottom-0 w-[260px] z-50 ${isRight ? 'border-l' : 'border-r'
+              } border-gray-200 dark:border-[#2a2a2a] bg-white dark:bg-[#171717] transition-transform duration-300 ${isDrawerVisible
                 ? 'translate-x-0'
                 : isRight
                   ? 'translate-x-full'
                   : '-translate-x-full'
-            }`}
+              }`}
           >
             <Sidebar
               isCollapsed={false}
