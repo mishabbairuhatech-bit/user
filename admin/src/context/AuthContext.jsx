@@ -1,5 +1,4 @@
-import { createContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { createContext, useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import API from '../services/endpoints';
 
@@ -8,7 +7,6 @@ export const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     api.get(API.GET_ME)
@@ -21,15 +19,23 @@ export const AuthProvider = ({ children }) => {
       .finally(() => setLoading(false));
   }, []);
 
-  // Listen for 401 from api interceptor — navigate without page refresh
+  const logout = useCallback(async () => {
+    try {
+      await api.post(API.LOGOUT);
+    } catch {
+      // ignore — clear local state regardless
+    }
+    setUser(null);
+  }, []);
+
+  // Listen for auth:expired from api interceptor (refresh token failed)
   useEffect(() => {
     const handleAuthExpired = () => {
       setUser(null);
-      navigate('/login');
     };
     window.addEventListener('auth:expired', handleAuthExpired);
     return () => window.removeEventListener('auth:expired', handleAuthExpired);
-  }, [navigate]);
+  }, []);
 
   const login = async (email, password) => {
     try {
@@ -45,21 +51,10 @@ export const AuthProvider = ({ children }) => {
       const meRes = await api.get(API.GET_ME);
       setUser(meRes.data.data || meRes.data);
 
-      navigate('/admin/dashboard');
       return data;
     } catch (error) {
       throw error;
     }
-  };
-
-  const logout = async () => {
-    try {
-      await api.post(API.LOGOUT);
-    } catch {
-      // ignore — clear local state regardless
-    }
-    setUser(null);
-    navigate('/login');
   };
 
   const value = {

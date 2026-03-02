@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AppConfigService {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService) { }
 
   // Application
   get appPort(): number {
@@ -44,7 +44,7 @@ export class AppConfigService {
     return this.configService.get<string>('JWT_SECRET', '');
   }
   get jwtExpiresIn(): string {
-    return this.configService.get<string>('JWT_EXPIRES_IN', '15m');
+    return this.configService.get<string>('JWT_EXPIRES_IN', '1m');
   }
   get jwtRefreshSecret(): string {
     return this.configService.get<string>('JWT_REFRESH_SECRET', '');

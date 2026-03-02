@@ -56,6 +56,8 @@ const LoginPage = () => {
         setMfaToken(result.mfa_token);
         setMfaMethod(result.mfa_method);
         setApiError('');
+      } else {
+        navigate('/admin/dashboard');
       }
     } catch (error) {
       const msg = error.response?.data?.message || 'Login failed. Please try again.';
