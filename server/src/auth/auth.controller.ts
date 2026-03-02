@@ -8,6 +8,7 @@ import {
   Res,
   HttpCode,
   HttpStatus,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
@@ -98,12 +99,17 @@ export class AuthController {
     const refreshToken = req.cookies?.refresh_token;
     if (!refreshToken) {
       clearAuthCookies(res);
-      return { message: 'No refresh token provided.' };
+      throw new UnauthorizedException('No refresh token provided.');
     }
 
-    const result = await this.authService.refreshTokens({ refresh_token: refreshToken });
-    setAuthCookies(res, result.access_token, result.refresh_token);
-    return { message: 'Tokens refreshed successfully.' };
+    try {
+      const result = await this.authService.refreshTokens({ refresh_token: refreshToken });
+      setAuthCookies(res, result.access_token, result.refresh_token);
+      return { message: 'Tokens refreshed successfully.' };
+    } catch (error) {
+      clearAuthCookies(res);
+      throw error;
+    }
   }
 
   @Public()
