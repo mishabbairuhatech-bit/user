@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { AdminLayout } from '@layouts';
 import { LoginPage } from '@pages/auth';
 import { DashboardPage, UIComponentsPage, UsersPage, UserDetailPage, UserCreatePage, SettingsPage } from '@/pages/admin';
+import CookiePolicyPage from '@pages/CookiePolicyPage';
 import PrivateRoute from './PrivateRoute';
 import PublicRoute from './PublicRoute';
 import RootRedirect from './RootRedirect';
@@ -18,6 +19,9 @@ const AppRoutes = () => {
           </PublicRoute>
         }
       />
+
+      {/* Cookie Policy - Public */}
+      <Route path="/cookie-policy" element={<CookiePolicyPage />} />
 
       {/* Protected Routes */}
       <Route

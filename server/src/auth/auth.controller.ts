@@ -20,6 +20,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { VerifyMfaDto } from './dto/verify-mfa.dto';
+import { GoogleOneTapDto } from './dto/google-one-tap.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { Public } from '../common/decorators/public.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -224,5 +225,33 @@ export class AuthController {
       });
       return res.redirect(`${this.configService.frontendUrl}/login?${params.toString()}`);
     }
+  }
+
+  @Public()
+  @Post('google/one-tap')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @ApiOperation({ summary: 'Login with Google One Tap credential' })
+  @ApiBody({ type: GoogleOneTapDto })
+  @ApiResponse({ status: 200, description: 'Login successful. Sets tokens in httpOnly cookies.' })
+  @ApiResponse({ status: 401, description: 'Invalid credential or no account found.' })
+  async googleOneTap(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+    @Body() dto: GoogleOneTapDto,
+  ) {
+    const ip = req.ip || req.socket.remoteAddress || '';
+    const userAgent = req.headers['user-agent'] || '';
+
+    const result = await this.authService.googleOneTapLogin(dto, ip, userAgent);
+
+    // MFA required — no cookies to set yet
+    if ('mfa_required' in result) {
+      return result;
+    }
+
+    setAuthCookies(res, result.access_token, result.refresh_token);
+    const { access_token, refresh_token, ...data } = result;
+    return data;
   }
 }

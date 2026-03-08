@@ -57,12 +57,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Fetch user profile (used after OAuth/One Tap login)
+  const fetchUser = useCallback(async () => {
+    try {
+      const meRes = await api.get(API.GET_ME);
+      setUser(meRes.data.data || meRes.data);
+      return meRes.data.data || meRes.data;
+    } catch (error) {
+      setUser(null);
+      throw error;
+    }
+  }, []);
+
   const value = {
     user,
     loading,
     isAuthenticated: !!user,
     login,
     logout,
+    fetchUser,
   };
 
   return (
