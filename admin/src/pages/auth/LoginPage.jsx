@@ -35,6 +35,9 @@ const LoginPage = () => {
   const [showPasskeyLogin, setShowPasskeyLogin] = useState(false);
   const [passkeyEmail, setPasskeyEmail] = useState('');
 
+  // Geolocation state
+  const [userLocation, setUserLocation] = useState({ latitude: null, longitude: null });
+
   const { login, fetchUser } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -56,6 +59,29 @@ const LoginPage = () => {
     }
   }, [searchParams, setSearchParams]);
 
+  // Get user's geolocation on page load
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const coords = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          };
+          console.log('Geolocation captured:', coords);
+          setUserLocation(coords);
+        },
+        (error) => {
+          console.log('Geolocation error:', error.code, error.message);
+          // Continue without location - it's optional
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+      );
+    } else {
+      console.log('Geolocation not supported');
+    }
+  }, []);
+
   // Google One Tap callback handler
   const handleGoogleOneTapCallback = useCallback(async (response) => {
     setIsLoading(true);
@@ -65,6 +91,8 @@ const LoginPage = () => {
         credential: response.credential,
         device_name: 'Web Browser',
         device_type: 'web',
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
       });
 
       const data = result.data?.data || result.data;
@@ -86,7 +114,7 @@ const LoginPage = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [navigate, fetchUser]);
+  }, [navigate, fetchUser, userLocation]);
 
   // Initialize Google One Tap
   useEffect(() => {
@@ -133,8 +161,14 @@ const LoginPage = () => {
   const onSubmit = async (data) => {
     setIsLoading(true);
     setApiError('');
+    console.log('Login with location:', userLocation);
     try {
-      const result = await login(data.email, data.password);
+      const result = await login(data.email, data.password, {
+        device_name: 'Web Browser',
+        device_type: 'web',
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
+      });
 
       // Check if MFA is required
       if (result?.mfa_required) {
@@ -168,6 +202,8 @@ const LoginPage = () => {
         code: mfaCode,
         device_name: 'Web Browser',
         device_type: 'web',
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
       });
 
       // Fetch user after MFA verification
@@ -216,6 +252,8 @@ const LoginPage = () => {
         response: authResp,
         device_name: 'Web Browser',
         device_type: 'web',
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
       });
 
       // Fetch user data after successful authentication
@@ -225,9 +263,15 @@ const LoginPage = () => {
       navigate('/admin/dashboard');
     } catch (err) {
       if (err.name === 'NotAllowedError') {
-        setApiError('Passkey authentication was cancelled');
+        setApiError('Passkey authentication was cancelled. Please try again.');
+      } else if (err.name === 'NotSupportedError') {
+        setApiError('Passkeys are not supported on this device or browser.');
+      } else if (err.name === 'SecurityError') {
+        setApiError('Security error. Make sure you are using HTTPS or localhost.');
+      } else if (err.name === 'AbortError') {
+        setApiError('Authentication was aborted. Please try again.');
       } else {
-        const msg = err.response?.data?.message || 'Passkey login failed. Please try again.';
+        const msg = err.response?.data?.message || err.message || 'Passkey login failed. Please try again.';
         setApiError(msg);
       }
     } finally {

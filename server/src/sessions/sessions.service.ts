@@ -20,22 +20,73 @@ export class SessionsService {
     userAgent: string;
     deviceName?: string;
     deviceType?: string;
+    latitude?: number;
+    longitude?: number;
   }): Promise<{ session: LoginSession; refreshToken: string }> {
     try {
+      console.log('=== CREATE SESSION ===');
+      console.log('Received data:', {
+        userId: data.userId,
+        ip: data.ip,
+        deviceName: data.deviceName,
+        deviceType: data.deviceType,
+        latitude: data.latitude,
+        longitude: data.longitude,
+        hasLatitude: data.latitude !== undefined && data.latitude !== null,
+        hasLongitude: data.longitude !== undefined && data.longitude !== null,
+      });
+
       const sessionId = uuidv4();
       const refreshToken = uuidv4();
       const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
 
       const deviceInfo = this.parseUserAgent(data.userAgent);
-      const location = this.geolocationService.lookup(data.ip);
       const now = new Date();
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7);
 
-      console.log('Creating session with geolocation data:', {
-        ip: data.ip,
-        location,
-      });
+      let city: string | null = null;
+      let region: string | null = null;
+      let country: string | null = null;
+      let countryCode: string | null = null;
+      let latitude: number | null = null;
+      let longitude: number | null = null;
+      let timezone: string | null = null;
+
+      // If client provided lat/long, use reverse geocoding to get location details
+      if (data.latitude && data.longitude) {
+        const reverseGeoResult = await this.geolocationService.reverseGeocode(
+          data.latitude,
+          data.longitude,
+        );
+        city = reverseGeoResult.city;
+        region = reverseGeoResult.region;
+        country = reverseGeoResult.country;
+        countryCode = reverseGeoResult.country_code;
+        latitude = data.latitude;
+        longitude = data.longitude;
+        timezone = reverseGeoResult.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        console.log('Using reverse geocoding from client coordinates:', {
+          clientCoords: { lat: data.latitude, lon: data.longitude },
+          result: reverseGeoResult,
+        });
+      } else {
+        // Fall back to IP-based geolocation
+        const ipLocation = this.geolocationService.lookup(data.ip);
+        city = ipLocation?.city || null;
+        region = ipLocation?.region || null;
+        country = ipLocation?.country || null;
+        countryCode = ipLocation?.country_code || null;
+        latitude = ipLocation?.latitude || null;
+        longitude = ipLocation?.longitude || null;
+        timezone = ipLocation?.timezone || null;
+
+        console.log('Using IP-based geolocation:', {
+          ip: data.ip,
+          result: ipLocation,
+        });
+      }
 
       const session = await this.sessionRepository.create({
         id: sessionId,
@@ -47,13 +98,13 @@ export class SessionsService {
         user_agent: data.userAgent,
         os: deviceInfo.os,
         browser: deviceInfo.browser,
-        city: location?.city || null,
-        region: location?.region || null,
-        country: location?.country || null,
-        country_code: location?.country_code || null,
-        latitude: location?.latitude || null,
-        longitude: location?.longitude || null,
-        timezone: location?.timezone || null,
+        city,
+        region,
+        country,
+        country_code: countryCode,
+        latitude,
+        longitude,
+        timezone,
         is_active: true,
         login_at: now,
         last_activity_at: now,
@@ -93,6 +144,8 @@ export class SessionsService {
           'region',
           'country',
           'country_code',
+          'latitude',
+          'longitude',
           'timezone',
           'login_at',
           'last_activity_at',

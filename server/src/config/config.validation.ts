@@ -48,4 +48,7 @@ export const configValidationSchema = Joi.object({
   SMTP_USER: Joi.string().default(''),
   SMTP_PASS: Joi.string().default(''),
   SMTP_FROM: Joi.string().default('noreply@yourapp.com'),
+
+  // Google Maps
+  GOOGLE_MAPS_API_KEY: Joi.string().allow('').default(''),
 });

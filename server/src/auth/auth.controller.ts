@@ -34,7 +34,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: AppConfigService,
-  ) {}
+  ) { }
 
   @Public()
   @Post('login')
@@ -116,7 +116,7 @@ export class AuthController {
   @Public()
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
-  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @ApiOperation({ summary: 'Request a password reset email' })
   @ApiResponse({ status: 200, description: 'Password reset email sent (if account exists).' })
   @ApiResponse({ status: 429, description: 'Too many reset requests.' })

@@ -1,7 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AdminLayout } from '@layouts';
-import { LoginPage } from '@pages/auth';
+import { LoginPage, ChangePasswordPage, ForgotPasswordPage, ResetPasswordPage } from '@pages/auth';
 import { DashboardPage, UIComponentsPage, UsersPage, UserDetailPage, UserCreatePage, SettingsPage } from '@/pages/admin';
+import { POSPage } from '@/pages/pos';
 import CookiePolicyPage from '@pages/CookiePolicyPage';
 import PrivateRoute from './PrivateRoute';
 import PublicRoute from './PublicRoute';
@@ -20,8 +21,48 @@ const AppRoutes = () => {
         }
       />
 
+      {/* Forgot Password - Public */}
+      <Route
+        path="/forgot-password"
+        element={
+          <PublicRoute>
+            <ForgotPasswordPage />
+          </PublicRoute>
+        }
+      />
+
+      {/* Reset Password - Public */}
+      <Route
+        path="/reset-password"
+        element={
+          <PublicRoute>
+            <ResetPasswordPage />
+          </PublicRoute>
+        }
+      />
+
       {/* Cookie Policy - Public */}
       <Route path="/cookie-policy" element={<CookiePolicyPage />} />
+
+      {/* Change Password - Protected but uses AuthLayout */}
+      <Route
+        path="/change-password"
+        element={
+          <PrivateRoute>
+            <ChangePasswordPage />
+          </PrivateRoute>
+        }
+      />
+
+      {/* POS - Protected, full screen */}
+      <Route
+        path="/pos"
+        element={
+          <PrivateRoute>
+            <POSPage />
+          </PrivateRoute>
+        }
+      />
 
       {/* Protected Routes */}
       <Route

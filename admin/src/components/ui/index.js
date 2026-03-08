@@ -12,6 +12,7 @@ export { default as Radio, RadioGroup } from './Radio';
 export { default as Switch } from './Switch';
 export { default as Textarea } from './Textarea';
 export { default as Modal } from './Modal';
+export { default as ConfirmModal } from './ConfirmModal';
 export { default as Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
 export { default as Badge } from './Badge';
 export { default as Alert } from './Alert';

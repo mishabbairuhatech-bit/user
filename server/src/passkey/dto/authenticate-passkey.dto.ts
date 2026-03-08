@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsObject, IsOptional, IsString, IsNumber } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class AuthenticatePasskeyOptionsDto {
@@ -28,4 +28,14 @@ export class AuthenticatePasskeyVerifyDto {
   @IsOptional()
   @IsString()
   device_type?: string;
+
+  @ApiPropertyOptional({ example: 40.7128, description: 'Latitude from browser geolocation' })
+  @IsOptional()
+  @IsNumber()
+  latitude?: number;
+
+  @ApiPropertyOptional({ example: -74.006, description: 'Longitude from browser geolocation' })
+  @IsOptional()
+  @IsNumber()
+  longitude?: number;
 }

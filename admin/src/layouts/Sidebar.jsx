@@ -19,7 +19,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import { useAuth } from '@hooks';
-import { Tooltip, Dropdown } from '@components/ui';
+import { Tooltip, Dropdown, ConfirmModal } from '@components/ui';
 
 const menuItems = [
   { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutGrid },
@@ -43,6 +43,7 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
   const { logout, user } = useAuth();
   const [logoHovered, setLogoHovered] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const userMenuRef = useRef(null);
 
   useEffect(() => {
@@ -65,11 +66,11 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
   return (
     <aside className={`h-full w-full flex flex-col transition-colors duration-300 ${isCollapsed ? 'bg-white dark:bg-[#121212]' : 'bg-white dark:bg-[#171717]'}`}>
       {/* Top — Logo & Toggle */}
-      <div className={`group/top h-14 flex items-center flex-shrink-0 ${isCollapsed ? 'justify-center px-2' : 'justify-between px-4'}`}>
+      <div className={`group/top h-14 flex items-center flex-shrink-0 ${isCollapsed ? 'justify-center px-0.5' : 'justify-between px-4'}`}>
         {isCollapsed && isTablet ? (
           /* Tablet collapsed: just logo, no hover icon */
-          <div className="w-9 h-9 flex items-center justify-center">
-            <svg viewBox="0 0 40 40" className="w-8 h-8">
+          <div className="w-8 h-8 flex items-center justify-center">
+            <svg viewBox="0 0 40 40" className="w-5 h-5">
               <circle cx="20" cy="20" r="17" fill="none" className="stroke-primary-700" strokeWidth="2.5" />
               <circle cx="20" cy="20" r="9" fill="none" className="stroke-primary-700" strokeWidth="2.5" />
               <circle cx="20" cy="20" r="2.5" className="fill-primary-700" />
@@ -82,12 +83,12 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
               onClick={onToggle}
               onMouseEnter={() => setLogoHovered(true)}
               onMouseLeave={() => setLogoHovered(false)}
-              className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-[#2a2a2a] transition-colors cursor-pointer"
+              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-[#2a2a2a] transition-colors cursor-pointer"
             >
               {logoHovered ? (
                 <PanelRight size={18} className="text-gray-500 dark:text-gray-400" />
               ) : (
-                <svg viewBox="0 0 40 40" className="w-8 h-8">
+                <svg viewBox="0 0 40 40" className="w-5 h-5">
                   <circle cx="20" cy="20" r="17" fill="none" className="stroke-primary-700" strokeWidth="2.5" />
                   <circle cx="20" cy="20" r="9" fill="none" className="stroke-primary-700" strokeWidth="2.5" />
                   <circle cx="20" cy="20" r="2.5" className="fill-primary-700" />
@@ -138,14 +139,14 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
             <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Menu</span>
           </div>
         )}
-        <ul className={`space-y-0.5 ${isCollapsed ? 'px-2 flex flex-col items-center' : 'px-2'} mb-4`}>
+        <ul className={`space-y-0.5 ${isCollapsed ? 'px-0.5 flex flex-col items-center' : 'px-2'} mb-4`}>
           {menuItems.map((item) => {
             const link = (
               <NavLink
                 to={item.path}
                 onClick={handleMobileNavClick}
                 className={({ isActive }) =>
-                  `flex items-center ${isCollapsed ? 'justify-center w-10 h-10' : 'gap-3 px-3 py-2 w-full'} rounded-lg transition-colors ${isActive
+                  `flex items-center ${isCollapsed ? 'justify-center w-8 h-8' : 'gap-3 px-3 py-2 w-full'} rounded-lg transition-colors ${isActive
                     ? 'bg-gray-100 dark:bg-[#2a2a2a] text-primary-700 dark:text-primary-400 font-medium'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'
                   }`
@@ -191,14 +192,14 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
             <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Users</span>
           </div>
         )}
-        <ul className={`space-y-0.5 ${isCollapsed ? 'px-2 flex flex-col items-center' : 'px-2'} mb-4`}>
+        <ul className={`space-y-0.5 ${isCollapsed ? 'px-0.5 flex flex-col items-center' : 'px-2'} mb-4`}>
           {userItems.map((item) => {
             const link = (
               <NavLink
                 to={item.path}
                 onClick={handleMobileNavClick}
                 className={({ isActive }) =>
-                  `flex items-center ${isCollapsed ? 'justify-center w-10 h-10' : 'gap-3 px-3 py-2 w-full'} rounded-lg transition-colors ${isActive
+                  `flex items-center ${isCollapsed ? 'justify-center w-8 h-8' : 'gap-3 px-3 py-2 w-full'} rounded-lg transition-colors ${isActive
                     ? 'bg-gray-100 dark:bg-[#2a2a2a] text-primary-700 dark:text-primary-400 font-medium'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'
                   }`
@@ -239,14 +240,14 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
             <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">General</span>
           </div>
         )}
-        <ul className={`space-y-0.5 ${isCollapsed ? 'px-2 flex flex-col items-center' : 'px-2'}`}>
+        <ul className={`space-y-0.5 ${isCollapsed ? 'px-0.5 flex flex-col items-center' : 'px-2'}`}>
           {generalItems.map((item) => {
             const link = (
               <NavLink
                 to={item.path}
                 onClick={handleMobileNavClick}
                 className={({ isActive }) =>
-                  `flex items-center ${isCollapsed ? 'justify-center w-10 h-10' : 'gap-3 px-3 py-2 w-full'} rounded-lg transition-colors ${isActive
+                  `flex items-center ${isCollapsed ? 'justify-center w-8 h-8' : 'gap-3 px-3 py-2 w-full'} rounded-lg transition-colors ${isActive
                     ? 'bg-gray-100 dark:bg-[#2a2a2a] text-primary-700 dark:text-primary-400 font-medium'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'
                   }`
@@ -278,12 +279,12 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
       </nav>
 
       {/* Bottom — User Profile */}
-      <div className={`flex-shrink-0 ${isCollapsed ? 'p-2 flex justify-center' : 'py-1 px-2'}`}>
+      <div className={`flex-shrink-0 ${isCollapsed ? 'px-0.5 py-2 flex justify-center' : 'py-1 px-2'}`}>
         {isCollapsed ? (
           <div ref={userMenuRef} className="relative">
             <div
               onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="w-8 h-8 rounded-full overflow-hidden cursor-pointer bg-primary-700 flex items-center justify-center text-white text-sm font-medium hover:ring-2 hover:ring-primary-500 transition-all"
+              className="w-7 h-7 rounded-full overflow-hidden cursor-pointer bg-primary-700 flex items-center justify-center text-white text-[10px] font-medium hover:ring-2 hover:ring-primary-500 transition-all"
             >
               {user?.first_name ? user.first_name.charAt(0).toUpperCase() : 'M'}
             </div>
@@ -334,8 +335,8 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
 
                 <button
                   onClick={() => {
-                    logout();
                     setUserMenuOpen(false);
+                    setShowLogoutModal(true);
                   }}
                   className="w-full flex items-center gap-2 px-4 py-2 text-sm text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                 >
@@ -420,8 +421,8 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
 
                 <button
                   onClick={() => {
-                    logout();
                     setUserMenuOpen(false);
+                    setShowLogoutModal(true);
                   }}
                   className="w-full flex items-center gap-2 px-4 py-2 text-sm text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                 >
@@ -433,6 +434,20 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
           </div>
         )}
       </div>
+
+      {/* Logout Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={() => {
+          logout();
+          setShowLogoutModal(false);
+        }}
+        title="Log Out"
+        message="Are you sure you want to log out?"
+        variant="danger"
+        confirmText="Log Out"
+      />
     </aside>
   );
 };

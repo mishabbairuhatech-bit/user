@@ -37,9 +37,18 @@ export const AuthProvider = ({ children }) => {
     return () => window.removeEventListener('auth:expired', handleAuthExpired);
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email, password, options = {}) => {
     try {
-      const res = await api.post(API.LOGIN, { email, password });
+      const payload = {
+        email,
+        password,
+        device_name: options.device_name || 'Web Browser',
+        device_type: options.device_type || 'web',
+        latitude: options.latitude || null,
+        longitude: options.longitude || null,
+      };
+      console.log('Login API payload:', { ...payload, password: '***' });
+      const res = await api.post(API.LOGIN, payload);
       const data = res.data.data || res.data;
 
       // MFA required — return the mfa payload so LoginPage can handle it

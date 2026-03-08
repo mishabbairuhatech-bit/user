@@ -51,7 +51,7 @@ const Modal = ({
   if (!isOpen) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto scrollbar-hide">
       {/* Overlay */}
       <div
         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
@@ -64,7 +64,7 @@ const Modal = ({
           ref={modalRef}
           tabIndex={-1}
           className={`
-            relative w-full ${sizes[size]} bg-white dark:bg-[#121212] rounded-xl shadow-xl border border-transparent dark:border-[#424242]
+            relative w-full ${sizes[size]} bg-white dark:bg-[#121212] rounded-xl shadow-xl
             transform transition-all
             ${className}
           `}

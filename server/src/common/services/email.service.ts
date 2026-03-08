@@ -43,8 +43,8 @@ export class EmailService {
       });
       this.logger.log(`Password reset email sent to ${to}`);
     } catch (error) {
-      console.error('EmailService.sendPasswordResetEmail error:', error);
       this.logger.error(`Failed to send password reset email to ${to}`, error);
+      throw new Error('Failed to send password reset email. Please try again later.');
     }
   }
 
@@ -65,8 +65,8 @@ export class EmailService {
       });
       this.logger.log(`MFA code sent to ${to}`);
     } catch (error) {
-      console.error('EmailService.sendMfaCode error:', error);
       this.logger.error(`Failed to send MFA code to ${to}`, error);
+      throw new Error('Failed to send verification code. Please try again later.');
     }
   }
 
@@ -90,8 +90,8 @@ export class EmailService {
       });
       this.logger.log(`MFA verification email sent to ${to}`);
     } catch (error) {
-      console.error('EmailService.sendMfaVerificationEmail error:', error);
       this.logger.error(`Failed to send MFA verification email to ${to}`, error);
+      throw new Error('Failed to send verification email. Please try again later.');
     }
   }
 }

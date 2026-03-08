@@ -119,4 +119,9 @@ export class AppConfigService {
   get smtpFrom(): string {
     return this.configService.get<string>('SMTP_FROM', 'noreply@yourapp.com');
   }
+
+  // Google Maps
+  get googleMapsApiKey(): string {
+    return this.configService.get<string>('GOOGLE_MAPS_API_KEY', '');
+  }
 }

@@ -130,7 +130,7 @@ export class AuthService {
         };
       }
 
-      return await this.completeLogin(user, loginDto, ip, userAgent);
+      return await this.completeLogin(user, loginDto, ip, userAgent, loginDto.latitude, loginDto.longitude);
     } catch (error) {
       console.error('AuthService.login error:', error);
       if (error instanceof UnauthorizedException || error instanceof BadRequestException) throw error;
@@ -196,9 +196,11 @@ export class AuthService {
         password: '',
         device_name: dto.device_name,
         device_type: dto.device_type,
+        latitude: dto.latitude,
+        longitude: dto.longitude,
       };
 
-      return await this.completeLogin(user, loginDto, ip, userAgent);
+      return await this.completeLogin(user, loginDto, ip, userAgent, dto.latitude, dto.longitude);
     } catch (error) {
       console.error('AuthService.verifyMfaLogin error:', error);
       if (error instanceof UnauthorizedException || error instanceof BadRequestException) throw error;
@@ -316,9 +318,11 @@ export class AuthService {
         password: '',
         device_name: dto.device_name || 'Google One Tap',
         device_type: dto.device_type || 'web',
+        latitude: dto.latitude,
+        longitude: dto.longitude,
       };
 
-      return await this.completeLogin(user, loginDto, ip, userAgent);
+      return await this.completeLogin(user, loginDto, ip, userAgent, dto.latitude, dto.longitude);
     } catch (error) {
       console.error('AuthService.googleOneTapLogin error:', error);
       if (error instanceof UnauthorizedException) throw error;
@@ -393,8 +397,17 @@ export class AuthService {
     try {
       const user = await this.usersService.findByEmail(dto.email);
       if (!user) {
-        // Return success even if not found to prevent email enumeration
-        return { message: 'If an account exists with this email, a password reset link has been sent.' };
+        throw new BadRequestException(ERROR_MESSAGES.INVALID_EMAIL);
+      }
+
+      // Check if account is active
+      if (!user.is_active) {
+        throw new BadRequestException(ERROR_MESSAGES.ACCOUNT_DEACTIVATED);
+      }
+
+      // Check if account is soft-deleted
+      if (user.is_deleted) {
+        throw new BadRequestException(ERROR_MESSAGES.ACCOUNT_NOT_FOUND);
       }
 
       const resetToken = uuidv4();
@@ -405,10 +418,13 @@ export class AuthService {
       await this.usersService.setPasswordResetToken(user.id, hashedToken, expires);
       await this.emailService.sendPasswordResetEmail(user.email, user.first_name, resetToken);
 
-      return { message: 'If an account exists with this email, a password reset link has been sent.' };
+      return { message: 'Password reset link has been sent to your email.' };
     } catch (error) {
       console.error('AuthService.forgotPassword error:', error);
-      throw new InternalServerErrorException('Failed to process forgot password request.');
+      if (error instanceof BadRequestException) throw error;
+      throw new InternalServerErrorException(
+        error.message || 'Failed to send password reset email. Please try again later.'
+      );
     }
   }
 
@@ -538,7 +554,7 @@ export class AuthService {
 
   // ── Private helpers ──
 
-  private async completeLogin(user: User, loginDto: LoginDto, ip: string, userAgent: string) {
+  private async completeLogin(user: User, loginDto: LoginDto, ip: string, userAgent: string, latitude?: number, longitude?: number) {
     try {
       const { session, refreshToken } = await this.sessionsService.createSession({
         userId: user.id,
@@ -546,6 +562,8 @@ export class AuthService {
         userAgent,
         deviceName: loginDto.device_name,
         deviceType: loginDto.device_type,
+        latitude,
+        longitude,
       });
 
       await this.usersService.updateLastLogin(user.id);

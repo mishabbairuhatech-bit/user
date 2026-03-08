@@ -97,6 +97,8 @@ export class PasskeyController {
       userAgent,
       dto.device_name,
       dto.device_type,
+      dto.latitude,
+      dto.longitude,
     );
 
     setAuthCookies(res, result.access_token, result.refresh_token);

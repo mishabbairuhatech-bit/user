@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { ChevronRight, Smartphone, Mail, Key, Shield, QrCode, Copy, Check, Monitor, Laptop, TabletSmartphone, Globe, ArrowRight, MapPin, Clock } from 'lucide-react';
-import { Switch, Modal, Button, Input } from '@components/ui';
+import { useNavigate } from 'react-router-dom';
+import { ChevronRight, Smartphone, Mail, Key, Shield, QrCode, Copy, Check, Monitor, Laptop, TabletSmartphone, Globe, ArrowRight, MapPin, Clock, Trash2 } from 'lucide-react';
+import { Switch, Modal, Button, Input, ConfirmModal } from '@components/ui';
 import { useAuth } from '@hooks';
 import api from '@services/api';
 import API from '@services/endpoints';
@@ -8,6 +9,7 @@ import { startRegistration, startAuthentication } from '@simplewebauthn/browser'
 
 const SecuritySettings = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   // State
   const [mfaEnabled, setMfaEnabled] = useState(false);
@@ -20,13 +22,20 @@ const SecuritySettings = () => {
   const [mfaTypeToDisable, setMfaTypeToDisable] = useState(null); // 'email' or 'totp'
 
   // Modals
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showAuthenticatorModal, setShowAuthenticatorModal] = useState(false);
   const [showEmailMfaModal, setShowEmailMfaModal] = useState(false);
   const [showPasskeyModal, setShowPasskeyModal] = useState(false);
   const [showRecoveryCodesModal, setShowRecoveryCodesModal] = useState(false);
   const [showDisableMfaModal, setShowDisableMfaModal] = useState(false);
   const [showTrustedDevicesModal, setShowTrustedDevicesModal] = useState(false);
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    variant: 'danger',
+    confirmText: 'Confirm',
+    onConfirm: () => {},
+  });
 
   // Data
   const [qrCode, setQrCode] = useState('');
@@ -40,6 +49,7 @@ const SecuritySettings = () => {
   const [passkeyName, setPasskeyName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [emailSent, setEmailSent] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -142,11 +152,13 @@ const SecuritySettings = () => {
     setShowEmailMfaModal(true);
     setTotpCode('');
     setError('');
+    setEmailSent(false);
     setLoading(true);
 
     try {
-      const res = await api.post(API.MFA_EMAIL_SETUP);
+      await api.post(API.MFA_EMAIL_SETUP);
       // Email sent successfully
+      setEmailSent(true);
       setLoading(false);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to send verification email');
@@ -236,24 +248,39 @@ const SecuritySettings = () => {
       await loadPasskeys();
     } catch (err) {
       if (err.name === 'NotAllowedError') {
-        setError('Passkey registration was cancelled or not allowed');
+        setError('Passkey registration was cancelled. Please make sure Windows Hello or another authenticator is set up on your device.');
+      } else if (err.name === 'NotSupportedError') {
+        setError('Passkeys are not supported on this device or browser.');
+      } else if (err.name === 'SecurityError') {
+        setError('Security error. Make sure you are using HTTPS or localhost.');
+      } else if (err.name === 'InvalidStateError') {
+        setError('This passkey is already registered on your account.');
       } else {
-        setError(err.response?.data?.message || 'Failed to register passkey');
+        setError(err.response?.data?.message || err.message || 'Failed to register passkey');
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeletePasskey = async (passkeyId) => {
-    if (!confirm('Are you sure you want to remove this passkey?')) return;
-
-    try {
-      await api.delete(`${API.PASSKEY_DELETE}/${passkeyId}`);
-      await loadPasskeys();
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to delete passkey');
-    }
+  const handleDeletePasskey = (passkeyId) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Remove Passkey',
+      message: 'Are you sure you want to remove this passkey?',
+      variant: 'danger',
+      confirmText: 'Remove',
+      onConfirm: async () => {
+        try {
+          await api.delete(`${API.PASSKEY_DELETE}/${passkeyId}`);
+          await loadPasskeys();
+          setConfirmModal(prev => ({ ...prev, isOpen: false }));
+        } catch (err) {
+          alert(err.response?.data?.message || 'Failed to delete passkey');
+          setConfirmModal(prev => ({ ...prev, isOpen: false }));
+        }
+      },
+    });
   };
 
   // ─── Disable MFA ────────────────────────────────────────────────────
@@ -308,17 +335,26 @@ const SecuritySettings = () => {
 
   // ─── Recovery Codes ─────────────────────────────────────────────────
 
-  const handleRegenerateRecoveryCodes = async () => {
-    if (!confirm('This will invalidate your existing recovery codes. Continue?')) return;
-
-    try {
-      const res = await api.post(API.MFA_RECOVERY_CODES);
-      const data = res.data.data || res.data;
-      setRecoveryCodes(data.recovery_codes || []);
-      setShowRecoveryCodesModal(true);
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to regenerate recovery codes');
-    }
+  const handleRegenerateRecoveryCodes = () => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Regenerate Recovery Codes',
+      message: 'This will invalidate your existing recovery codes. Continue?',
+      variant: 'warning',
+      confirmText: 'Regenerate',
+      onConfirm: async () => {
+        try {
+          const res = await api.post(API.MFA_RECOVERY_CODES);
+          const data = res.data.data || res.data;
+          setRecoveryCodes(data.recovery_codes || []);
+          setConfirmModal(prev => ({ ...prev, isOpen: false }));
+          setShowRecoveryCodesModal(true);
+        } catch (err) {
+          alert(err.response?.data?.message || 'Failed to regenerate recovery codes');
+          setConfirmModal(prev => ({ ...prev, isOpen: false }));
+        }
+      },
+    });
   };
 
   const copyRecoveryCodes = () => {
@@ -339,20 +375,29 @@ const SecuritySettings = () => {
 
   // ─── Trusted Devices / Sessions ─────────────────────────────────────
 
-  const handleRemoveSession = async (sessionId) => {
-    if (!confirm('Are you sure you want to remove this device?')) return;
+  const handleRemoveSession = (sessionId) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Remove Device',
+      message: 'Are you sure you want to remove this device?',
+      variant: 'danger',
+      confirmText: 'Remove',
+      onConfirm: async () => {
+        try {
+          await api.delete(`${API.SESSION_DELETE}/${sessionId}`);
+          await loadSessions();
+          setConfirmModal(prev => ({ ...prev, isOpen: false }));
 
-    try {
-      await api.delete(`${API.SESSION_DELETE}/${sessionId}`);
-      await loadSessions();
-
-      // If user removed current session, logout
-      if (sessionId === currentSessionId) {
-        window.location.href = '/login';
-      }
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to remove session');
-    }
+          // If user removed current session, logout
+          if (sessionId === currentSessionId) {
+            window.location.href = '/login';
+          }
+        } catch (err) {
+          alert(err.response?.data?.message || 'Failed to remove session');
+          setConfirmModal(prev => ({ ...prev, isOpen: false }));
+        }
+      },
+    });
   };
 
   const formatLastActivity = (date) => {
@@ -383,6 +428,13 @@ const SecuritySettings = () => {
     return parts.length > 0 ? parts.join(', ') : null;
   };
 
+  const formatCoordinates = (session) => {
+    if (session.latitude && session.longitude) {
+      return `${session.latitude.toFixed(4)}, ${session.longitude.toFixed(4)}`;
+    }
+    return null;
+  };
+
   const formatLoginTime = (date) => {
     if (!date) return 'Unknown';
     return new Date(date).toLocaleString(undefined, {
@@ -405,7 +457,7 @@ const SecuritySettings = () => {
       <div className="flex items-center justify-between py-2">
         <h3 className="text-sm font-normal text-gray-900 dark:text-white">Password</h3>
         <button
-          onClick={() => setShowPasswordModal(true)}
+          onClick={() => navigate('/change-password')}
           className="flex items-center gap-1 text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-300"
         >
           <span>Change</span>
@@ -551,15 +603,23 @@ const SecuritySettings = () => {
           Log out of this device
         </h3>
         <button
-          onClick={async () => {
-            if (confirm('Are you sure you want to log out?')) {
-              try {
-                await api.post(API.LOGOUT);
-                window.location.href = '/login';
-              } catch (err) {
-                alert('Failed to logout');
-              }
-            }
+          onClick={() => {
+            setConfirmModal({
+              isOpen: true,
+              title: 'Log Out',
+              message: 'Are you sure you want to log out?',
+              variant: 'danger',
+              confirmText: 'Log Out',
+              onConfirm: async () => {
+                try {
+                  await api.post(API.LOGOUT);
+                  window.location.href = '/login';
+                } catch (err) {
+                  alert('Failed to logout');
+                  setConfirmModal(prev => ({ ...prev, isOpen: false }));
+                }
+              },
+            });
           }}
           className="px-6 py-2 bg-transparent border border-gray-300 dark:border-[#424242] text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors"
         >
@@ -581,15 +641,23 @@ const SecuritySettings = () => {
             </p>
           </div>
           <button
-            onClick={async () => {
-              if (confirm('This will log you out of all devices including this one. Continue?')) {
-                try {
-                  await api.post(API.LOGOUT_ALL);
-                  window.location.href = '/login';
-                } catch (err) {
-                  alert('Failed to logout all sessions');
-                }
-              }
+            onClick={() => {
+              setConfirmModal({
+                isOpen: true,
+                title: 'Log Out All Devices',
+                message: 'This will log you out of all devices including this one. Continue?',
+                variant: 'danger',
+                confirmText: 'Log Out All',
+                onConfirm: async () => {
+                  try {
+                    await api.post(API.LOGOUT_ALL);
+                    window.location.href = '/login';
+                  } catch (err) {
+                    alert('Failed to logout all sessions');
+                    setConfirmModal(prev => ({ ...prev, isOpen: false }));
+                  }
+                },
+              });
             }}
             className="px-6 py-2 bg-transparent border border-red-500 dark:border-red-600 text-red-600 dark:text-red-500 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors ml-2"
           >
@@ -599,23 +667,6 @@ const SecuritySettings = () => {
       </div>
 
       {/* ─── MODALS ─────────────────────────────────────────────────── */}
-
-      {/* Password Change Modal */}
-      <Modal
-        isOpen={showPasswordModal}
-        onClose={() => setShowPasswordModal(false)}
-        title="Change Password"
-        size="md"
-      >
-        <div className="space-y-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            This feature redirects to the password change page.
-          </p>
-          <Button onClick={() => window.location.href = '/admin/settings/password'}>
-            Go to Password Settings
-          </Button>
-        </div>
-      </Modal>
 
       {/* Authenticator App Setup Modal */}
       <Modal
@@ -722,78 +773,80 @@ const SecuritySettings = () => {
           setShowEmailMfaModal(false);
           setTotpCode('');
           setError('');
+          setEmailSent(false);
         }}
-        title="Verify Your Email"
+        title=""
         size="md"
       >
-        <form onSubmit={(e) => { e.preventDefault(); confirmEnableEmailMfa(); }} className="space-y-4">
-          <div className="text-center">
-            <Mail className="w-12 h-12 mx-auto text-primary-600 dark:text-primary-400 mb-4" />
-            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Check Your Email
-            </h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              We've sent a 6-digit verification code to <strong>{user?.email}</strong>
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Enter the code below to complete email MFA setup
-            </p>
-          </div>
-
-          {error && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        {!emailSent ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+              <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">Sending verification code...</p>
             </div>
-          )}
+          </div>
+        ) : (
+          <form onSubmit={(e) => { e.preventDefault(); confirmEnableEmailMfa(); }} className="space-y-6 py-4">
+            {/* Header */}
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                <Check className="w-8 h-8 text-green-600 dark:text-green-400" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                Code Sent!
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                We've sent a 6-digit verification code to <strong>{user?.email}</strong>
+              </p>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Verification Code
-            </label>
-            <Input
-              type="text"
-              maxLength={6}
-              value={totpCode}
-              onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
-              placeholder="000000"
-              className="text-center text-2xl tracking-widest"
-              autoFocus
-              disabled={loading}
-            />
-            <div className="mt-2 text-xs text-center">
-              <p className="text-gray-500 dark:text-gray-400 mb-1">
+            {error && (
+              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <p className="text-sm text-red-600 dark:text-red-400 text-center">{error}</p>
+              </div>
+            )}
+
+            {/* Verify Code Input */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 text-center">
+                Enter the 6-digit code from your email
+              </label>
+              <Input
+                type="text"
+                maxLength={6}
+                value={totpCode}
+                onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
+                placeholder="000000"
+                className="text-center text-2xl tracking-[0.5em] font-semibold"
+                autoFocus
+              />
+            </div>
+
+            {/* Continue Button */}
+            <Button
+              type="submit"
+              loading={loading}
+              className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 text-base font-medium"
+            >
+              Verify & Enable
+            </Button>
+
+            {/* Resend */}
+            <div className="text-center border-t border-gray-200 dark:border-gray-700 pt-4">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                 Didn't receive the code? Check your spam folder
               </p>
               <button
                 type="button"
                 onClick={handleResendEmailCode}
                 disabled={loading}
-                className="text-primary-600 dark:text-primary-400 hover:underline disabled:opacity-50"
+                className="text-sm text-primary-600 dark:text-primary-400 hover:underline disabled:opacity-50"
               >
                 Resend Code
               </button>
             </div>
-          </div>
-
-          <div className="flex gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                setShowEmailMfaModal(false);
-                setTotpCode('');
-                setError('');
-              }}
-              className="flex-1"
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" loading={loading} className="flex-1">
-              Verify & Enable
-            </Button>
-          </div>
-        </form>
+          </form>
+        )}
       </Modal>
 
       {/* Passkey Registration Modal */}
@@ -924,97 +977,100 @@ const SecuritySettings = () => {
       <Modal
         isOpen={showTrustedDevicesModal}
         onClose={() => setShowTrustedDevicesModal(false)}
-        title="Trusted Devices"
-        size="lg"
+        title="Trusted devices"
+        size="md"
       >
         <div className="space-y-4">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            These are the devices where you're currently logged in. Remove any devices you don't recognize.
+            After you sign in, a device becomes trusted. When you log in somewhere new, we'll send a prompt to your trusted devices for approval. You can remove a device from this list at any time.
           </p>
 
           {sessions.length === 0 ? (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              <Monitor className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p>No active sessions</p>
+              <Smartphone className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p>No trusted devices</p>
             </div>
           ) : (
-            <div className="space-y-3 max-h-[400px] overflow-y-auto">
+            <div className="space-y-1 max-h-[400px] overflow-y-auto scrollbar-hide">
               {sessions.map((session) => {
-                const isCurrentSession = session.id === currentSessionId;
                 const DeviceIcon =
-                  session.device_type === 'mobile' ? TabletSmartphone :
+                  session.device_type === 'mobile' ? Smartphone :
                     session.device_type === 'tablet' ? TabletSmartphone :
                       session.device_type === 'desktop' ? Monitor :
-                        Laptop;
+                        Smartphone;
+
+                // Format device name like "iOS 26.2 iPhone" or "Windows 11 Chrome"
+                const deviceName = session.device_name ||
+                  `${session.os || 'Unknown'} ${session.browser || 'Device'}`;
+
+                // Format location like "Kozhikode, IN"
+                const locationParts = [];
+                if (session.city) locationParts.push(session.city);
+                if (session.country) locationParts.push(session.country);
+                const location = locationParts.length > 0 ? locationParts.join(', ') : null;
+
+                // Format login time
+                const loginDate = session.login_at || session.created_at;
+                const formattedLogin = loginDate ? new Date(loginDate).toLocaleString(undefined, {
+                  month: 'numeric',
+                  day: 'numeric',
+                  year: '2-digit',
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  hour12: true,
+                }) : 'Unknown';
+
+                const isCurrentSession = session.id === currentSessionId;
 
                 return (
                   <div
                     key={session.id}
-                    className={`p-4 rounded-lg border ${isCurrentSession
-                      ? 'bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-800'
-                      : 'bg-gray-50 dark:bg-[#1a1a1a] border-gray-200 dark:border-gray-700'
-                      }`}
+                    className="flex items-center justify-between py-3"
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3 flex-1">
-                        <DeviceIcon className={`w-5 h-5 mt-0.5 ${isCurrentSession ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500'
-                          }`} />
-
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h4 className="text-sm font-medium text-gray-900 dark:text-white">
-                              {session.device_name || 'Unknown Device'}
-                            </h4>
-                            {isCurrentSession && (
-                              <span className="px-2 py-0.5 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-xs rounded-full">
-                                Current
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="space-y-0.5 text-xs text-gray-600 dark:text-gray-400">
-                            <div className="flex items-center gap-1.5">
-                              <Globe className="w-3 h-3" />
-                              <span>{session.browser || 'Unknown Browser'} • {session.os || 'Unknown OS'}</span>
-                            </div>
-                            {formatLocation(session) && (
-                              <div className="flex items-center gap-1.5">
-                                <MapPin className="w-3 h-3" />
-                                <span>{formatLocation(session)}</span>
-                              </div>
-                            )}
-                            {session.ip_address && (
-                              <div>IP: {session.ip_address}</div>
-                            )}
-                            <div className="flex items-center gap-1.5">
-                              <Clock className="w-3 h-3" />
-                              <span>Login: {formatLoginTime(session.login_at || session.created_at)}</span>
-                            </div>
-                            <div>Last active: {formatLastActivity(session.last_activity_at)}</div>
-                          </div>
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <DeviceIcon className="w-5 h-5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                            {deviceName}
+                          </p>
+                          {isCurrentSession && (
+                            <span className="px-1.5 py-0.5 text-[10px] font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded">
+                              Current
+                            </span>
+                          )}
                         </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Last logged in on {formattedLogin}{location ? ` from ${location}` : ''}
+                        </p>
                       </div>
-
-                      <button
-                        onClick={() => handleRemoveSession(session.id)}
-                        className="ml-3 text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                      >
-                        Remove
-                      </button>
                     </div>
+
+                    <button
+                      onClick={() => handleRemoveSession(session.id)}
+                      className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors flex-shrink-0"
+                      title="Remove device"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
                   </div>
                 );
               })}
             </div>
           )}
-
-          <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
-            <Button variant="outline" onClick={() => setShowTrustedDevicesModal(false)} className="w-full">
-              Close
-            </Button>
-          </div>
         </div>
       </Modal>
+
+      {/* Confirm Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        variant={confirmModal.variant}
+        confirmText={confirmModal.confirmText}
+      />
     </div>
   );
 };

@@ -73,8 +73,11 @@ export class PasskeyService {
           transports: pk.transports as AuthenticatorTransportFuture[],
         })),
         authenticatorSelection: {
+          // Allow both platform (Windows Hello, Touch ID) and cross-platform (USB keys, phones)
+          authenticatorAttachment: undefined,
           residentKey: 'preferred',
-          userVerification: 'required',
+          userVerification: 'preferred',
+          requireResidentKey: false,
         },
       });
 
@@ -101,7 +104,7 @@ export class PasskeyService {
         expectedChallenge: challenge.challenge,
         expectedOrigin: this.configService.webauthnOrigin,
         expectedRPID: this.configService.webauthnRpId,
-        requireUserVerification: true,
+        requireUserVerification: false,
       });
 
       if (!verification.verified || !verification.registrationInfo) {
@@ -151,7 +154,7 @@ export class PasskeyService {
           id: pk.credential_id,
           transports: pk.transports as AuthenticatorTransportFuture[],
         })),
-        userVerification: 'required',
+        userVerification: 'preferred',
       });
 
       const challengeId = this.storeChallengeForUser(options.challenge, user.id);
@@ -171,6 +174,8 @@ export class PasskeyService {
     userAgent: string,
     deviceName?: string,
     deviceType?: string,
+    latitude?: number,
+    longitude?: number,
   ) {
     try {
       const stored = this.challenges.get(challengeId);
@@ -202,7 +207,7 @@ export class PasskeyService {
           counter: Number(passkey.counter),
           transports: passkey.transports as AuthenticatorTransportFuture[],
         },
-        requireUserVerification: true,
+        requireUserVerification: false,
       });
 
       if (!verification.verified) {
@@ -236,6 +241,8 @@ export class PasskeyService {
         userAgent,
         deviceName: deviceName || 'Passkey',
         deviceType: deviceType || 'web',
+        latitude,
+        longitude,
       });
 
       await this.usersService.updateLastLogin(user.id);

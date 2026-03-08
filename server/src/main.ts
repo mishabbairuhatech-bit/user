@@ -22,7 +22,7 @@ async function bootstrap() {
     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   // Global validation pipe
@@ -70,8 +70,8 @@ async function bootstrap() {
   });
 
   const port = process.env.APP_PORT || 3000;
-  await app.listen(port);
-  logger.log(`Server running on http://localhost:${port}`);
+  await app.listen(port, '0.0.0.0');
+  logger.log(`Server running on http://localhost:${port} and network interface`);
   logger.log(`Swagger docs available at http://localhost:${port}/api/docs`);
 }
 

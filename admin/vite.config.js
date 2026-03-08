@@ -19,4 +19,13 @@ export default defineConfig({
       '@routes': path.resolve(__dirname, './src/routes'),
     },
   },
+  server: {
+    host: true,
+    proxy: {
+      '/api': {
+        target: 'http://192.168.1.4:3000',
+        changeOrigin: true,
+      },
+    },
+  },
 })
