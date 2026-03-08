@@ -40,44 +40,44 @@ export class DatabaseModule implements OnModuleInit {
   constructor(private readonly sequelize: Sequelize) { }
 
   async onModuleInit() {
-    try {
-      // Get existing tables from the database
-      const results = await this.sequelize.query<{ tablename: string }>(
-        `SELECT tablename FROM pg_tables WHERE schemaname = 'public'`,
-        { type: QueryTypes.SELECT },
-      );
-      const existingTables = new Set(results.map((r) => r.tablename));
+    // try {
+    //   // Get existing tables from the database
+    //   const results = await this.sequelize.query<{ tablename: string }>(
+    //     `SELECT tablename FROM pg_tables WHERE schemaname = 'public'`,
+    //     { type: QueryTypes.SELECT },
+    //   );
+    //   const existingTables = new Set(results.map((r) => r.tablename));
 
-      // Models in dependency order (parent tables first)
-      const models = [User, LoginSession, PasswordHistory, Passkey];
+    //   // Models in dependency order (parent tables first)
+    //   const models = [User, LoginSession, PasswordHistory, Passkey];
 
-      for (const model of models) {
-        const tableName = model.getTableName() as string;
+    //   for (const model of models) {
+    //     const tableName = model.getTableName() as string;
 
-        if (!existingTables.has(tableName)) {
-          this.logger.warn(`Table "${tableName}" missing — creating...`);
-          await model.sync();
-          this.logger.log(`Table "${tableName}" created.`);
-        } else {
-          // Table exists, sync with alter to add any missing columns
-          try {
-            await model.sync({ alter: true });
-            this.logger.log(`Table "${tableName}" synced.`);
-          } catch (error: any) {
-            // Ignore "column already exists" errors (PostgreSQL code 42701)
-            if (error?.parent?.code === '42701') {
-              this.logger.log(`Table "${tableName}" synced (columns already exist).`);
-            } else {
-              throw error;
-            }
-          }
-        }
-      }
+    //     if (!existingTables.has(tableName)) {
+    //       this.logger.warn(`Table "${tableName}" missing — creating...`);
+    //       await model.sync();
+    //       this.logger.log(`Table "${tableName}" created.`);
+    //     } else {
+    //       // Table exists, sync with alter to add any missing columns
+    //       try {
+    //         await model.sync({ alter: true });
+    //         this.logger.log(`Table "${tableName}" synced.`);
+    //       } catch (error: any) {
+    //         // Ignore "column already exists" errors (PostgreSQL code 42701)
+    //         if (error?.parent?.code === '42701') {
+    //           this.logger.log(`Table "${tableName}" synced (columns already exist).`);
+    //         } else {
+    //           throw error;
+    //         }
+    //       }
+    //     }
+    //   }
 
-      this.logger.log('Database tables synced successfully.');
-    } catch (error) {
-      this.logger.error('Failed to sync database tables:', error);
-      throw error;
-    }
+    //   this.logger.log('Database tables synced successfully.');
+    // } catch (error) {
+    //   this.logger.error('Failed to sync database tables:', error);
+    //   throw error;
+    // }
   }
 }

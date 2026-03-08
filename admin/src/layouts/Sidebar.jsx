@@ -278,7 +278,7 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
       </nav>
 
       {/* Bottom — User Profile */}
-      <div className={`flex-shrink-0 border-t border-gray-100 dark:border-[#2a2a2a] ${isCollapsed ? 'p-2 flex justify-center' : 'p-3'}`}>
+      <div className={`flex-shrink-0 ${isCollapsed ? 'p-2 flex justify-center' : 'py-1 px-2'}`}>
         {isCollapsed ? (
           <div ref={userMenuRef} className="relative">
             <div
@@ -297,7 +297,7 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
                     {user?.first_name ? user.first_name.charAt(0).toUpperCase() : 'M'}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
                       {user?.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : 'mishab'}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
@@ -352,13 +352,13 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
           >
             <div
               onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center gap-3 px-1 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2a2a2a] transition-colors cursor-pointer"
+              className="flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2a2a2a] transition-colors cursor-pointer"
             >
-              <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-primary-700 flex items-center justify-center text-white text-sm font-medium">
+              <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 bg-primary-700 flex items-center justify-center text-white text-sm font-medium">
                 {user?.first_name ? user.first_name.charAt(0).toUpperCase() : 'M'}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
                   {user?.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : 'mishab'}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
@@ -376,7 +376,7 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
                     {user?.first_name ? user.first_name.charAt(0).toUpperCase() : 'M'}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
                       {user?.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : 'mishab'}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 truncate">

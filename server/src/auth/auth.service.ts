@@ -22,6 +22,8 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { GoogleOneTapDto } from './dto/google-one-tap.dto';
+import { OAuth2Client } from 'google-auth-library';
 
 @Injectable()
 export class AuthService {
@@ -236,6 +238,91 @@ export class AuthService {
       console.error('AuthService.googleLogin error:', error);
       if (error instanceof UnauthorizedException) throw error;
       throw new InternalServerErrorException('Failed to process Google login.');
+    }
+  }
+
+  async googleOneTapLogin(dto: GoogleOneTapDto, ip: string, userAgent: string) {
+    try {
+      // Verify the Google ID token
+      const client = new OAuth2Client(this.configService.googleClientId);
+
+      const ticket = await client.verifyIdToken({
+        idToken: dto.credential,
+        audience: this.configService.googleClientId,
+      });
+
+      const payload = ticket.getPayload();
+      if (!payload) {
+        throw new UnauthorizedException('Invalid Google credential.');
+      }
+
+      const { sub: googleId, email, given_name, family_name, picture } = payload;
+
+      if (!email) {
+        throw new UnauthorizedException('Email not provided by Google.');
+      }
+
+      // Find user by google_id or email
+      let user = await this.usersService.findByGoogleId(googleId);
+
+      if (!user) {
+        // Try to find by email (for linking)
+        user = await this.usersService.findByEmail(email);
+        if (user && !user.google_id) {
+          // Link google account to existing user
+          await this.usersService.linkGoogleAccount(user.id, googleId);
+        } else if (!user) {
+          throw new UnauthorizedException(ERROR_MESSAGES.GOOGLE_NO_ACCOUNT);
+        }
+      }
+
+      if (!user.is_active) {
+        throw new UnauthorizedException(ERROR_MESSAGES.ACCOUNT_DEACTIVATED);
+      }
+
+      // Check if MFA is enabled
+      if (user.mfa_enabled) {
+        const mfaMethod = user.mfa_method || 'email';
+
+        if (mfaMethod === 'email' || mfaMethod === 'EMAIL') {
+          // Generate and send email OTP
+          const code = this.generateOtpCode();
+          const expires = new Date();
+          expires.setMinutes(expires.getMinutes() + 5);
+
+          await this.usersService.updateMfaSettings(user.id, {
+            mfa_code: code,
+            mfa_code_expires: expires,
+          });
+
+          await this.emailService.sendMfaCode(user.email, user.first_name || 'User', code);
+        }
+
+        // Generate MFA token
+        const mfaToken = this.jwtService.sign(
+          { sub: user.id, type: 'mfa' },
+          { expiresIn: '10m' },
+        );
+
+        return {
+          mfa_required: true,
+          mfa_token: mfaToken,
+          mfa_method: mfaMethod.toUpperCase(),
+        };
+      }
+
+      const loginDto: LoginDto = {
+        email: user.email,
+        password: '',
+        device_name: dto.device_name || 'Google One Tap',
+        device_type: dto.device_type || 'web',
+      };
+
+      return await this.completeLogin(user, loginDto, ip, userAgent);
+    } catch (error) {
+      console.error('AuthService.googleOneTapLogin error:', error);
+      if (error instanceof UnauthorizedException) throw error;
+      throw new InternalServerErrorException('Failed to process Google One Tap login.');
     }
   }
 

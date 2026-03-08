@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { ArrowUpRight, Shield, Key } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthLayout } from '@layouts';
 import { Button, Input, Checkbox } from '@components/ui';
 import { useAuth } from '@hooks';
@@ -35,14 +35,100 @@ const LoginPage = () => {
   const [showPasskeyLogin, setShowPasskeyLogin] = useState(false);
   const [passkeyEmail, setPasskeyEmail] = useState('');
 
-  const { login } = useAuth();
+  const { login, fetchUser } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  // Read error from URL query params (e.g., from Google OAuth redirect)
+  useEffect(() => {
+    const errorParam = searchParams.get('error');
+    if (errorParam) {
+      setApiError(errorParam);
+      // Clear the error from URL
+      searchParams.delete('error');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
+  // Google One Tap callback handler
+  const handleGoogleOneTapCallback = useCallback(async (response) => {
+    setIsLoading(true);
+    setApiError('');
+    try {
+      const result = await api.post(API.GOOGLE_ONE_TAP, {
+        credential: response.credential,
+        device_name: 'Web Browser',
+        device_type: 'web',
+      });
+
+      const data = result.data?.data || result.data;
+
+      // Check if MFA is required
+      if (data?.mfa_required) {
+        setMfaRequired(true);
+        setMfaToken(data.mfa_token);
+        setMfaMethod(data.mfa_method);
+        setApiError('');
+      } else {
+        // Fetch user data to update auth state
+        await fetchUser();
+        navigate('/admin/dashboard');
+      }
+    } catch (error) {
+      const msg = error.response?.data?.message || 'Google login failed. Please try again.';
+      setApiError(msg);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [navigate, fetchUser]);
+
+  // Initialize Google One Tap
+  useEffect(() => {
+    // Skip if MFA or Passkey screens are shown
+    if (mfaRequired || showPasskeyLogin) return;
+
+    const initializeGoogleOneTap = () => {
+      if (window.google?.accounts?.id) {
+        window.google.accounts.id.initialize({
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+          callback: handleGoogleOneTapCallback,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+        });
+
+        // Display the One Tap prompt
+        window.google.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed()) {
+            console.log('One Tap not displayed:', notification.getNotDisplayedReason());
+          }
+          if (notification.isSkippedMoment()) {
+            console.log('One Tap skipped:', notification.getSkippedReason());
+          }
+        });
+      }
+    };
+
+    // Wait for Google script to load
+    if (window.google?.accounts?.id) {
+      initializeGoogleOneTap();
+    } else {
+      const checkGoogle = setInterval(() => {
+        if (window.google?.accounts?.id) {
+          clearInterval(checkGoogle);
+          initializeGoogleOneTap();
+        }
+      }, 100);
+
+      // Cleanup
+      return () => clearInterval(checkGoogle);
+    }
+  }, [handleGoogleOneTapCallback, mfaRequired, showPasskeyLogin]);
 
   const onSubmit = async (data) => {
     setIsLoading(true);

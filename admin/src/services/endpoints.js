@@ -15,6 +15,7 @@ const API = {
   // Auth - Google OAuth
   GOOGLE_AUTH: "auth/google",
   GOOGLE_CALLBACK: "auth/google/callback",
+  GOOGLE_ONE_TAP: "auth/google/one-tap",
 
   // MFA
   MFA_EMAIL_SETUP: "mfa/email/setup",
