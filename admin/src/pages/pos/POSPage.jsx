@@ -2,18 +2,23 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import { ShoppingCart, LayoutGrid, Home, Clock, Bookmark, Settings, Pause, RotateCcw, BarChart3, Keyboard, Search, X } from 'lucide-react';
 import { categories, products } from './data/mockData';
 import { Modal, Input } from '@components/ui';
+import { useSettings } from '@hooks';
 import usePOS from './hooks/usePOS';
 import POSHeader from './components/POSHeader';
 import CategoryTabs from './components/CategoryTabs';
 import ProductGrid from './components/ProductGrid';
 import CartPanel from './components/CartPanel';
-import PaymentModal from './components/PaymentModal';
-import HoldBillsModal from './components/HoldBillsModal';
+import PaymentPanel from './components/PaymentPanel';
+import HeldBillsPanel from './components/HeldBillsPanel';
+import HeldBillsWarningModal from './components/HeldBillsWarningModal';
 import BillPreview from './components/BillPreview';
-import ReturnsModal from './components/ReturnsModal';
+import ReturnsPanel from './components/ReturnsPanel';
 import DailyReportModal from './components/DailyReportModal';
 
 const POSPage = () => {
+  const { settings } = useSettings();
+  const isCartLeft = settings.posCartPosition === 'left';
+
   // POS hook
   const {
     cart,
@@ -44,12 +49,15 @@ const POSPage = () => {
   const [showMobileCart, setShowMobileCart] = useState(false);
 
   // Modals
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [showHoldBillsModal, setShowHoldBillsModal] = useState(false);
-  const [showReturnsModal, setShowReturnsModal] = useState(false);
+  const [showPaymentPanel, setShowPaymentPanel] = useState(false);
+  const [showReturnsPanel, setShowReturnsPanel] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [completedBill, setCompletedBill] = useState(null);
   const [showShortcutsModal, setShowShortcutsModal] = useState(false);
+
+  // Held bills panel (replaces cart area)
+  const [showHeldBillsPanel, setShowHeldBillsPanel] = useState(false);
+  const [cartWarningContext, setCartWarningContext] = useState(null); // null | 'heldBills' | 'returns'
   const [selectedProductIndex, setSelectedProductIndex] = useState(0);
   const [gridColumns, setGridColumns] = useState(4);
   const [isSearchMode, setIsSearchMode] = useState(false);
@@ -98,30 +106,94 @@ const POSPage = () => {
     holdBill();
   };
 
+  // Open held bills panel - with warning if cart has items
+  const handleOpenHeldBills = useCallback(() => {
+    if (showHeldBillsPanel) {
+      setShowHeldBillsPanel(false);
+      return;
+    }
+    setShowReturnsPanel(false);
+    if (cart.length > 0) {
+      setCartWarningContext('heldBills');
+    } else {
+      setShowHeldBillsPanel(true);
+      setFocusSection('cart');
+    }
+  }, [showHeldBillsPanel, cart.length]);
+
+  const handleOpenReturns = useCallback(() => {
+    if (showReturnsPanel) {
+      setShowReturnsPanel(false);
+      return;
+    }
+    setShowHeldBillsPanel(false);
+    setShowPaymentPanel(false);
+    if (cart.length > 0) {
+      setCartWarningContext('returns');
+    } else {
+      setShowReturnsPanel(true);
+      setFocusSection('cart');
+    }
+  }, [showReturnsPanel, cart.length]);
+
+  // Warning modal handlers
+  const handleWarningHoldBill = useCallback(() => {
+    const ctx = cartWarningContext;
+    holdBill();
+    setCartWarningContext(null);
+    if (ctx === 'returns') {
+      setShowReturnsPanel(true);
+    } else {
+      setShowHeldBillsPanel(true);
+    }
+    setFocusSection('cart');
+  }, [holdBill, cartWarningContext]);
+
+  const handleWarningClearCart = useCallback(() => {
+    const ctx = cartWarningContext;
+    clearCart();
+    setCartWarningContext(null);
+    if (ctx === 'returns') {
+      setShowReturnsPanel(true);
+    } else {
+      setShowHeldBillsPanel(true);
+    }
+    setFocusSection('cart');
+  }, [clearCart, cartWarningContext]);
+
+  // Resume bill from held bills panel
+  const handleResumeBill = useCallback((billId) => {
+    resumeBill(billId);
+    setShowHeldBillsPanel(false);
+  }, [resumeBill]);
+
   const handleCheckout = () => {
     if (cart.length > 0) {
-      setShowPaymentModal(true);
+      setShowPaymentPanel(true);
+      setShowHeldBillsPanel(false);
+      setShowReturnsPanel(false);
+      setFocusSection('cart');
     }
   };
 
-  const handleCompleteSale = (paymentMethod, amountTendered) => {
+  const handleCompleteSale = useCallback((paymentMethod, amountTendered) => {
     const bill = completeSale(paymentMethod, amountTendered);
     if (bill) {
-      setShowPaymentModal(false);
+      setShowPaymentPanel(false);
       setCompletedBill(bill);
     }
-  };
+  }, [completeSale]);
 
   const handleProcessReturn = (originalBill, returnItems) => {
     const returnBill = processReturn(originalBill, returnItems);
     if (returnBill) {
-      setShowReturnsModal(false);
+      setShowReturnsPanel(false);
       setCompletedBill(returnBill);
     }
   };
 
   // Check if any modal is open
-  const isAnyModalOpen = showPaymentModal || showHoldBillsModal || showReturnsModal || showReportModal || completedBill || showShortcutsModal;
+  const isAnyModalOpen = cartWarningContext || showReportModal || completedBill || showShortcutsModal;
 
   // Keyboard shortcuts handler
   const handleKeyDown = useCallback((e) => {
@@ -130,20 +202,51 @@ const POSPage = () => {
       return;
     }
 
+    // When payment panel is active, only allow Escape and F8 — everything else is handled by PaymentPanel
+    if (showPaymentPanel) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setShowPaymentPanel(false);
+        return;
+      }
+      if (e.key === 'F8' || ((e.ctrlKey || e.metaKey) && e.key === 'Enter')) {
+        e.preventDefault();
+        setShowPaymentPanel(false);
+        return;
+      }
+      // Block everything else from POSPage
+      return;
+    }
+
+    // When returns panel is active, only allow Escape and F3 — everything else is handled by ReturnsPanel
+    if (showReturnsPanel) {
+      if (e.key === 'Escape') {
+        // ReturnsPanel handles its own Escape for going back from bill selection
+        // Only close panel if ReturnsPanel doesn't stop propagation
+        e.preventDefault();
+        setShowReturnsPanel(false);
+        return;
+      }
+      if (e.key === 'F3' || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'r')) {
+        e.preventDefault();
+        setShowReturnsPanel(false);
+        return;
+      }
+      return;
+    }
+
     // Close modals with Escape
     if (e.key === 'Escape') {
       if (completedBill) {
         setCompletedBill(null);
-      } else if (showPaymentModal) {
-        setShowPaymentModal(false);
-      } else if (showHoldBillsModal) {
-        setShowHoldBillsModal(false);
-      } else if (showReturnsModal) {
-        setShowReturnsModal(false);
+      } else if (cartWarningContext) {
+        setCartWarningContext(null);
       } else if (showReportModal) {
         setShowReportModal(false);
       } else if (showShortcutsModal) {
         setShowShortcutsModal(false);
+      } else if (showHeldBillsPanel) {
+        setShowHeldBillsPanel(false);
       } else if (isSearchMode || searchQuery) {
         setIsSearchMode(false);
         setSearchQuery('');
@@ -164,23 +267,26 @@ const POSPage = () => {
     // Function keys - toggle modals (work even when modal is open)
     if (e.key === 'F3' || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'r')) { // Mac: Cmd+R, Win: Ctrl+R
       e.preventDefault();
-      setShowReturnsModal(prev => !prev);
+      if (!cartWarningContext) {
+        handleOpenReturns();
+      }
       return;
     } else if (e.key === 'F4' || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'e')) { // Mac: Cmd+E, Win: Ctrl+E
       e.preventDefault();
       setShowReportModal(prev => !prev);
       return;
-    } else if (e.key === 'F5' || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'h')) { // Mac: Cmd+H is native hide, but typically apps bind Ctrl+H or similar
-      // To play nice with Mac OS 'Hide' shortcut, let's also support Alt+H
+    } else if (e.key === 'F5' || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'h')) {
       e.preventDefault();
-      setShowHoldBillsModal(prev => !prev);
+      if (!cartWarningContext) {
+        handleOpenHeldBills();
+      }
       return;
     } else if (e.key === 'F8' || ((e.ctrlKey || e.metaKey) && e.key === 'Enter')) { // Cmd+Enter
       e.preventDefault();
-      if (showPaymentModal) {
-        setShowPaymentModal(false);
+      if (showPaymentPanel) {
+        setShowPaymentPanel(false);
       } else if (cart.length > 0) {
-        setShowPaymentModal(true);
+        handleCheckout();
       }
       return;
     }
@@ -193,7 +299,9 @@ const POSPage = () => {
       e.preventDefault();
       if (cart.length > 0) {
         handleHoldBill();
-        setShowHoldBillsModal(true);
+        setShowReturnsPanel(false);
+        setShowHeldBillsPanel(true);
+        setFocusSection('cart');
       }
     } else if (e.key === 'F9' || ((e.ctrlKey || e.metaKey) && e.key === 'Backspace')) { // Clear
       e.preventDefault();
@@ -245,15 +353,16 @@ const POSPage = () => {
       return;
     }
 
-    // Tab to cycle through sections: categories -> products -> cart
+    // Tab to cycle through sections: categories -> products -> cart/held bills
+    const canFocusRightPanel = cart.length > 0 || showHeldBillsPanel || showPaymentPanel || showReturnsPanel;
     if (e.key === 'Tab') {
       e.preventDefault();
       if (e.shiftKey) {
         // Shift+Tab: reverse direction
         if (focusSection === 'categories') {
-          if (cart.length > 0) {
+          if (canFocusRightPanel) {
             setFocusSection('cart');
-            setSelectedCartIndex(0);
+            if (!showHeldBillsPanel && !showPaymentPanel && !showReturnsPanel) setSelectedCartIndex(0);
           } else {
             setFocusSection('products');
           }
@@ -269,9 +378,9 @@ const POSPage = () => {
         if (focusSection === 'categories') {
           setFocusSection('products');
         } else if (focusSection === 'products') {
-          if (cart.length > 0) {
+          if (canFocusRightPanel) {
             setFocusSection('cart');
-            setSelectedCartIndex(0);
+            if (!showHeldBillsPanel && !showPaymentPanel && !showReturnsPanel) setSelectedCartIndex(0);
           } else {
             setFocusSection('categories');
           }
@@ -305,8 +414,8 @@ const POSPage = () => {
       return;
     }
 
-    // Cart navigation when cart focused
-    if (focusSection === 'cart' && cart.length > 0) {
+    // Cart navigation when cart focused (skip if held bills or payment panel is shown - they handle their own keys)
+    if (focusSection === 'cart' && cart.length > 0 && !showHeldBillsPanel && !showPaymentPanel) {
       if (e.key === 'ArrowDown') {
         e.preventDefault();
         setSelectedCartIndex(prev => Math.min(prev + 1, cart.length - 1));
@@ -386,12 +495,13 @@ const POSPage = () => {
       return;
     }
   }, [
-    isAnyModalOpen, completedBill, showPaymentModal, showHoldBillsModal,
-    showReturnsModal, showReportModal, showShortcutsModal, searchQuery,
+    isAnyModalOpen, completedBill, showPaymentPanel, cartWarningContext,
+    showReturnsPanel, showReportModal, showShortcutsModal, searchQuery,
     filteredProducts, selectedProductIndex, cart, addToCart, updateQuantity,
-    removeFromCart, clearCart, handleHoldBill, handleCheckout, gridColumns,
+    removeFromCart, clearCart, handleHoldBill, gridColumns,
     isSearchMode, selectedCartIndex, focusSection, selectedCategoryIndex, categories,
-    showDiscountIndex, updateItemDiscountType, setDiscountType
+    showDiscountIndex, updateItemDiscountType, setDiscountType, showHeldBillsPanel,
+    handleOpenHeldBills, handleOpenReturns, handleCheckout
   ]);
 
   // Add keyboard event listener
@@ -414,6 +524,13 @@ const POSPage = () => {
     }
   }, [cart.length, selectedCartIndex]);
 
+  // Auto-switch back to cart when items are added while held bills panel is shown
+  useEffect(() => {
+    if (showHeldBillsPanel && cart.length > 0) {
+      setShowHeldBillsPanel(false);
+    }
+  }, [cart.length, showHeldBillsPanel]);
+
   return (
     <div className="h-screen flex bg-white dark:bg-[#0a0a0a]">
       <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-[#0a0a0a]">
@@ -422,16 +539,18 @@ const POSPage = () => {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           heldBillsCount={heldBills.length}
-          onHoldBillsClick={() => setShowHoldBillsModal(true)}
+          onHoldBillsClick={handleOpenHeldBills}
+          isHeldBillsActive={showHeldBillsPanel}
+          isReturnsActive={showReturnsPanel}
           onReportsClick={() => setShowReportModal(true)}
-          onReturnsClick={() => setShowReturnsModal(true)}
+          onReturnsClick={handleOpenReturns}
           onKeyboardClick={() => setShowShortcutsModal(true)}
         />
 
         {/* Main content */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className={`flex-1 flex overflow-hidden ${isCartLeft ? 'flex-row-reverse' : 'flex-row'}`}>
           {/* Products panel */}
-          <div className="flex-1 flex flex-col overflow-hidden">
+          <div className={`flex-1 flex flex-col overflow-hidden relative transition-opacity ${showPaymentPanel || showReturnsPanel || showHeldBillsPanel ? 'opacity-40 pointer-events-none select-none' : ''}`}>
             {/* Categories */}
             <CategoryTabs
               categories={categories}
@@ -441,7 +560,7 @@ const POSPage = () => {
                 setSelectedProductIndex(0);
               }}
               selectedIndex={selectedCategoryIndex}
-              isFocused={focusSection === 'categories'}
+              isFocused={!showPaymentPanel && !showReturnsPanel && !showHeldBillsPanel && focusSection === 'categories'}
             />
 
             {/* Products grid */}
@@ -451,38 +570,68 @@ const POSPage = () => {
                 cart={cart}
                 onAddToCart={addToCart}
                 onUpdateQuantity={updateQuantity}
-                selectedIndex={focusSection === 'products' ? selectedProductIndex : -1}
+                selectedIndex={!showPaymentPanel && !showReturnsPanel && !showHeldBillsPanel && focusSection === 'products' ? selectedProductIndex : -1}
               />
             </div>
+
+            {/* Disabled overlay when payment/returns/held bills panel is active */}
+            {(showPaymentPanel || showReturnsPanel || showHeldBillsPanel) && (
+              <div className="absolute inset-0 z-10" />
+            )}
           </div>
 
-          {/* Cart panel - Desktop */}
+          {/* Cart panel / Held Bills panel / Payment panel - Desktop */}
           <div className="hidden md:block w-[380px] flex-shrink-0">
-            <CartPanel
-              cart={cart}
-              totals={totals}
-              discount={discount}
-              discountType={discountType}
-              onUpdateQuantity={updateQuantity}
-              onUpdateItemDiscount={updateItemDiscount}
-              onUpdateItemDiscountType={updateItemDiscountType}
-              onRemove={removeFromCart}
-              onClear={clearCart}
-              onHold={handleHoldBill}
-              onSetDiscount={setDiscount}
-              onSetDiscountType={setDiscountType}
-              onCheckout={handleCheckout}
-              selectedIndex={focusSection === 'cart' ? selectedCartIndex : -1}
-              isFocused={focusSection === 'cart'}
-              showDiscountIndex={focusSection === 'cart' ? showDiscountIndex : -1}
-              onToggleDiscount={(idx) => setShowDiscountIndex(idx)}
-              focusCartDiscount={focusCartDiscount}
-            />
+            {showPaymentPanel ? (
+              <PaymentPanel
+                isActive={showPaymentPanel}
+                totals={totals}
+                cart={cart}
+                onComplete={handleCompleteSale}
+                onBack={() => setShowPaymentPanel(false)}
+              />
+            ) : showReturnsPanel ? (
+              <ReturnsPanel
+                isActive={showReturnsPanel}
+                completedBills={completedBills}
+                onProcessReturn={handleProcessReturn}
+                onBack={() => setShowReturnsPanel(false)}
+              />
+            ) : showHeldBillsPanel ? (
+              <HeldBillsPanel
+                heldBills={heldBills}
+                onResume={handleResumeBill}
+                onDelete={deleteHeldBill}
+                onBack={() => setShowHeldBillsPanel(false)}
+                isFocused={focusSection === 'cart'}
+              />
+            ) : (
+              <CartPanel
+                cart={cart}
+                totals={totals}
+                discount={discount}
+                discountType={discountType}
+                onUpdateQuantity={updateQuantity}
+                onUpdateItemDiscount={updateItemDiscount}
+                onUpdateItemDiscountType={updateItemDiscountType}
+                onRemove={removeFromCart}
+                onClear={clearCart}
+                onHold={handleHoldBill}
+                onSetDiscount={setDiscount}
+                onSetDiscountType={setDiscountType}
+                onCheckout={handleCheckout}
+                selectedIndex={focusSection === 'cart' ? selectedCartIndex : -1}
+                isFocused={focusSection === 'cart'}
+                showDiscountIndex={focusSection === 'cart' ? showDiscountIndex : -1}
+                onToggleDiscount={(idx) => setShowDiscountIndex(idx)}
+                focusCartDiscount={focusCartDiscount}
+              />
+            )}
           </div>
         </div>
 
         {/* Mobile cart button */}
-        <div className="md:hidden fixed bottom-4 right-4 z-40">
+        <div className={`md:hidden fixed bottom-4 ${isCartLeft ? 'left-4' : 'right-4'} z-40`}>
           <button
             onClick={() => setShowMobileCart(true)}
             className="relative w-14 h-14 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
@@ -535,32 +684,18 @@ const POSPage = () => {
         )}
 
         {/* Modals */}
-        <PaymentModal
-          isOpen={showPaymentModal}
-          onClose={() => setShowPaymentModal(false)}
-          totals={totals}
-          onComplete={handleCompleteSale}
-        />
-
-        <HoldBillsModal
-          isOpen={showHoldBillsModal}
-          onClose={() => setShowHoldBillsModal(false)}
-          heldBills={heldBills}
-          onResume={resumeBill}
-          onDelete={deleteHeldBill}
+        <HeldBillsWarningModal
+          isOpen={!!cartWarningContext}
+          onClose={() => setCartWarningContext(null)}
+          onHoldBill={handleWarningHoldBill}
+          onClearCart={handleWarningClearCart}
+          context={cartWarningContext}
         />
 
         <BillPreview
           isOpen={!!completedBill}
           onClose={() => setCompletedBill(null)}
           bill={completedBill}
-        />
-
-        <ReturnsModal
-          isOpen={showReturnsModal}
-          onClose={() => setShowReturnsModal(false)}
-          completedBills={completedBills}
-          onProcessReturn={handleProcessReturn}
         />
 
         <DailyReportModal
@@ -575,8 +710,13 @@ const POSPage = () => {
           onClose={() => setShowShortcutsModal(false)}
           title="Keyboard Shortcuts"
           size="md"
+          footer={
+            <p className="text-xs text-gray-400 text-center">
+              Press <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-[#2a2a2a] rounded">F1</kbd> or <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-[#2a2a2a] rounded">?</kbd> to toggle • <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-[#2a2a2a] rounded">Esc</kbd> to close
+            </p>
+          }
         >
-          <div className="space-y-4">
+          <div className="space-y-4 py-4">
             {/* Section Navigation */}
             <div className="flex items-center justify-between text-sm pb-3 border-b border-gray-200 dark:border-[#2a2a2a]">
               <span className="font-medium text-gray-700 dark:text-gray-300">Switch Sections</span>
@@ -630,9 +770,6 @@ const POSPage = () => {
                 </div>
               </div>
             </div>
-            <p className="text-xs text-gray-400 text-center pt-2 border-t border-gray-200 dark:border-[#2a2a2a]">
-              Press <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-[#2a2a2a] rounded">F1</kbd> or <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-[#2a2a2a] rounded">?</kbd> to toggle • <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-[#2a2a2a] rounded">Esc</kbd> to close
-            </p>
           </div>
         </Modal>
 

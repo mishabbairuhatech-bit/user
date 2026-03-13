@@ -104,6 +104,7 @@ const defaultSettings = {
   animations: true,
   borderRadius: 'rounded', // 'none', 'small', 'rounded', 'full'
   fontSize: 'medium', // 'small', 'medium', 'large'
+  posCartPosition: 'right', // 'left', 'right'
 };
 
 export const SettingsContext = createContext(null);

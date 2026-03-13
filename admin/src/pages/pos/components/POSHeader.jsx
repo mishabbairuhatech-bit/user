@@ -1,6 +1,6 @@
 import { ArrowLeft, Pause, BarChart3, RotateCcw, Clock, Settings, Keyboard, User, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Badge, Input } from '@components/ui';
+import { Badge, Button, Input } from '@components/ui';
 import { useSettings } from '@hooks';
 
 const POSHeader = ({
@@ -8,6 +8,8 @@ const POSHeader = ({
   onSearchChange,
   heldBillsCount,
   onHoldBillsClick,
+  isHeldBillsActive = false,
+  isReturnsActive = false,
   onReportsClick,
   onReturnsClick,
   onKeyboardClick,
@@ -22,12 +24,14 @@ const POSHeader = ({
     <header className="h-14 flex items-center justify-between px-6 bg-white dark:bg-[#121212] border-b border-gray-100 dark:border-[#2a2a2a] shrink-0">
       {/* Left - Back Button */}
       <div className="flex items-center gap-4 flex-1 max-w-xl">
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
+          icon={ArrowLeft}
+          iconOnly
           onClick={() => navigate('/admin/dashboard')}
-          className="flex flex-col items-center justify-center w-8 h-8 bg-gray-50 dark:bg-[#1e1e1e] hover:bg-gray-100 dark:hover:bg-[#2a2a2a] text-gray-500 dark:text-gray-400 rounded-lg transition-colors shrink-0"
-        >
-          <ArrowLeft size={18} />
-        </button>
+          className="shrink-0"
+        />
       </div>
 
       {/* Right - Actions & Profile */}
@@ -35,19 +39,24 @@ const POSHeader = ({
         {/* Existing Action Buttons */}
         <div className="flex items-center gap-1.5 pr-3 border-r border-gray-200 dark:border-[#2a2a2a]">
           {/* Returns */}
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={RotateCcw}
+            iconOnly
             onClick={onReturnsClick}
-            className="flex items-center justify-center w-8 h-8 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] hover:text-gray-900 dark:hover:text-white rounded-lg transition-colors"
             title="Returns (F3)"
-          >
-            <RotateCcw size={16} />
-          </button>
+            className={isReturnsActive ? '!bg-primary-100 dark:!bg-primary-900/30 !text-primary-600 dark:!text-primary-400' : ''}
+          />
 
           {/* Held Bills */}
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
+            iconOnly
             onClick={onHoldBillsClick}
-            className="relative flex items-center justify-center w-8 h-8 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] hover:text-gray-900 dark:hover:text-white rounded-lg transition-colors"
             title="Held Bills (F5)"
+            className={`relative ${isHeldBillsActive ? '!bg-primary-100 dark:!bg-primary-900/30 !text-primary-600 dark:!text-primary-400' : ''}`}
           >
             <Pause size={16} />
             {heldBillsCount > 0 && (
@@ -55,34 +64,37 @@ const POSHeader = ({
                 {heldBillsCount}
               </Badge>
             )}
-          </button>
+          </Button>
 
           {/* Reports */}
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={BarChart3}
+            iconOnly
             onClick={onReportsClick}
-            className="flex items-center justify-center w-8 h-8 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] hover:text-gray-900 dark:hover:text-white rounded-lg transition-colors"
             title="Reports (F4)"
-          >
-            <BarChart3 size={16} />
-          </button>
+          />
 
           {/* Keyboard Shortcuts */}
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={Keyboard}
+            iconOnly
             onClick={onKeyboardClick}
-            className="flex items-center justify-center w-8 h-8 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] hover:text-gray-900 dark:hover:text-white rounded-lg transition-colors"
             title="Keyboard Shortcuts (F1 / ?)"
-          >
-            <Keyboard size={16} />
-          </button>
+          />
 
           {/* Settings */}
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={Settings}
+            iconOnly
             onClick={openSettings}
-            className="flex items-center justify-center w-8 h-8 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] hover:text-gray-900 dark:hover:text-white rounded-lg transition-colors"
             title="Settings"
-          >
-            <Settings size={16} />
-          </button>
+          />
         </div>
 
         {/* User Profile */}

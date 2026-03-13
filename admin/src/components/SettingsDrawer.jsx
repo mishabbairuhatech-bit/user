@@ -1,9 +1,12 @@
 import { Check, RotateCcw } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { Drawer } from '@components/ui';
 import { useSettings, primaryColors, fontFamilies } from '@/context/SettingsContext';
 
 const SettingsDrawer = () => {
   const { settings, updateSetting, resetSettings, isSettingsOpen, closeSettings } = useSettings();
+  const location = useLocation();
+  const isPOSPage = location.pathname.includes('/pos');
 
   const themeModes = [
     { value: 'light', label: 'Light' },
@@ -184,16 +187,29 @@ const SettingsDrawer = () => {
             Layout
           </h3>
 
-          <SettingRow label="Sidebar position" description="Choose which side the sidebar appears" noBorder>
-            <SegmentedControl
-              options={[
-                { value: 'left', label: 'Left' },
-                { value: 'right', label: 'Right' },
-              ]}
-              value={settings.sidebarPosition}
-              onChange={(val) => updateSetting('sidebarPosition', val)}
-            />
-          </SettingRow>
+          {isPOSPage ? (
+            <SettingRow label="POS cart position" description="Which side the cart panel appears in POS" noBorder>
+              <SegmentedControl
+                options={[
+                  { value: 'left', label: 'Left' },
+                  { value: 'right', label: 'Right' },
+                ]}
+                value={settings.posCartPosition}
+                onChange={(val) => updateSetting('posCartPosition', val)}
+              />
+            </SettingRow>
+          ) : (
+            <SettingRow label="Sidebar position" description="Choose which side the sidebar appears" noBorder>
+              <SegmentedControl
+                options={[
+                  { value: 'left', label: 'Left' },
+                  { value: 'right', label: 'Right' },
+                ]}
+                value={settings.sidebarPosition}
+                onChange={(val) => updateSetting('sidebarPosition', val)}
+              />
+            </SettingRow>
+          )}
         </div>
       </div>
     </Drawer>

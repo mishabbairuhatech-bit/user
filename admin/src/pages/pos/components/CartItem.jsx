@@ -1,5 +1,6 @@
 import { Minus, Plus, X, Percent, DollarSign } from 'lucide-react';
 import { useState } from 'react';
+import { Button } from '@components/ui';
 
 const CartItem = ({ item, onUpdateQuantity, onUpdateDiscount, onUpdateDiscountType, onRemove, isSelected, showDiscount = false, onToggleDiscount }) => {
   const [localShowDiscount, setLocalShowDiscount] = useState(false);
@@ -60,21 +61,25 @@ const CartItem = ({ item, onUpdateQuantity, onUpdateDiscount, onUpdateDiscountTy
       <div className="flex flex-col items-end gap-2 ml-2">
         {/* Quantity */}
         <div className="flex items-center gap-1.5">
-          <button
+          <Button
+            variant="outline"
+            size="sm"
+            icon={Minus}
+            iconOnly
             onClick={() => onUpdateQuantity(product.id, quantity - 1)}
-            className="w-7 h-7 flex items-center justify-center border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1a1a1a] hover:bg-gray-50 dark:hover:bg-[#2a2a2a] rounded-lg text-gray-700 dark:text-gray-300 transition-colors shadow-sm"
-          >
-            <Minus size={14} strokeWidth={2.5} />
-          </button>
+            className="!w-7 !h-7 !min-h-0 !p-0 shadow-sm"
+          />
           <span className="w-4 text-center text-sm font-bold text-gray-900 dark:text-white">
             {quantity}
           </span>
-          <button
+          <Button
+            variant="primary"
+            size="sm"
+            icon={Plus}
+            iconOnly
             onClick={() => onUpdateQuantity(product.id, quantity + 1)}
-            className="w-7 h-7 flex items-center justify-center bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors shadow-sm"
-          >
-            <Plus size={14} strokeWidth={2.5} />
-          </button>
+            className="!w-7 !h-7 !min-h-0 !p-0 shadow-sm"
+          />
         </div>
 
         {/* Item Discount Option */}

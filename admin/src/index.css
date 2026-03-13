@@ -140,6 +140,16 @@ body {
 [data-radius="none"] .rounded-full:not(img):not([class*="w-6"]):not([class*="w-7"]):not([class*="w-8"]):not([class*="w-10"]) {
   border-radius: 0 !important;
 }
+[data-radius="none"] .rounded-l-lg,
+[data-radius="none"] .rounded-l-xl {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+[data-radius="none"] .rounded-r-lg,
+[data-radius="none"] .rounded-r-xl {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
 
 /* Small — subtle rounding */
 [data-radius="small"] .rounded-lg {
@@ -153,6 +163,19 @@ body {
 }
 [data-radius="small"] .rounded-3xl {
   border-radius: 10px !important;
+}
+[data-radius="small"] .rounded-full:not(img):not([class*="w-6"]):not([class*="w-7"]):not([class*="w-8"]):not([class*="w-10"]) {
+  border-radius: 12px !important;
+}
+[data-radius="small"] .rounded-l-lg,
+[data-radius="small"] .rounded-l-xl {
+  border-top-left-radius: 6px !important;
+  border-bottom-left-radius: 6px !important;
+}
+[data-radius="small"] .rounded-r-lg,
+[data-radius="small"] .rounded-r-xl {
+  border-top-right-radius: 6px !important;
+  border-bottom-right-radius: 6px !important;
 }
 
 /* Rounded — default Tailwind values, no overrides needed */
@@ -175,4 +198,20 @@ body {
 }
 [data-radius="full"] .rounded-3xl {
   border-radius: 28px !important;
+}
+[data-radius="full"] .rounded-l-lg {
+  border-top-left-radius: 14px !important;
+  border-bottom-left-radius: 14px !important;
+}
+[data-radius="full"] .rounded-l-xl {
+  border-top-left-radius: 18px !important;
+  border-bottom-left-radius: 18px !important;
+}
+[data-radius="full"] .rounded-r-lg {
+  border-top-right-radius: 14px !important;
+  border-bottom-right-radius: 14px !important;
+}
+[data-radius="full"] .rounded-r-xl {
+  border-top-right-radius: 18px !important;
+  border-bottom-right-radius: 18px !important;
 }

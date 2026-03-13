@@ -1,5 +1,5 @@
 import { Plus, Minus, AlertCircle } from 'lucide-react';
-import { Card } from '@components/ui';
+import { Card, Button } from '@components/ui';
 
 const ProductCard = ({ product, onAdd, onUpdateQuantity, cartQuantity, isSelected }) => {
   const isLowStock = product.stock <= 5;
@@ -69,40 +69,47 @@ const ProductCard = ({ product, onAdd, onUpdateQuantity, cartQuantity, isSelecte
         {!isOutOfStock && (
           inCart ? (
             /* Plus/Minus controls when in cart */
-            <div className="flex items-center justify-between w-full p-1 border border-primary-500 dark:border-primary-500 bg-white dark:bg-[#1a1a1a] rounded-[14px] h-10">
-              <button
+            <div className="flex items-center justify-between w-full p-1 border border-primary-500 dark:border-primary-500 bg-white dark:bg-[#1a1a1a] rounded-3xl h-10">
+              <Button
+                variant="outline"
+                size="sm"
+                icon={Minus}
+                iconOnly
                 onClick={(e) => {
                   e.stopPropagation();
                   onUpdateQuantity(product.id, cartQuantity - 1);
                 }}
-                className="w-8 h-8 flex items-center justify-center bg-white dark:bg-[#2a2a2a] hover:bg-gray-50 dark:hover:bg-[#363636] border border-gray-200 dark:border-[#333] text-gray-700 dark:text-gray-300 rounded-[10px] shadow-sm transition-all"
-              >
-                <Minus size={14} strokeWidth={2.5} />
-              </button>
+                className="!w-8 !h-8 !min-h-0 !p-0 shadow-sm"
+              />
               <span className="flex-1 text-center text-sm font-bold text-primary-700 dark:text-primary-300">
                 {cartQuantity} in cart
               </span>
-              <button
+              <Button
+                variant="primary"
+                size="sm"
+                icon={Plus}
+                iconOnly
                 onClick={(e) => {
                   e.stopPropagation();
                   onUpdateQuantity(product.id, cartQuantity + 1);
                 }}
-                className="w-8 h-8 flex items-center justify-center bg-primary-500 hover:bg-primary-600 text-white rounded-[10px] shadow-[0_2px_8px_-2px_rgba(var(--color-primary-500),0.5)] transition-all"
-              >
-                <Plus size={14} strokeWidth={2.5} />
-              </button>
+                className="!w-8 !h-8 !min-h-0 !p-0 !bg-primary-500 hover:!bg-primary-600 shadow-[0_2px_8px_-2px_rgba(var(--color-primary-500),0.5)]"
+              />
             </div>
           ) : (
             /* Add button when not in cart */
-            <button
+            <Button
+              variant="outline"
+              size="sm"
+              prefixIcon={Plus}
               onClick={(e) => {
                 e.stopPropagation();
                 onAdd(product);
               }}
-              className="w-full h-10 flex items-center justify-center gap-2 border border-primary-500 dark:border-primary-500 text-primary-600 dark:text-primary-400 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-600 bg-white dark:bg-[#1a1a1a] rounded-[14px] text-sm font-semibold transition-all active:scale-[0.98]"
+              className="w-full !h-10 !border-primary-500 !text-primary-600 dark:!text-primary-400 hover:!bg-primary-500 hover:!text-white dark:hover:!bg-primary-600 !bg-white dark:!bg-[#1a1a1a]"
             >
-              <Plus size={16} strokeWidth={2.5} /> Add to cart
-            </button>
+              Add to cart
+            </Button>
           )
         )}
       </div>

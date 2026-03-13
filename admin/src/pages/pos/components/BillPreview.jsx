@@ -94,8 +94,26 @@ const BillPreview = ({ isOpen, onClose, bill }) => {
       title=""
       size="sm"
       showCloseButton={false}
+      footer={
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            onClick={handlePrint}
+            prefixIcon={Printer}
+            className="flex-1"
+          >
+            Print <kbd className="ml-2 text-xs opacity-50">P</kbd>
+          </Button>
+          <Button
+            onClick={onClose}
+            className="flex-1"
+          >
+            Done <kbd className="ml-2 text-xs opacity-50">Enter</kbd>
+          </Button>
+        </div>
+      }
     >
-      <div className="text-center py-4">
+      <div className="text-center pt-4">
         {/* Success icon */}
         <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
           isReturn ? 'bg-orange-100 dark:bg-orange-900/30' : 'bg-green-100 dark:bg-green-900/30'
@@ -116,7 +134,7 @@ const BillPreview = ({ isOpen, onClose, bill }) => {
       </div>
 
       {/* Bill content */}
-      <div id="bill-print-content" className="bg-gray-50 dark:bg-[#1a1a1a] rounded-xl p-4 text-sm">
+      <div id="bill-print-content" className="bg-gray-50 dark:bg-[#1a1a1a] rounded-xl p-4 mb-4 text-sm">
         {/* Header */}
         <div className="text-center mb-4">
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">STORE NAME</h3>
@@ -250,23 +268,6 @@ const BillPreview = ({ isOpen, onClose, bill }) => {
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex gap-3 mt-4">
-        <Button
-          variant="outline"
-          onClick={handlePrint}
-          prefixIcon={Printer}
-          className="flex-1"
-        >
-          Print <kbd className="ml-2 text-xs opacity-50">P</kbd>
-        </Button>
-        <Button
-          onClick={onClose}
-          className="flex-1"
-        >
-          Done <kbd className="ml-2 text-xs opacity-50">Enter</kbd>
-        </Button>
-      </div>
     </Modal>
   );
 };

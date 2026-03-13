@@ -1,5 +1,6 @@
 import { ShoppingCart, Trash2, Pause, Percent } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
+import { Button } from '@components/ui';
 import CartItem from './CartItem';
 
 const CartPanel = ({
@@ -59,22 +60,24 @@ const CartPanel = ({
           )}
         </div>
         <div className="flex items-center gap-1.5">
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={Pause}
+            iconOnly
             onClick={onHold}
-            className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-[#2a2a2a] rounded-lg transition-colors"
             title="Hold bill"
             disabled={cart.length === 0}
-          >
-            <Pause size={16} />
-          </button>
-          <button
+          />
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={Trash2}
+            iconOnly
             onClick={onClear}
-            className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
             title="Clear cart"
             disabled={cart.length === 0}
-          >
-            <Trash2 size={16} />
-          </button>
+          />
         </div>
       </div>
 
@@ -185,13 +188,15 @@ const CartPanel = ({
             </div>
 
             {/* Checkout button */}
-            <button
-               onClick={onCheckout}
-               disabled={cart.length === 0}
-               className="w-full h-12 bg-primary-500 hover:bg-primary-600 text-white font-bold rounded-[14px] shadow-[0_4px_14px_0_rgba(var(--color-primary-500),0.39)] transition-all active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={onCheckout}
+              disabled={cart.length === 0}
+              className="w-full"
             >
               Place an Order
-            </button>
+            </Button>
           </div>
         </>
       )}
