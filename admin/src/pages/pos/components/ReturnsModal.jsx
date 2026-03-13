@@ -184,8 +184,39 @@ const ReturnsModal = ({ isOpen, onClose, completedBills, onProcessReturn }) => {
       onClose={onClose}
       title="Process Return"
       size="lg"
+      footer={
+        !selectedBill ? (
+          <div className="flex justify-end">
+            <Button variant="outline" onClick={onClose}>
+              Close <kbd className="ml-2 text-xs opacity-50">Esc</kbd>
+            </Button>
+          </div>
+        ) : (
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSelectedBill(null);
+                setSelectedItems({});
+              }}
+              className="flex-1"
+            >
+              Back <kbd className="ml-2 text-xs opacity-50">Bksp</kbd>
+            </Button>
+            <Button
+              onClick={handleProcessReturn}
+              disabled={!hasSelectedItems}
+              loading={processing}
+              className="flex-1 bg-orange-500 hover:bg-orange-600"
+              prefixIcon={RotateCcw}
+            >
+              Process <kbd className="ml-2 text-xs opacity-50">P</kbd>
+            </Button>
+          </div>
+        )
+      }
     >
-      <div className="space-y-4">
+      <div className="space-y-4 py-4">
         {!selectedBill ? (
           <>
             {/* Search */}
@@ -215,11 +246,10 @@ const ReturnsModal = ({ isOpen, onClose, completedBills, onProcessReturn }) => {
                     key={bill.id}
                     ref={el => itemRefs.current[index] = el}
                     onClick={() => handleSelectBill(bill)}
-                    className={`w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-[#1a1a1a] rounded-xl border-2 transition-colors text-left ${
-                      index === selectedIndex
+                    className={`w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-[#1a1a1a] rounded-xl border-2 transition-colors text-left ${index === selectedIndex
                         ? 'border-primary-500 dark:border-primary-500'
                         : 'border-gray-200 dark:border-[#2a2a2a] hover:border-primary-300 dark:hover:border-primary-600'
-                    }`}
+                      }`}
                   >
                     <div>
                       <p className="font-medium text-gray-900 dark:text-white">{bill.id}</p>
@@ -268,13 +298,12 @@ const ReturnsModal = ({ isOpen, onClose, completedBills, onProcessReturn }) => {
                 <div
                   key={idx}
                   ref={el => itemRefs.current[idx] = el}
-                  className={`flex items-center gap-3 p-3 rounded-lg border-2 transition-colors ${
-                    idx === selectedIndex
+                  className={`flex items-center gap-3 p-3 rounded-lg border-2 transition-colors ${idx === selectedIndex
                       ? 'border-primary-500 dark:border-primary-500'
                       : selectedItems[idx]?.selected
                         ? 'bg-primary-50 dark:bg-primary-900/20 border-primary-300 dark:border-primary-600'
                         : 'bg-gray-50 dark:bg-[#1a1a1a] border-gray-200 dark:border-[#2a2a2a]'
-                  }`}
+                    }`}
                 >
                   <Checkbox
                     checked={selectedItems[idx]?.selected || false}
@@ -335,37 +364,7 @@ const ReturnsModal = ({ isOpen, onClose, completedBills, onProcessReturn }) => {
               </div>
             )}
 
-            {/* Actions */}
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setSelectedBill(null);
-                  setSelectedItems({});
-                }}
-                className="flex-1"
-              >
-                Back <kbd className="ml-2 text-xs opacity-50">Bksp</kbd>
-              </Button>
-              <Button
-                onClick={handleProcessReturn}
-                disabled={!hasSelectedItems}
-                loading={processing}
-                className="flex-1 bg-orange-500 hover:bg-orange-600"
-                prefixIcon={RotateCcw}
-              >
-                Process <kbd className="ml-2 text-xs opacity-50">P</kbd>
-              </Button>
-            </div>
           </>
-        )}
-
-        {!selectedBill && (
-          <div className="flex justify-end border-t border-gray-200 dark:border-[#2a2a2a]">
-            <Button variant="outline" onClick={onClose}>
-              Close <kbd className="ml-2 text-xs opacity-50">Esc</kbd>
-            </Button>
-          </div>
         )}
       </div>
     </Modal>

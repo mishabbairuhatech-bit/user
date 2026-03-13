@@ -50,8 +50,23 @@ const DailyReportModal = ({ isOpen, onClose, report }) => {
       onClose={onClose}
       title="Daily Report"
       size="lg"
+      footer={
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            onClick={handlePrint}
+            prefixIcon={Printer}
+            className="flex-1"
+          >
+            Print <kbd className="ml-2 text-xs opacity-50">P</kbd>
+          </Button>
+          <Button onClick={onClose} className="flex-1">
+            Close <kbd className="ml-2 text-xs opacity-50">Enter</kbd>
+          </Button>
+        </div>
+      }
     >
-      <div className="space-y-6">
+      <div className="space-y-6 py-4">
         {/* Header */}
         <div className="text-center p-4 bg-gradient-to-r from-primary-500 to-primary-600 rounded-xl text-white">
           <p className="text-sm opacity-80">Sales Report</p>
@@ -170,20 +185,6 @@ const DailyReportModal = ({ isOpen, onClose, report }) => {
           </div>
         )}
 
-        {/* Actions */}
-        <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-[#2a2a2a]">
-          <Button
-            variant="outline"
-            onClick={handlePrint}
-            prefixIcon={Printer}
-            className="flex-1"
-          >
-            Print <kbd className="ml-2 text-xs opacity-50">P</kbd>
-          </Button>
-          <Button onClick={onClose} className="flex-1">
-            Close <kbd className="ml-2 text-xs opacity-50">Enter</kbd>
-          </Button>
-        </div>
       </div>
     </Modal>
   );

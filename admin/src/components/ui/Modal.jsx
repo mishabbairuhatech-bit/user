@@ -89,7 +89,7 @@ const Modal = ({
           )}
 
           {/* Body */}
-          <div className="px-6 py-4">
+          <div className="px-6">
             {children}
           </div>
 

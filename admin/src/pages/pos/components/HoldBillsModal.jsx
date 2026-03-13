@@ -66,101 +66,99 @@ const HoldBillsModal = ({ isOpen, onClose, heldBills, onResume, onDelete }) => {
       onClose={onClose}
       title="Held Bills"
       size="lg"
-    >
-      <div className="space-y-4">
-        {heldBills.length === 0 ? (
-          <div className="text-center py-12 text-gray-400 dark:text-gray-500">
-            <ShoppingCart size={48} className="mx-auto mb-4 opacity-50" />
-            <p className="text-lg font-medium">No held bills</p>
-            <p className="text-sm">Bills you hold will appear here</p>
-          </div>
-        ) : (
-          <div className="space-y-3 max-h-[400px] overflow-y-auto scrollbar-hide">
-            {heldBills.map((bill, index) => (
-              <div
-                key={bill.id}
-                ref={el => itemRefs.current[index] = el}
-                className={`flex items-center gap-4 p-4 bg-gray-50 dark:bg-[#1a1a1a] rounded-xl border-2 transition-colors ${
-                  index === selectedIndex
-                    ? 'border-primary-500 dark:border-primary-500'
-                    : 'border-gray-200 dark:border-[#2a2a2a]'
-                }`}
-              >
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Clock size={14} className="text-gray-400" />
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {formatTime(bill.created_at)}
-                    </span>
-                    {bill.customer && (
-                      <span className="text-sm text-gray-700 dark:text-gray-300">
-                        - {bill.customer}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {bill.items.length} items
-                    </span>
-                    <span className="text-lg font-bold text-gray-900 dark:text-white">
-                      ${bill.totals.total.toFixed(2)}
-                    </span>
-                  </div>
-
-                  {/* Items preview */}
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {bill.items.slice(0, 3).map((item, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-0.5 text-xs bg-gray-200 dark:bg-[#2a2a2a] text-gray-700 dark:text-gray-300 rounded-full"
-                      >
-                        {item.quantity}x {item.product.name}
-                      </span>
-                    ))}
-                    {bill.items.length > 3 && (
-                      <span className="px-2 py-0.5 text-xs bg-gray-200 dark:bg-[#2a2a2a] text-gray-500 dark:text-gray-400 rounded-full">
-                        +{bill.items.length - 3} more
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onDelete(bill.id)}
-                    className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-                  >
-                    <Trash2 size={16} />
-                    {index === selectedIndex && <kbd className="ml-1 text-xs opacity-50">Del</kbd>}
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      onResume(bill.id);
-                      onClose();
-                    }}
-                    prefixIcon={Play}
-                  >
-                    Resume
-                    {index === selectedIndex && <kbd className="ml-1 text-xs opacity-50">Enter</kbd>}
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <div className="flex justify-end border-t border-gray-200 dark:border-[#2a2a2a]">
+      footer={
+        <div className="flex justify-end">
           <Button variant="outline" onClick={onClose}>
             Close <kbd className="ml-2 text-xs opacity-50">Esc</kbd>
           </Button>
         </div>
-      </div>
+      }
+    >
+      {heldBills.length === 0 ? (
+        <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+          <ShoppingCart size={48} className="mx-auto mb-4 opacity-50" />
+          <p className="text-lg font-medium">No held bills</p>
+          <p className="text-sm">Bills you hold will appear here</p>
+        </div>
+      ) : (
+        <div className="space-y-3 py-4 max-h-[400px] overflow-y-auto scrollbar-hide">
+          {heldBills.map((bill, index) => (
+            <div
+              key={bill.id}
+              ref={el => itemRefs.current[index] = el}
+              className={`flex items-center gap-4 p-4 bg-gray-50 dark:bg-[#1a1a1a] rounded-xl border-2 transition-colors ${index === selectedIndex
+                ? 'border-primary-500 dark:border-primary-500'
+                : 'border-gray-200 dark:border-[#2a2a2a]'
+                }`}
+            >
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <Clock size={14} className="text-gray-400" />
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {formatTime(bill.created_at)}
+                  </span>
+                  {bill.customer && (
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      - {bill.customer}
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    {bill.items.length} items
+                  </span>
+                  <span className="text-lg font-bold text-gray-900 dark:text-white">
+                    ${bill.totals.total.toFixed(2)}
+                  </span>
+                </div>
+
+                {/* Items preview */}
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {bill.items.slice(0, 3).map((item, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2 py-0.5 text-xs bg-gray-200 dark:bg-[#2a2a2a] text-gray-700 dark:text-gray-300 rounded-full"
+                    >
+                      {item.quantity}x {item.product.name}
+                    </span>
+                  ))}
+                  {bill.items.length > 3 && (
+                    <span className="px-2 py-0.5 text-xs bg-gray-200 dark:bg-[#2a2a2a] text-gray-500 dark:text-gray-400 rounded-full">
+                      +{bill.items.length - 3} more
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onDelete(bill.id)}
+                  className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                >
+                  <Trash2 size={16} />
+                  {index === selectedIndex && <kbd className="ml-1 text-xs opacity-50">Del</kbd>}
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    onResume(bill.id);
+                    onClose();
+                  }}
+                  prefixIcon={Play}
+                >
+                  Resume
+                  {index === selectedIndex && <kbd className="ml-1 text-xs opacity-50">Enter</kbd>}
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </Modal>
   );
 };
