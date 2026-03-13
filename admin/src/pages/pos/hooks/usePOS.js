@@ -41,7 +41,7 @@ const usePOS = () => {
         return updated;
       }
       // Add new item
-      return [...prev, { product, quantity: 1, discount: 0 }];
+      return [...prev, { product, quantity: 1, discount: 0, discountType: 'percent' }];
     });
   }, []);
 
@@ -62,7 +62,16 @@ const usePOS = () => {
   const updateItemDiscount = useCallback((productId, discount) => {
     setCart(prev => prev.map(item =>
       item.product.id === productId
-        ? { ...item, discount: Math.max(0, Math.min(100, discount)) }
+        ? { ...item, discount: Math.max(0, item.discountType === 'percent' ? Math.min(100, discount) : discount) }
+        : item
+    ));
+  }, []);
+
+  // Update item discount type
+  const updateItemDiscountType = useCallback((productId, discountType) => {
+    setCart(prev => prev.map(item =>
+      item.product.id === productId
+        ? { ...item, discountType, discount: 0 }
         : item
     ));
   }, []);
@@ -82,11 +91,17 @@ const usePOS = () => {
 
   // Calculate totals
   const calculateTotals = useCallback(() => {
-    const subtotal = cart.reduce((sum, item) => {
+    const grossTotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+
+    const itemDiscountTotal = cart.reduce((sum, item) => {
       const itemTotal = item.product.price * item.quantity;
-      const itemDiscount = (itemTotal * item.discount) / 100;
-      return sum + (itemTotal - itemDiscount);
+      const itemDiscount = item.discountType === 'fixed'
+        ? Math.min(item.discount * item.quantity, itemTotal)
+        : (itemTotal * item.discount) / 100;
+      return sum + itemDiscount;
     }, 0);
+
+    const subtotal = grossTotal - itemDiscountTotal;
 
     let discountAmount = 0;
     if (discountType === 'percent') {
@@ -100,6 +115,8 @@ const usePOS = () => {
     const total = afterDiscount + tax;
 
     return {
+      grossTotal: Number(grossTotal.toFixed(2)),
+      itemDiscountTotal: Number(itemDiscountTotal.toFixed(2)),
       subtotal: Number(subtotal.toFixed(2)),
       discountAmount: Number(discountAmount.toFixed(2)),
       tax: Number(tax.toFixed(2)),
@@ -281,6 +298,7 @@ const usePOS = () => {
     addToCart,
     updateQuantity,
     updateItemDiscount,
+    updateItemDiscountType,
     removeFromCart,
     clearCart,
 

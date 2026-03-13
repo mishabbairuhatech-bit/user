@@ -153,36 +153,69 @@ const BillPreview = ({ isOpen, onClose, bill }) => {
         <div className="border-t border-dashed border-gray-300 dark:border-gray-600 my-3" />
 
         {/* Items */}
-        <div className="space-y-2 mb-3">
-          {bill.items.map((item, idx) => (
-            <div key={idx} className="flex justify-between">
-              <div>
-                <span className="text-gray-900 dark:text-white">{item.product.name}</span>
-                <span className="text-gray-500 ml-2">x{item.quantity}</span>
+        <div className="space-y-1.5 mb-3">
+          {bill.items.map((item, idx) => {
+            const itemTotal = item.product.price * item.quantity;
+            const itemDiscountType = item.discountType || 'percent';
+            const itemDiscountAmt = itemDiscountType === 'fixed'
+              ? Math.min(item.discount * item.quantity, itemTotal)
+              : (itemTotal * item.discount) / 100;
+            const itemFinal = itemTotal - itemDiscountAmt;
+            const hasDiscount = itemDiscountAmt > 0;
+
+            return (
+              <div key={idx} className="flex justify-between items-center">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-gray-900 dark:text-white">{item.product.name}</span>
+                  <span className="text-gray-500">x{item.quantity}</span>
+                  {hasDiscount && (
+                    <span className="text-[10px] text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-1 py-0.5 rounded">
+                      {itemDiscountType === 'percent' ? `${item.discount}%` : `$${item.discount}`} off
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {hasDiscount && (
+                    <span className="text-xs text-gray-400 dark:text-gray-500 line-through">${itemTotal.toFixed(2)}</span>
+                  )}
+                  <span className={`font-medium ${hasDiscount ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-white'}`}>
+                    ${itemFinal.toFixed(2)}
+                  </span>
+                </div>
               </div>
-              <span className="text-gray-900 dark:text-white">
-                ${(item.product.price * item.quantity).toFixed(2)}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="border-t border-dashed border-gray-300 dark:border-gray-600 my-3" />
 
         {/* Totals */}
         <div className="space-y-1">
+          {/* Gross Total */}
+          {bill.totals.itemDiscountTotal > 0 && (
+            <>
+              <div className="flex justify-between text-xs">
+                <span className="text-gray-500">Gross Total</span>
+                <span className="text-gray-900 dark:text-white">${bill.totals.grossTotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-gray-500">Item Discounts</span>
+                <span className="text-green-600 dark:text-green-400">-${bill.totals.itemDiscountTotal.toFixed(2)}</span>
+              </div>
+            </>
+          )}
           <div className="flex justify-between text-xs">
             <span className="text-gray-500">Subtotal</span>
             <span className="text-gray-900 dark:text-white">${bill.totals.subtotal.toFixed(2)}</span>
           </div>
           {bill.totals.discountAmount > 0 && (
             <div className="flex justify-between text-xs">
-              <span className="text-gray-500">Discount</span>
-              <span className="text-green-600">-${bill.totals.discountAmount.toFixed(2)}</span>
+              <span className="text-gray-500">Cart Discount</span>
+              <span className="text-green-600 dark:text-green-400">-${bill.totals.discountAmount.toFixed(2)}</span>
             </div>
           )}
           <div className="flex justify-between text-xs">
-            <span className="text-gray-500">Tax (5%)</span>
+            <span className="text-gray-500">Tax (10%)</span>
             <span className="text-gray-900 dark:text-white">${bill.totals.tax.toFixed(2)}</span>
           </div>
           <div className="flex justify-between font-bold text-base pt-2 border-t border-gray-300 dark:border-gray-600">

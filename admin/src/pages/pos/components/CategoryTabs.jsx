@@ -1,12 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { Coffee, UtensilsCrossed, Cake, Cookie, LayoutGrid } from 'lucide-react';
-
-const iconMap = {
-  Coffee,
-  UtensilsCrossed,
-  Cake,
-  Cookie,
-};
 
 const CategoryTabs = ({ categories, activeCategory, onCategoryChange, selectedIndex = 0, isFocused = false }) => {
   const itemRefs = useRef([]);
@@ -23,29 +15,30 @@ const CategoryTabs = ({ categories, activeCategory, onCategoryChange, selectedIn
   }, [selectedIndex, isFocused]);
 
   return (
-    <div className={`flex items-center gap-2 px-4 h-14 bg-white dark:bg-[#121212] border-2 overflow-x-auto scrollbar-hide transition-colors ${
-      isFocused
-        ? 'border-primary-500 dark:border-primary-500'
-        : 'border-transparent'
-    }`}>
+    <div className="flex items-center gap-6 px-6 h-14 bg-white dark:bg-[#121212] overflow-x-auto scrollbar-hide border-b border-gray-100 dark:border-[#2a2a2a] transition-colors leading-none">
       {/* All category */}
       <button
         ref={el => itemRefs.current[0] = el}
         onClick={() => onCategoryChange(null)}
-        className={`relative flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all ${
+        className={`relative flex items-center h-full px-3 whitespace-nowrap transition-all ${
+          isFocused && selectedIndex === 0
+            ? 'ring-2 ring-primary-400 ring-inset rounded-md'
+            : ''
+        } ${
           activeCategory === null
-            ? 'bg-primary-600 text-white'
-            : 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#363636]'
-        } ${isFocused && selectedIndex === 0 ? 'ring-2 ring-primary-400 ring-offset-1' : ''}`}
+            ? 'text-gray-900 dark:text-white font-bold'
+            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+        }`}
         title="Alt+1"
       >
-        <LayoutGrid size={16} />
-        <span className="text-sm font-medium">All</span>
+        <span className="text-sm">All Items</span>
+        {activeCategory === null && (
+          <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gray-900 dark:bg-white" />
+        )}
       </button>
 
       {/* Category buttons */}
       {categories.map((category, index) => {
-        const IconComponent = iconMap[category.icon] || Coffee;
         const isActive = activeCategory === category.id;
         const isSelected = isFocused && selectedIndex === index + 1;
 
@@ -54,15 +47,21 @@ const CategoryTabs = ({ categories, activeCategory, onCategoryChange, selectedIn
             key={category.id}
             ref={el => itemRefs.current[index + 1] = el}
             onClick={() => onCategoryChange(category.id)}
-            className={`relative flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all ${
+            className={`relative flex items-center h-full px-3 whitespace-nowrap transition-all ${
+              isSelected
+                ? 'ring-2 ring-primary-400 ring-inset rounded-md'
+                : ''
+            } ${
               isActive
-                ? 'bg-primary-600 text-white'
-                : 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#363636]'
-            } ${isSelected ? 'ring-2 ring-primary-400 ring-offset-1' : ''}`}
+                ? 'text-gray-900 dark:text-white font-bold'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+            }`}
             title={`Alt+${index + 2 <= 9 ? index + 2 : 0}`}
           >
-            <IconComponent size={16} />
-            <span className="text-sm font-medium">{category.name}</span>
+            <span className="text-sm">{category.name}</span>
+            {isActive && (
+              <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gray-900 dark:bg-white" />
+            )}
           </button>
         );
       })}
