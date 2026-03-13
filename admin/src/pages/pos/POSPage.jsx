@@ -153,8 +153,9 @@ const POSPage = () => {
       return;
     }
 
-    // F1 to toggle shortcuts modal (works even when modal is open)
-    if (e.key === 'F1') {
+    // F1 or ? to toggle shortcuts modal (works even when modal is open)
+    // On Mac, F1 is intercepted by the OS (brightness), so ? (Shift+/) is the alternative
+    if (e.key === 'F1' || (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey)) {
       e.preventDefault();
       setShowShortcutsModal(prev => !prev);
       return;
@@ -619,6 +620,7 @@ const POSPage = () => {
               <div>
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Actions</h4>
                 <div className="space-y-1 text-sm">
+                  <div className="flex justify-between"><span className="text-gray-500">Shortcuts</span><span className="flex gap-1"><kbd className="px-2 py-0.5 bg-gray-100 dark:bg-[#2a2a2a] rounded">F1</kbd> <kbd className="px-2 py-0.5 bg-gray-100 dark:bg-[#2a2a2a] rounded">?</kbd></span></div>
                   <div className="flex justify-between"><span className="text-gray-500">Hold Bill</span><span className="flex gap-1"><kbd className="px-2 py-0.5 bg-gray-100 dark:bg-[#2a2a2a] rounded">F2</kbd> <kbd className="px-2 py-0.5 bg-gray-100 dark:bg-[#2a2a2a] rounded">Cmd+S</kbd></span></div>
                   <div className="flex justify-between"><span className="text-gray-500">Returns</span><span className="flex gap-1"><kbd className="px-2 py-0.5 bg-gray-100 dark:bg-[#2a2a2a] rounded">F3</kbd> <kbd className="px-2 py-0.5 bg-gray-100 dark:bg-[#2a2a2a] rounded">Cmd+R</kbd></span></div>
                   <div className="flex justify-between"><span className="text-gray-500">Reports</span><span className="flex gap-1"><kbd className="px-2 py-0.5 bg-gray-100 dark:bg-[#2a2a2a] rounded">F4</kbd> <kbd className="px-2 py-0.5 bg-gray-100 dark:bg-[#2a2a2a] rounded">Cmd+E</kbd></span></div>
@@ -629,7 +631,7 @@ const POSPage = () => {
               </div>
             </div>
             <p className="text-xs text-gray-400 text-center pt-2 border-t border-gray-200 dark:border-[#2a2a2a]">
-              Press <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-[#2a2a2a] rounded">F1</kbd> to toggle • <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-[#2a2a2a] rounded">Esc</kbd> to close
+              Press <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-[#2a2a2a] rounded">F1</kbd> or <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-[#2a2a2a] rounded">?</kbd> to toggle • <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-[#2a2a2a] rounded">Esc</kbd> to close
             </p>
           </div>
         </Modal>

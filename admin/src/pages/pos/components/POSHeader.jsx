@@ -70,7 +70,7 @@ const POSHeader = ({
           <button
             onClick={onKeyboardClick}
             className="flex items-center justify-center w-8 h-8 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] hover:text-gray-900 dark:hover:text-white rounded-lg transition-colors"
-            title="Keyboard Shortcuts (F1)"
+            title="Keyboard Shortcuts (F1 / ?)"
           >
             <Keyboard size={16} />
           </button>
