@@ -52,7 +52,7 @@ const Button = forwardRef(({
       type={type}
       disabled={disabled || loading}
       className={`
-        inline-flex items-center justify-center font-medium rounded-3xl
+        inline-flex items-center justify-center font-medium rounded-xl
         outline-none
         focus:outline-none
         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#141414]

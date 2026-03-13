@@ -69,7 +69,7 @@ const ProductCard = ({ product, onAdd, onUpdateQuantity, cartQuantity, isSelecte
         {!isOutOfStock && (
           inCart ? (
             /* Plus/Minus controls when in cart */
-            <div className="flex items-center justify-between w-full p-1 border border-primary-500 dark:border-primary-500 bg-white dark:bg-[#1a1a1a] rounded-3xl h-10">
+            <div className="flex items-center justify-between w-full p-1 border border-primary-500 dark:border-primary-500 bg-white dark:bg-[#1a1a1a] rounded-xl h-10">
               <Button
                 variant="outline"
                 size="sm"

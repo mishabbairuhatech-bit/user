@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Banknote, CreditCard, Smartphone, Check, ArrowLeft, Loader2 } from 'lucide-react';
-import { Button } from '@components/ui';
+import { Button, Input } from '@components/ui';
 
 const paymentMethods = [
   { id: 'cash', name: 'Cash', icon: Banknote, color: 'bg-green-500' },
@@ -263,13 +263,15 @@ const PaymentPanel = ({ isActive, totals, cart = [], onComplete, onBack }) => {
             const Icon = method.icon;
             const isSelected = index === selectedMethodIndex;
             return (
-              <button
+              <Button
                 key={method.id}
+                variant={isSelected ? 'outline' : 'ghost'}
+                size="sm"
                 onClick={() => { setSelectedMethodIndex(index); setFocusArea('method'); }}
-                className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg border-2 transition-all ${
+                className={`!flex !items-center !justify-center gap-1.5 !py-2 !px-2 !rounded-lg !border-2 ${
                   isSelected
-                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                    : 'border-gray-200 dark:border-[#2a2a2a] hover:border-gray-300 dark:hover:border-[#424242]'
+                    ? '!border-primary-500 !bg-primary-50 dark:!bg-primary-900/20'
+                    : '!border-gray-200 dark:!border-[#2a2a2a] hover:!border-gray-300 dark:hover:!border-[#424242]'
                 }`}
               >
                 <div className={`w-7 h-7 rounded-full ${method.color} flex items-center justify-center text-white shrink-0`}>
@@ -280,7 +282,7 @@ const PaymentPanel = ({ isActive, totals, cart = [], onComplete, onBack }) => {
                 }`}>
                   {method.name}
                 </span>
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -288,9 +290,10 @@ const PaymentPanel = ({ isActive, totals, cart = [], onComplete, onBack }) => {
         {/* Cash input */}
         {selectedMethod === 'cash' && (
           <div className="space-y-2">
-            <input
+            <Input
               ref={amountRef}
-              type="number"
+              type="text"
+              size="md"
               value={amountTendered}
               onChange={(e) => setAmountTendered(e.target.value)}
               onFocus={() => setFocusArea('amount')}
@@ -310,28 +313,32 @@ const PaymentPanel = ({ isActive, totals, cart = [], onComplete, onBack }) => {
                 }
               }}
               placeholder="Amount tendered"
-              className="w-full h-10 text-center text-lg font-semibold bg-white dark:bg-[#1a1a1a] border-2 border-gray-200 dark:border-[#2a2a2a] rounded-lg outline-none transition-colors text-gray-900 dark:text-white focus:border-gray-300 dark:focus:border-[#3a3a3a]"
+              className="[&_input]:text-center [&_input]:text-lg [&_input]:font-semibold"
             />
 
             {/* Quick amounts */}
             <div className="flex gap-1 rounded-lg">
               {quickAmounts.map((amount, idx) => (
-                <button
+                <Button
                   key={amount}
+                  variant="secondary"
+                  size="sm"
                   onClick={() => setAmountTendered(String(amount))}
-                  className="flex-1 py-1.5 rounded-md text-[11px] font-medium transition-colors flex flex-col items-center bg-gray-100 dark:bg-[#2a2a2a] hover:bg-gray-200 dark:hover:bg-[#363636] text-gray-700 dark:text-gray-300"
+                  className="flex-1 !flex !flex-col !items-center !px-2 !py-1.5 !min-h-0 !text-[11px]"
                 >
                   <span>${amount}</span>
                   <kbd className="text-[9px] text-gray-400">{idx + 1}</kbd>
-                </button>
+                </Button>
               ))}
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => setAmountTendered(String(Math.ceil(totals.total)))}
-                className="flex-1 py-1.5 rounded-md text-[11px] font-medium transition-colors flex flex-col items-center bg-primary-100 dark:bg-primary-900/20 hover:bg-primary-200 dark:hover:bg-primary-900/30 text-primary-600 dark:text-primary-400"
+                className="flex-1 !flex !flex-col !items-center !px-2 !py-1.5 !min-h-0 !text-[11px] !bg-primary-100 dark:!bg-primary-900/20 hover:!bg-primary-200 dark:hover:!bg-primary-900/30 !text-primary-600 dark:!text-primary-400"
               >
                 <span>Exact</span>
                 <kbd className="text-[9px] text-primary-400">E</kbd>
-              </button>
+              </Button>
             </div>
 
             {/* Change */}
