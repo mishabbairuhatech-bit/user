@@ -16,7 +16,7 @@ const CartItem = ({ item, onUpdateQuantity, onUpdateDiscount, onUpdateDiscountTy
   return (
     <div className={`flex items-center gap-3 py-3 px-3 rounded-xl transition-all duration-300 ease-in-out ${
       isSelected
-        ? 'bg-primary-50 dark:bg-primary-900/20 scale-[1.04] shadow-sm -translate-y-0.5'
+        ? 'bg-primary-50 dark:bg-transparent scale-[1.04] shadow-sm -translate-y-0.5'
         : 'scale-100 translate-y-0 hover:bg-gray-50/50 dark:hover:bg-[#1a1a1a]/50'
     }`}>
       {/* Image */}
@@ -41,20 +41,20 @@ const CartItem = ({ item, onUpdateQuantity, onUpdateDiscount, onUpdateDiscountTy
 
       {/* Info */}
       <div className="flex-1 min-w-0 flex flex-col justify-center">
-        <h4 className="text-[13px] font-bold text-gray-900 dark:text-white truncate">
+        <h4 className={`text-[13px] font-bold truncate ${isSelected ? 'text-primary-600 dark:text-primary-400' : 'text-gray-900 dark:text-white'}`}>
           {product.name}
         </h4>
-        <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate mt-0.5">
+        <p className={`text-[11px] truncate mt-0.5 ${isSelected ? 'text-primary-500 dark:text-primary-300' : 'text-gray-400 dark:text-gray-500'}`}>
           {product.description || `Artificial potted plant, 9 cm`}
         </p>
         <div className="flex items-center gap-1.5 mt-1">
           {discountAmount > 0 ? (
             <>
-              <span className="text-[11px] text-gray-400 dark:text-gray-500 line-through">${itemTotal.toFixed(2)}</span>
-              <span className="text-[13px] font-extrabold text-green-500 dark:text-green-400">${finalPrice.toFixed(2)}</span>
+              <span className={`text-[11px] line-through ${isSelected ? 'text-primary-400 dark:text-primary-300' : 'text-gray-400 dark:text-gray-500'}`}>${itemTotal.toFixed(2)}</span>
+              <span className={`text-[13px] font-extrabold ${isSelected ? 'text-primary-600 dark:text-primary-400' : 'text-green-500 dark:text-green-400'}`}>${finalPrice.toFixed(2)}</span>
             </>
           ) : (
-            <span className="text-[13px] font-extrabold text-primary-500 dark:text-primary-400">${itemTotal.toFixed(2)}</span>
+            <span className={`text-[13px] font-extrabold ${isSelected ? 'text-primary-600 dark:text-primary-400' : 'text-primary-500 dark:text-primary-400'}`}>${itemTotal.toFixed(2)}</span>
           )}
         </div>
       </div>
@@ -71,7 +71,7 @@ const CartItem = ({ item, onUpdateQuantity, onUpdateDiscount, onUpdateDiscountTy
             onClick={() => onUpdateQuantity(product.id, quantity - 1)}
             className="!w-7 !h-7 !min-h-0 !p-0 shadow-sm"
           />
-          <span className="w-4 text-center text-sm font-bold text-gray-900 dark:text-white">
+          <span className={`w-4 text-center text-sm font-bold ${isSelected ? 'text-primary-600 dark:text-primary-400' : 'text-gray-900 dark:text-white'}`}>
             {quantity}
           </span>
           <Button

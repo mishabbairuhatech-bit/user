@@ -56,7 +56,7 @@ const HeldBillsWarningModal = ({ isOpen, onClose, onHoldBill, onClearCart, conte
             variant="ghost"
             size="md"
             onClick={onHoldBill}
-            className="w-full !flex !items-center !gap-3 !px-4 !py-3 !h-auto !bg-primary-50 dark:!bg-primary-900/20 hover:!bg-primary-100 dark:hover:!bg-primary-900/30 !border-2 !border-primary-200 dark:!border-primary-800 !rounded-xl"
+            className="w-full !flex !items-center !gap-3 !px-4 !py-3 !h-auto !bg-primary-50 dark:!bg-[#0a1f12] hover:!bg-primary-100 dark:hover:!bg-[#0f2a18] !border-2 !border-primary-200 dark:!border-primary-800 !rounded-xl"
           >
             <div className="w-9 h-9 rounded-lg bg-primary-500 flex items-center justify-center shrink-0">
               <Pause size={18} className="text-white" />
@@ -85,7 +85,7 @@ const HeldBillsWarningModal = ({ isOpen, onClose, onHoldBill, onClearCart, conte
             variant="ghost"
             size="md"
             onClick={onClearCart}
-            className="w-full !flex !items-center !gap-3 !px-4 !py-3 !h-auto !bg-red-50 dark:!bg-red-900/10 hover:!bg-red-100 dark:hover:!bg-red-900/20 !border-2 !border-red-200 dark:!border-red-800/50 !rounded-xl"
+            className="w-full !flex !items-center !gap-3 !px-4 !py-3 !h-auto !bg-red-50 dark:!bg-[#1f0a0a] hover:!bg-red-100 dark:hover:!bg-[#2a0f0f] !border-2 !border-red-200 dark:!border-red-900 !rounded-xl"
           >
             <div className="w-9 h-9 rounded-lg bg-red-500 flex items-center justify-center shrink-0">
               <Trash2 size={18} className="text-white" />
