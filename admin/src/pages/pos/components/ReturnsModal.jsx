@@ -242,13 +242,15 @@ const ReturnsModal = ({ isOpen, onClose, completedBills, onProcessReturn }) => {
                 </div>
               ) : (
                 filteredBills.map((bill, index) => (
-                  <button
+                  <Button
                     key={bill.id}
                     ref={el => itemRefs.current[index] = el}
+                    variant="ghost"
+                    size="md"
                     onClick={() => handleSelectBill(bill)}
-                    className={`w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-[#1a1a1a] rounded-xl border-2 transition-colors text-left ${index === selectedIndex
-                        ? 'border-primary-500 dark:border-primary-500'
-                        : 'border-gray-200 dark:border-[#2a2a2a] hover:border-primary-300 dark:hover:border-primary-600'
+                    className={`w-full !flex !items-center !justify-between !p-4 !h-auto !min-h-0 !rounded-xl !border-2 !text-left ${index === selectedIndex
+                        ? '!border-primary-500 dark:!border-primary-500 !bg-gray-50 dark:!bg-[#1a1a1a]'
+                        : '!border-gray-200 dark:!border-[#2a2a2a] hover:!border-primary-300 dark:hover:!border-primary-600 !bg-gray-50 dark:!bg-[#1a1a1a]'
                       }`}
                   >
                     <div>
@@ -263,7 +265,7 @@ const ReturnsModal = ({ isOpen, onClose, completedBills, onProcessReturn }) => {
                       </span>
                       {index === selectedIndex && <kbd className="text-xs text-gray-400">Enter</kbd>}
                     </div>
-                  </button>
+                  </Button>
                 ))
               )}
             </div>
@@ -278,15 +280,17 @@ const ReturnsModal = ({ isOpen, onClose, completedBills, onProcessReturn }) => {
                   {formatDate(selectedBill.created_at)}
                 </p>
               </div>
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
+                icon={X}
+                iconOnly
                 onClick={() => {
                   setSelectedBill(null);
                   setSelectedItems({});
                 }}
-                className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-              >
-                <X size={20} />
-              </button>
+                className="!text-gray-400 hover:!text-gray-600 dark:hover:!text-gray-300"
+              />
             </div>
 
             {/* Items to return */}
@@ -324,21 +328,27 @@ const ReturnsModal = ({ isOpen, onClose, completedBills, onProcessReturn }) => {
                   </div>
                   {selectedItems[idx]?.selected && (
                     <div className="flex items-center gap-2">
-                      <button
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        iconOnly
                         onClick={() => updateQuantity(idx, selectedItems[idx].quantity - 1)}
-                        className="w-7 h-7 flex items-center justify-center bg-gray-200 dark:bg-[#2a2a2a] rounded-lg"
+                        className="!w-7 !h-7 !min-h-0 !p-0"
                       >
                         -
-                      </button>
+                      </Button>
                       <span className="w-8 text-center text-sm font-medium">
                         {selectedItems[idx].quantity}
                       </span>
-                      <button
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        iconOnly
                         onClick={() => updateQuantity(idx, selectedItems[idx].quantity + 1)}
-                        className="w-7 h-7 flex items-center justify-center bg-gray-200 dark:bg-[#2a2a2a] rounded-lg"
+                        className="!w-7 !h-7 !min-h-0 !p-0"
                       >
                         +
-                      </button>
+                      </Button>
                     </div>
                   )}
                   {idx === selectedIndex && <kbd className="text-xs text-gray-400">Enter</kbd>}

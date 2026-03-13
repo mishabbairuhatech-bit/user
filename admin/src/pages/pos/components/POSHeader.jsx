@@ -98,10 +98,14 @@ const POSHeader = ({
         </div>
 
         {/* User Profile */}
-        <button className="flex items-center gap-2 pl-1 hover:opacity-80 transition-opacity">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="!flex !items-center !gap-2 !pl-1 !min-h-0"
+        >
           <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-lg overflow-hidden shrink-0 border border-orange-200 dark:border-orange-800">
-            <img 
-              src="https://api.dicebear.com/7.x/notionists/svg?seed=Antonella&backgroundColor=ffedd5" 
+            <img
+              src="https://api.dicebear.com/7.x/notionists/svg?seed=Antonella&backgroundColor=ffedd5"
               alt="Cashier"
               className="w-full h-full object-cover"
             />
@@ -111,7 +115,7 @@ const POSHeader = ({
             <span className="text-xs font-bold text-gray-900 dark:text-white leading-none">Antonella</span>
           </div>
           <ChevronDown size={14} className="text-gray-400" />
-        </button>
+        </Button>
       </div>
     </header>
   );

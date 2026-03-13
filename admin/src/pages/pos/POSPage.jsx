@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { ShoppingCart, LayoutGrid, Home, Clock, Bookmark, Settings, Pause, RotateCcw, BarChart3, Keyboard, Search, X } from 'lucide-react';
 import { categories, products } from './data/mockData';
-import { Modal, Input } from '@components/ui';
+import { Modal, Input, Button } from '@components/ui';
 import { useSettings } from '@hooks';
 import usePOS from './hooks/usePOS';
 import POSHeader from './components/POSHeader';
@@ -632,17 +632,20 @@ const POSPage = () => {
 
         {/* Mobile cart button */}
         <div className={`md:hidden fixed bottom-4 ${isCartLeft ? 'left-4' : 'right-4'} z-40`}>
-          <button
+          <Button
+            variant="primary"
+            size="lg"
+            icon={ShoppingCart}
+            iconOnly
             onClick={() => setShowMobileCart(true)}
-            className="relative w-14 h-14 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
+            className="relative !w-14 !h-14 !rounded-full shadow-lg"
           >
-            <ShoppingCart size={24} />
             {cart.length > 0 && (
               <span className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
                 {totals.itemCount}
               </span>
             )}
-          </button>
+          </Button>
         </div>
 
         {/* Mobile cart drawer */}
@@ -807,12 +810,14 @@ const POSPage = () => {
               className="shadow-xl"
               suffix={
                 searchQuery && (
-                  <button
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    icon={X}
+                    iconOnly
                     onClick={() => { setIsSearchMode(false); setSearchQuery(''); }}
-                    className="w-4 h-4 rounded-full bg-primary-500 hover:bg-primary-600 transition-colors flex items-center justify-center text-white cursor-pointer"
-                  >
-                    <X size={10} strokeWidth={4} />
-                  </button>
+                    className="!w-4 !h-4 !min-h-0 !p-0 !rounded-full cursor-pointer"
+                  />
                 )
               }
             />

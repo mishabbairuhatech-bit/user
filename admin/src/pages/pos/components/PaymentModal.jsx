@@ -116,13 +116,15 @@ const PaymentModal = ({ isOpen, onClose, totals, onComplete }) => {
               const Icon = method.icon;
               const isSelected = index === selectedMethodIndex;
               return (
-                <button
+                <Button
                   key={method.id}
+                  variant={isSelected ? 'outline' : 'ghost'}
+                  size="md"
                   onClick={() => setSelectedMethodIndex(index)}
-                  className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                  className={`!flex !flex-col !items-center !gap-2 !p-4 !h-auto !rounded-xl !border-2 ${
                     isSelected
-                      ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                      : 'border-gray-200 dark:border-[#2a2a2a] hover:border-gray-300 dark:hover:border-[#424242]'
+                      ? '!border-primary-500 !bg-primary-50 dark:!bg-primary-900/20'
+                      : '!border-gray-200 dark:!border-[#2a2a2a] hover:!border-gray-300 dark:hover:!border-[#424242]'
                   }`}
                 >
                   <div className={`w-12 h-12 rounded-full ${method.color} flex items-center justify-center text-white`}>
@@ -133,7 +135,7 @@ const PaymentModal = ({ isOpen, onClose, totals, onComplete }) => {
                   }`}>
                     {method.name}
                   </span>
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -157,22 +159,26 @@ const PaymentModal = ({ isOpen, onClose, totals, onComplete }) => {
             {/* Quick amounts */}
             <div className="flex gap-2">
               {quickAmounts.map((amount, idx) => (
-                <button
+                <Button
                   key={amount}
+                  variant="secondary"
+                  size="sm"
                   onClick={() => setAmountTendered(String(amount))}
-                  className="flex-1 py-2 bg-gray-100 dark:bg-[#2a2a2a] hover:bg-gray-200 dark:hover:bg-[#363636] rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors flex flex-col items-center"
+                  className="flex-1 !flex !flex-col !items-center !py-2 !min-h-0"
                 >
                   <span>${amount}</span>
                   <kbd className="text-xs text-gray-400 mt-0.5">{idx + 1}</kbd>
-                </button>
+                </Button>
               ))}
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => setAmountTendered(String(Math.ceil(totals.total)))}
-                className="flex-1 py-2 bg-primary-100 dark:bg-primary-900/20 hover:bg-primary-200 dark:hover:bg-primary-900/30 rounded-lg text-sm font-medium text-primary-600 dark:text-primary-400 transition-colors flex flex-col items-center"
+                className="flex-1 !flex !flex-col !items-center !py-2 !min-h-0 !bg-primary-100 dark:!bg-primary-900/20 hover:!bg-primary-200 dark:hover:!bg-primary-900/30 !text-primary-600 dark:!text-primary-400"
               >
                 <span>Exact</span>
                 <kbd className="text-xs text-primary-400 mt-0.5">E</kbd>
-              </button>
+              </Button>
             </div>
 
             {/* Change */}

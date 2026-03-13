@@ -29,12 +29,14 @@ const CartItem = ({ item, onUpdateQuantity, onUpdateDiscount, onUpdateDiscountTy
             e.target.src = 'https://via.placeholder.com/48?text=No+Image';
           }}
         />
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
+          icon={X}
+          iconOnly
           onClick={() => onRemove(product.id)}
-          className="absolute top-1 left-1 p-0.5 bg-white/80 dark:bg-black/50 hover:bg-red-500 hover:text-white rounded-md text-gray-500 transition-colors backdrop-blur-[2px]"
-        >
-          <X size={10} />
-        </button>
+          className="absolute top-1 left-1 !p-0.5 !min-h-0 !w-auto !h-auto !bg-white/80 dark:!bg-black/50 hover:!bg-red-500 hover:!text-white !rounded-md !text-gray-500 backdrop-blur-[2px]"
+        />
       </div>
 
       {/* Info */}
@@ -86,13 +88,16 @@ const CartItem = ({ item, onUpdateQuantity, onUpdateDiscount, onUpdateDiscountTy
         <div className="flex items-center justify-end gap-1 w-full relative">
           {discountVisible ? (
             <div className="flex items-center gap-1">
-              <button
+              <Button
+                variant="outline"
+                size="sm"
+                iconOnly
                 onClick={() => onUpdateDiscountType(product.id, discountType === 'percent' ? 'fixed' : 'percent')}
-                className="w-6 h-6 flex items-center justify-center border border-gray-200 dark:border-[#424242] rounded-md bg-gray-50 dark:bg-[#2a2a2a] text-gray-600 dark:text-gray-300 hover:border-primary-500 transition-colors"
+                className="!w-6 !h-6 !min-h-0 !p-0 !bg-gray-50 dark:!bg-[#2a2a2a] hover:!border-primary-500"
                 title="Toggle % / $ (S)"
               >
                 {discountType === 'percent' ? <Percent size={10} /> : <DollarSign size={10} />}
-              </button>
+              </Button>
               <input
                 autoFocus={showDiscount}
                 type="number"
@@ -114,25 +119,29 @@ const CartItem = ({ item, onUpdateQuantity, onUpdateDiscount, onUpdateDiscountTy
                 placeholder={discountType === 'percent' ? '%' : '$'}
                 className="w-12 h-6 px-1 text-[11px] text-center border border-gray-200 dark:border-[#424242] rounded-md bg-white dark:bg-[#1a1a1a] text-gray-900 dark:text-white outline-none focus:border-primary-500"
               />
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
+                icon={X}
+                iconOnly
                 onClick={() => { setLocalShowDiscount(false); if (onToggleDiscount) onToggleDiscount(false); }}
-                className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-red-500"
-              >
-                <X size={12} />
-              </button>
+                className="!w-6 !h-6 !min-h-0 !p-0 !text-gray-400 hover:!text-red-500"
+              />
             </div>
           ) : (
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => { setLocalShowDiscount(true); if (onToggleDiscount) onToggleDiscount(true); }}
-              className={`flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded transition-colors ${
+              className={`!min-h-0 !px-1.5 !py-0.5 !text-[10px] !font-bold ${
                 discount > 0
-                  ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
-                  : 'text-gray-400 hover:text-primary-500 bg-gray-100 dark:bg-[#2a2a2a] hover:bg-primary-50 dark:hover:bg-primary-900/20'
+                  ? '!bg-green-100 !text-green-600 dark:!bg-green-900/30 dark:!text-green-400'
+                  : '!text-gray-400 hover:!text-primary-500 !bg-gray-100 dark:!bg-[#2a2a2a] hover:!bg-primary-50 dark:hover:!bg-primary-900/20'
               }`}
             >
               {discountType === 'percent' ? <Percent size={10} /> : <DollarSign size={10} />}
               {discount > 0 ? `${discount}${discountType === 'percent' ? '%' : '$'} OFF` : 'Discount'}
-            </button>
+            </Button>
           )}
         </div>
       </div>

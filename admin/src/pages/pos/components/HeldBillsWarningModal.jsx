@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import { AlertTriangle, Pause, Trash2, X } from 'lucide-react';
-import { Modal } from '@components/ui';
+import { Modal, Button } from '@components/ui';
 
 const HeldBillsWarningModal = ({ isOpen, onClose, onHoldBill, onClearCart, context = 'heldBills' }) => {
   const handleKeyDown = useCallback(
@@ -52,9 +52,11 @@ const HeldBillsWarningModal = ({ isOpen, onClose, onHoldBill, onClearCart, conte
         {/* Actions */}
         <div className="space-y-2.5">
           {/* Option 1: Hold current bill */}
-          <button
+          <Button
+            variant="ghost"
+            size="md"
             onClick={onHoldBill}
-            className="w-full flex items-center gap-3 px-4 py-3 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/30 border-2 border-primary-200 dark:border-primary-800 rounded-xl transition-colors group"
+            className="w-full !flex !items-center !gap-3 !px-4 !py-3 !h-auto !bg-primary-50 dark:!bg-primary-900/20 hover:!bg-primary-100 dark:hover:!bg-primary-900/30 !border-2 !border-primary-200 dark:!border-primary-800 !rounded-xl"
           >
             <div className="w-9 h-9 rounded-lg bg-primary-500 flex items-center justify-center shrink-0">
               <Pause size={18} className="text-white" />
@@ -76,12 +78,14 @@ const HeldBillsWarningModal = ({ isOpen, onClose, onHoldBill, onClearCart, conte
                 1
               </kbd>
             </div>
-          </button>
+          </Button>
 
           {/* Option 2: Clear cart */}
-          <button
+          <Button
+            variant="ghost"
+            size="md"
             onClick={onClearCart}
-            className="w-full flex items-center gap-3 px-4 py-3 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 border-2 border-red-200 dark:border-red-800/50 rounded-xl transition-colors group"
+            className="w-full !flex !items-center !gap-3 !px-4 !py-3 !h-auto !bg-red-50 dark:!bg-red-900/10 hover:!bg-red-100 dark:hover:!bg-red-900/20 !border-2 !border-red-200 dark:!border-red-800/50 !rounded-xl"
           >
             <div className="w-9 h-9 rounded-lg bg-red-500 flex items-center justify-center shrink-0">
               <Trash2 size={18} className="text-white" />
@@ -103,12 +107,14 @@ const HeldBillsWarningModal = ({ isOpen, onClose, onHoldBill, onClearCart, conte
                 2
               </kbd>
             </div>
-          </button>
+          </Button>
 
           {/* Option 3: Continue / Close */}
-          <button
+          <Button
+            variant="ghost"
+            size="md"
             onClick={onClose}
-            className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-[#1a1a1a] hover:bg-gray-100 dark:hover:bg-[#2a2a2a] border-2 border-gray-200 dark:border-[#2a2a2a] rounded-xl transition-colors group"
+            className="w-full !flex !items-center !gap-3 !px-4 !py-3 !h-auto !bg-gray-50 dark:!bg-[#1a1a1a] hover:!bg-gray-100 dark:hover:!bg-[#2a2a2a] !border-2 !border-gray-200 dark:!border-[#2a2a2a] !rounded-xl"
           >
             <div className="w-9 h-9 rounded-lg bg-gray-400 dark:bg-gray-600 flex items-center justify-center shrink-0">
               <X size={18} className="text-white" />
@@ -130,7 +136,7 @@ const HeldBillsWarningModal = ({ isOpen, onClose, onHoldBill, onClearCart, conte
                 3
               </kbd>
             </div>
-          </button>
+          </Button>
         </div>
       </div>
     </Modal>

@@ -305,12 +305,14 @@ const ReturnsPanel = ({ isActive, completedBills, onProcessReturn, onBack }) => 
                 className="w-full h-9 pl-9 pr-8 text-sm bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#2a2a2a] rounded-lg outline-none text-gray-900 dark:text-white placeholder-gray-400 focus:border-gray-300 dark:focus:border-[#3a3a3a] transition-colors"
               />
               {searchQuery && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  icon={X}
+                  iconOnly
                   onClick={() => { setSearchQuery(''); setSelectedIndex(0); }}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 flex items-center justify-center transition-colors"
-                >
-                  <X size={10} className="text-white" />
-                </button>
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 !w-4 !h-4 !min-h-0 !p-0 !rounded-full !bg-gray-300 dark:!bg-gray-600 hover:!bg-gray-400 dark:hover:!bg-gray-500 !text-white"
+                />
               )}
             </div>
           </div>
@@ -325,14 +327,16 @@ const ReturnsPanel = ({ isActive, completedBills, onProcessReturn, onBack }) => 
               </div>
             ) : (
               filteredBills.map((bill, index) => (
-                <button
+                <Button
                   key={bill.id}
                   ref={el => itemRefs.current[index] = el}
+                  variant="ghost"
+                  size="sm"
                   onClick={() => handleSelectBill(bill)}
-                  className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-colors text-left ${
+                  className={`w-full !flex !items-center !justify-between !p-3 !rounded-xl !border-2 !text-left !h-auto !min-h-0 ${
                     index === selectedIndex
-                      ? 'border-primary-400 dark:border-primary-500 bg-primary-50/50 dark:bg-primary-900/10'
-                      : 'border-gray-100 dark:border-[#2a2a2a] bg-gray-50 dark:bg-[#1a1a1a] hover:border-gray-200 dark:hover:border-[#3a3a3a]'
+                      ? '!border-primary-400 dark:!border-primary-500 !bg-primary-50/50 dark:!bg-primary-900/10'
+                      : '!border-gray-100 dark:!border-[#2a2a2a] !bg-gray-50 dark:!bg-[#1a1a1a] hover:!border-gray-200 dark:hover:!border-[#3a3a3a]'
                   }`}
                 >
                   <div className="min-w-0">
@@ -349,7 +353,7 @@ const ReturnsPanel = ({ isActive, completedBills, onProcessReturn, onBack }) => 
                       <kbd className="text-[10px] text-gray-400">↵</kbd>
                     )}
                   </div>
-                </button>
+                </Button>
               ))
             )}
           </div>
