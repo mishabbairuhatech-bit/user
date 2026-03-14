@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Search, Plus } from 'lucide-react';
-import { PageHeader, Table, Badge, Input, Avatar, Button } from '@components/ui';
+import { PageHeader, Table, Badge, Input, Avatar, Button, SplitterLayout } from '@components/ui';
 import api from '@services/api';
 import API from '@services/endpoints';
 import QUERY_KEY from '@services/queryKeys';
@@ -169,50 +169,46 @@ const UsersPage = () => {
       </div>
 
       {/* Table + Detail Panel */}
-      <div className={`bg-white dark:bg-[#121212] rounded-2xl border border-gray-100 dark:border-[#424242] shadow-sm overflow-hidden flex ${(selectedUserId || showCreateForm) && isDesktop ? 'h-[calc(100vh-230px)]' : ''}`}>
-        {/* Table */}
-        <div className={`min-w-0 transition-all duration-300 overflow-y-auto scrollbar-hide ${(selectedUserId || showCreateForm) && isDesktop ? 'flex-1' : 'w-full'}`}>
-          <Table
-            columns={columns}
-            data={users}
-            loading={isLoading}
-            emptyMessage="No users found"
-            sortColumn={sortColumn}
-            sortDirection={sortDirection}
-            onSort={handleSort}
-            onRowClick={handleRowClick}
-            activeRowId={selectedUserId}
-            showPagination
-            currentPage={page}
-            totalPages={meta.total_pages || 1}
-            onPageChange={setPage}
-            pageSize={pageSize}
-            onPageSizeChange={handlePageSizeChange}
-            pageSizeOptions={[10, 20, 50, 100]}
-            className="border-0 rounded-none shadow-none"
-          />
-        </div>
-
-        {/* Vertical Divider + Side Panel - Desktop only */}
-        {showCreateForm && isDesktop && (
-          <>
-            <div className="w-px bg-gray-200 dark:bg-[#424242] flex-shrink-0" />
-            <div className="w-[380px] flex-shrink-0 overflow-y-auto scrollbar-hide">
-              <UserCreateForm onClose={() => setShowCreateForm(false)} />
+      <div className="bg-white dark:bg-[#121212] rounded-2xl border border-gray-100 dark:border-[#424242] shadow-sm overflow-hidden flex h-[calc(100vh-230px)]">
+        <SplitterLayout
+          initialRightWidth={380}
+          minRightWidth={300}
+          maxRightWidth={600}
+          className="bg-transparent dark:bg-transparent"
+          leftPanel={
+            <div className="h-full w-full overflow-y-auto scrollbar-hide">
+              <Table
+                columns={columns}
+                data={users}
+                loading={isLoading}
+                emptyMessage="No users found"
+                sortColumn={sortColumn}
+                sortDirection={sortDirection}
+                onSort={handleSort}
+                onRowClick={handleRowClick}
+                activeRowId={selectedUserId}
+                showPagination
+                currentPage={page}
+                totalPages={meta.total_pages || 1}
+                onPageChange={setPage}
+                pageSize={pageSize}
+                onPageSizeChange={handlePageSizeChange}
+                pageSizeOptions={[10, 20, 50, 100]}
+                className="border-0 rounded-none shadow-none"
+              />
             </div>
-          </>
-        )}
-        {!showCreateForm && selectedUserId && isDesktop && (
-          <>
-            <div className="w-px bg-gray-200 dark:bg-[#424242] flex-shrink-0" />
-            <div className="w-[380px] flex-shrink-0 overflow-y-auto scrollbar-hide">
+          }
+          rightPanel={
+            (showCreateForm && isDesktop) ? (
+              <UserCreateForm onClose={() => setShowCreateForm(false)} />
+            ) : (!showCreateForm && selectedUserId && isDesktop) ? (
               <UserDetailPanel
                 userId={selectedUserId}
                 onClose={() => setSelectedUserId(null)}
               />
-            </div>
-          </>
-        )}
+            ) : null
+          }
+        />
       </div>
     </div>
   );

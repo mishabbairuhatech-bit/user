@@ -122,8 +122,8 @@ const UserCreateForm = ({ onClose }) => {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto scrollbar-hide px-5 py-4">
-        <div className="space-y-3">
+      <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto scrollbar-hide px-5 py-4 flex flex-col">
+        <div className="space-y-3 flex-1">
           <div className="grid grid-cols-2 gap-2">
             <Input
               label="First Name"
@@ -189,7 +189,7 @@ const UserCreateForm = ({ onClose }) => {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 mt-5 pt-4 border-t border-gray-200 dark:border-[#424242]">
+        <div className="flex items-center gap-2 mt-5 pt-4 border-t border-gray-200 dark:border-[#424242] flex-shrink-0">
           <Button type="submit" size="sm" loading={mutation.isPending} className="flex-1">
             Create User
           </Button>

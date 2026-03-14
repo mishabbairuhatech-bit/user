@@ -62,32 +62,36 @@ const SplitterLayout = ({
       className={`flex h-full w-full overflow-hidden bg-white dark:bg-[#1f1f1f] ${className}`}
     >
       {/* Left Panel */}
-      <div className="flex-1 overflow-auto min-w-0 h-full">
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0 h-full">
         {leftPanel}
       </div>
 
       {/* Splitter Resizer */}
-      <div 
-        role="separator"
-        className={`relative z-10 flex-shrink-0 cursor-col-resize transition-all duration-150 ease-in-out border-l border-gray-200 dark:border-[#2a2a2a] group ${isDragging ? 'bg-primary-500 border-primary-500' : 'bg-transparent hover:bg-primary-400 hover:border-primary-400'}`}
-        style={{ width: '4px', marginLeft: '-2px', marginRight: '-2px' }}
-        onMouseDown={startDragging}
-      >
-        {/* invisible wider hit area for easier grabbing */}
-        <div className="absolute inset-y-0 -inset-x-2 z-20 cursor-col-resize" />
-      </div>
+      {rightPanel && (
+        <div 
+          role="separator"
+          className={`relative flex-shrink-0 cursor-col-resize transition-all duration-150 ease-in-out border-l border-gray-200 dark:border-[#2a2a2a] group ${isDragging ? 'bg-primary-500 border-primary-500' : 'bg-transparent hover:bg-primary-400 hover:border-primary-400'}`}
+          style={{ width: '4px' }}
+          onMouseDown={startDragging}
+        >
+          {/* invisible wider hit area for easier grabbing */}
+          <div className="absolute inset-y-0 -inset-x-2 z-20 cursor-col-resize" />
+        </div>
+      )}
 
       {/* Right Panel */}
-      <div 
-        style={{ width: `${rightWidth}px` }}
-        className="h-full flex-shrink-0 overflow-auto bg-gray-50 dark:bg-[#141414] relative"
-      >
-        {/* Prevent pointer events from interfering with dragging if rightPanel has iframes or things that eat events */}
-        {isDragging && (
-           <div className="absolute inset-0 z-50 bg-transparent pointer-events-none" />
-        )}
-        {rightPanel}
-      </div>
+      {rightPanel && (
+        <div 
+          style={{ width: `${rightWidth}px` }}
+          className="h-full flex flex-col flex-shrink-0 overflow-hidden bg-gray-50 dark:bg-[#141414] relative"
+        >
+          {/* Prevent pointer events from interfering with dragging if rightPanel has iframes or things that eat events */}
+          {isDragging && (
+             <div className="absolute inset-0 z-50 bg-transparent pointer-events-none" />
+          )}
+          {rightPanel}
+        </div>
+      )}
     </div>
   );
 };
