@@ -9,7 +9,7 @@ const ProductCard = ({ product, onAdd, onUpdateQuantity, cartQuantity, isSelecte
   return (
     <Card
       onClick={() => !isOutOfStock && !inCart && onAdd(product)}
-      className={`relative p-3 transition-all flex flex-col h-full outline-none focus:outline-none ${isSelected
+      className={`relative p-2 transition-all flex flex-col h-full outline-none focus:outline-none ${isSelected
         ? '!border-primary-500 !bg-gray-50/40 dark:!bg-[#181818] shadow-lg transform scale-[1.02]'
         : isOutOfStock
           ? 'opacity-50 cursor-not-allowed'
@@ -19,7 +19,7 @@ const ProductCard = ({ product, onAdd, onUpdateQuantity, cartQuantity, isSelecte
         }`}
     >
       {/* Image */}
-      <div className="relative aspect-[4/3] bg-gray-50 dark:bg-[#2a2a2a] rounded-2xl overflow-hidden mb-3">
+      <div className="relative aspect-[4/3] bg-gray-50 dark:bg-[#2a2a2a] rounded-2xl overflow-hidden mb-2">
         <img
           src={product.image}
           alt={product.name}
@@ -53,11 +53,11 @@ const ProductCard = ({ product, onAdd, onUpdateQuantity, cartQuantity, isSelecte
           {product.name}
         </h3>
 
-        <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-3 line-clamp-2 leading-relaxed min-h-[32px]">
+        <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-2 line-clamp-2 leading-relaxed min-h-[32px]">
           {product.description || `Artificial potted plant, indoor/outdoor ${product.name.toLowerCase()}, 9 cm`}
         </p>
 
-        <div className="mt-auto flex items-center justify-between mb-4">
+        <div className="mt-auto flex items-center justify-between mb-2.5">
           <span className="text-[15px] font-extrabold text-primary-500 dark:text-primary-400">
             ${product.price.toFixed(2)}
           </span>

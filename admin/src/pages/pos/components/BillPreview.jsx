@@ -102,13 +102,13 @@ const BillPreview = ({ isOpen, onClose, bill }) => {
             prefixIcon={Printer}
             className="flex-1"
           >
-            Print <kbd className="ml-2 text-xs opacity-50">P</kbd>
+            Print <kbd className="hidden md:inline ml-2 text-xs opacity-50">P</kbd>
           </Button>
           <Button
             onClick={onClose}
             className="flex-1"
           >
-            Done <kbd className="ml-2 text-xs opacity-50">Enter</kbd>
+            Done <kbd className="hidden md:inline ml-2 text-xs opacity-50">Enter</kbd>
           </Button>
         </div>
       }

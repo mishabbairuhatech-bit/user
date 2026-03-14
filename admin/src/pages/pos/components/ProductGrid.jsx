@@ -22,12 +22,12 @@ const ProductGrid = ({ products, cart, onAddToCart, onUpdateQuantity, loading, s
 
   if (loading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 gap-4 p-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-7 4xl:grid-cols-8 gap-[5px] p-3">
         {[...Array(12)].map((_, i) => (
           <div key={i} className="animate-pulse">
             <div className="aspect-square bg-gray-200 dark:bg-[#2a2a2a] rounded-xl" />
-            <div className="mt-3 h-4 bg-gray-200 dark:bg-[#2a2a2a] rounded w-3/4" />
-            <div className="mt-2 h-6 bg-gray-200 dark:bg-[#2a2a2a] rounded w-1/2" />
+            <div className="mt-2 h-4 bg-gray-200 dark:bg-[#2a2a2a] rounded w-3/4" />
+            <div className="mt-1.5 h-6 bg-gray-200 dark:bg-[#2a2a2a] rounded w-1/2" />
           </div>
         ))}
       </div>
@@ -47,7 +47,7 @@ const ProductGrid = ({ products, cart, onAddToCart, onUpdateQuantity, loading, s
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 gap-4 p-4 pb-8">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-7 4xl:grid-cols-8 gap-[5px] p-3 pb-6">
       {products.map((product, index) => (
         <div key={product.id} ref={el => itemRefs.current[index] = el}>
           <ProductCard

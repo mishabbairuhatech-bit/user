@@ -28,3 +28,4 @@ export { default as Drawer } from './Drawer';
 export { default as PageHeader } from './PageHeader';
 export { default as ToastProvider, useToast } from './Toast';
 export { default as Notification } from './Notification';
+export { default as SplitterLayout } from './SplitterLayout';

@@ -66,22 +66,25 @@ const POSPage = () => {
   const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(0); // 0 = All, 1+ = categories
   const [showDiscountIndex, setShowDiscountIndex] = useState(-1); // which cart item has discount input open
   const [focusCartDiscount, setFocusCartDiscount] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   // Calculate grid columns based on screen width
   useEffect(() => {
     const calculateColumns = () => {
       const width = window.innerWidth;
-      // Match the grid breakpoints: grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7
-      if (width >= 2560) return 7;       // 4xl
-      if (width >= 1920) return 6;       // 3xl
-      if (width >= 1536) return 5;       // 2xl
-      if (width >= 1280) return 4;       // xl
-      if (width >= 1024) return 3;       // lg
-      return 2;                          // md and below
+      // Match the grid breakpoints: grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-7 4xl:grid-cols-8
+      if (width >= 2560) return 8;       // 4xl
+      if (width >= 1920) return 7;       // 3xl
+      if (width >= 1536) return 6;       // 2xl
+      if (width >= 1280) return 5;       // xl
+      if (width >= 1024) return 4;       // lg
+      if (width >= 768) return 3;          // md
+      return 2;                          // mobile
     };
 
     const handleResize = () => {
       setGridColumns(calculateColumns());
+      setIsMobile(window.innerWidth < 768);
     };
 
     handleResize(); // Initial calculation
@@ -110,6 +113,7 @@ const POSPage = () => {
   const handleOpenHeldBills = useCallback(() => {
     if (showHeldBillsPanel) {
       setShowHeldBillsPanel(false);
+      setShowMobileCart(false);
       return;
     }
     setShowReturnsPanel(false);
@@ -117,6 +121,7 @@ const POSPage = () => {
       setCartWarningContext('heldBills');
     } else {
       setShowHeldBillsPanel(true);
+      setShowMobileCart(true);
       setFocusSection('cart');
     }
   }, [showHeldBillsPanel, cart.length]);
@@ -124,6 +129,7 @@ const POSPage = () => {
   const handleOpenReturns = useCallback(() => {
     if (showReturnsPanel) {
       setShowReturnsPanel(false);
+      setShowMobileCart(false);
       return;
     }
     setShowHeldBillsPanel(false);
@@ -132,6 +138,7 @@ const POSPage = () => {
       setCartWarningContext('returns');
     } else {
       setShowReturnsPanel(true);
+      setShowMobileCart(true);
       setFocusSection('cart');
     }
   }, [showReturnsPanel, cart.length]);
@@ -146,6 +153,7 @@ const POSPage = () => {
     } else {
       setShowHeldBillsPanel(true);
     }
+    setShowMobileCart(true);
     setFocusSection('cart');
   }, [holdBill, cartWarningContext]);
 
@@ -158,6 +166,7 @@ const POSPage = () => {
     } else {
       setShowHeldBillsPanel(true);
     }
+    setShowMobileCart(true);
     setFocusSection('cart');
   }, [clearCart, cartWarningContext]);
 
@@ -197,6 +206,9 @@ const POSPage = () => {
 
   // Keyboard shortcuts handler
   const handleKeyDown = useCallback((e) => {
+    // Skip all keyboard shortcuts on mobile
+    if (window.innerWidth < 768) return;
+
     // Skip if typing in an input
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
       return;
@@ -353,9 +365,9 @@ const POSPage = () => {
       return;
     }
 
-    // Tab to cycle through sections: categories -> products -> cart/held bills
+    // Tab to cycle through sections: categories -> products -> cart/held bills (desktop only)
     const canFocusRightPanel = cart.length > 0 || showHeldBillsPanel || showPaymentPanel || showReturnsPanel;
-    if (e.key === 'Tab') {
+    if (e.key === 'Tab' && window.innerWidth >= 768) {
       e.preventDefault();
       if (e.shiftKey) {
         // Shift+Tab: reverse direction
@@ -559,8 +571,8 @@ const POSPage = () => {
                 setActiveCategory(catId);
                 setSelectedProductIndex(0);
               }}
-              selectedIndex={selectedCategoryIndex}
-              isFocused={!showPaymentPanel && !showReturnsPanel && !showHeldBillsPanel && focusSection === 'categories'}
+              selectedIndex={!isMobile ? selectedCategoryIndex : -1}
+              isFocused={!isMobile && !showPaymentPanel && !showReturnsPanel && !showHeldBillsPanel && focusSection === 'categories'}
             />
 
             {/* Products grid */}
@@ -570,7 +582,7 @@ const POSPage = () => {
                 cart={cart}
                 onAddToCart={addToCart}
                 onUpdateQuantity={updateQuantity}
-                selectedIndex={!showPaymentPanel && !showReturnsPanel && !showHeldBillsPanel && focusSection === 'products' ? selectedProductIndex : -1}
+                selectedIndex={!isMobile && !showPaymentPanel && !showReturnsPanel && !showHeldBillsPanel && focusSection === 'products' ? selectedProductIndex : -1}
               />
             </div>
 
@@ -580,17 +592,9 @@ const POSPage = () => {
             )}
           </div>
 
-          {/* Cart panel / Held Bills panel / Payment panel - Desktop */}
+          {/* Cart panel / Held Bills panel - Desktop */}
           <div className="hidden md:block w-[380px] flex-shrink-0">
-            {showPaymentPanel ? (
-              <PaymentPanel
-                isActive={showPaymentPanel}
-                totals={totals}
-                cart={cart}
-                onComplete={handleCompleteSale}
-                onBack={() => setShowPaymentPanel(false)}
-              />
-            ) : showReturnsPanel ? (
+            {showReturnsPanel ? (
               <ReturnsPanel
                 isActive={showReturnsPanel}
                 completedBills={completedBills}
@@ -625,6 +629,9 @@ const POSPage = () => {
                 showDiscountIndex={focusSection === 'cart' ? showDiscountIndex : -1}
                 onToggleDiscount={(idx) => setShowDiscountIndex(idx)}
                 focusCartDiscount={focusCartDiscount}
+                showPayment={showPaymentPanel}
+                onCompleteSale={handleCompleteSale}
+                onBackFromPayment={() => setShowPaymentPanel(false)}
               />
             )}
           </div>
@@ -648,12 +655,17 @@ const POSPage = () => {
           </Button>
         </div>
 
-        {/* Mobile cart drawer */}
+        {/* Mobile cart/panel drawer */}
         {showMobileCart && (
           <div className="md:hidden fixed inset-0 z-50">
             <div
               className="absolute inset-0 bg-black/50"
-              onClick={() => setShowMobileCart(false)}
+              onClick={() => {
+                setShowMobileCart(false);
+                setShowPaymentPanel(false);
+                setShowHeldBillsPanel(false);
+                setShowReturnsPanel(false);
+              }}
             />
             <div className="absolute bottom-0 left-0 right-0 h-[80vh] bg-white dark:bg-[#121212] rounded-t-2xl overflow-hidden">
               <div className="h-full flex flex-col">
@@ -661,26 +673,59 @@ const POSPage = () => {
                 <div className="flex justify-center py-2">
                   <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
                 </div>
-                <CartPanel
-                  cart={cart}
-                  totals={totals}
-                  discount={discount}
-                  discountType={discountType}
-                  onUpdateQuantity={updateQuantity}
-                  onUpdateItemDiscount={updateItemDiscount}
-                  onRemove={removeFromCart}
-                  onClear={clearCart}
-                  onHold={() => {
-                    handleHoldBill();
-                    setShowMobileCart(false);
-                  }}
-                  onSetDiscount={setDiscount}
-                  onSetDiscountType={setDiscountType}
-                  onCheckout={() => {
-                    setShowMobileCart(false);
-                    handleCheckout();
-                  }}
-                />
+                {showReturnsPanel ? (
+                  <ReturnsPanel
+                    isActive={showReturnsPanel}
+                    completedBills={completedBills}
+                    onProcessReturn={(originalBill, returnItems) => {
+                      handleProcessReturn(originalBill, returnItems);
+                      setShowMobileCart(false);
+                    }}
+                    onBack={() => {
+                      setShowReturnsPanel(false);
+                      setShowMobileCart(false);
+                    }}
+                  />
+                ) : showHeldBillsPanel ? (
+                  <HeldBillsPanel
+                    heldBills={heldBills}
+                    onResume={(billId) => {
+                      handleResumeBill(billId);
+                      setShowMobileCart(true);
+                    }}
+                    onDelete={deleteHeldBill}
+                    onBack={() => {
+                      setShowHeldBillsPanel(false);
+                      setShowMobileCart(false);
+                    }}
+                    isFocused={false}
+                  />
+                ) : (
+                  <CartPanel
+                    cart={cart}
+                    totals={totals}
+                    discount={discount}
+                    discountType={discountType}
+                    onUpdateQuantity={updateQuantity}
+                    onUpdateItemDiscount={updateItemDiscount}
+                    onUpdateItemDiscountType={updateItemDiscountType}
+                    onRemove={removeFromCart}
+                    onClear={clearCart}
+                    onHold={() => {
+                      handleHoldBill();
+                      setShowMobileCart(false);
+                    }}
+                    onSetDiscount={setDiscount}
+                    onSetDiscountType={setDiscountType}
+                    onCheckout={handleCheckout}
+                    showPayment={showPaymentPanel}
+                    onCompleteSale={(method, amount) => {
+                      handleCompleteSale(method, amount);
+                      setShowMobileCart(false);
+                    }}
+                    onBackFromPayment={() => setShowPaymentPanel(false)}
+                  />
+                )}
               </div>
             </div>
           </div>

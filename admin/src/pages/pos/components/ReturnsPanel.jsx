@@ -285,7 +285,7 @@ const ReturnsPanel = ({ isActive, completedBills, onProcessReturn, onBack }) => 
             Returns
           </span>
         </div>
-        <span className="text-[10px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-[#2a2a2a] px-1.5 py-0.5 rounded">
+        <span className="hidden md:inline text-[10px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-[#2a2a2a] px-1.5 py-0.5 rounded">
           ↑↓ Enter {selectedBill ? '+- P' : ''}
         </span>
       </div>
@@ -350,7 +350,7 @@ const ReturnsPanel = ({ isActive, completedBills, onProcessReturn, onBack }) => 
                       ${bill.totals.total.toFixed(2)}
                     </span>
                     {index === selectedIndex && (
-                      <kbd className="text-[10px] text-gray-400">↵</kbd>
+                      <kbd className="hidden md:inline text-[10px] text-gray-400">↵</kbd>
                     )}
                   </div>
                 </Button>
@@ -366,7 +366,7 @@ const ReturnsPanel = ({ isActive, completedBills, onProcessReturn, onBack }) => 
               onClick={onBack}
               className="w-full"
             >
-              Cancel <kbd className="text-[10px] opacity-50 ml-1">Esc</kbd>
+              Cancel <kbd className="hidden md:inline text-[10px] opacity-50 ml-1">Esc</kbd>
             </Button>
           </div>
         </>
@@ -494,7 +494,7 @@ const ReturnsPanel = ({ isActive, completedBills, onProcessReturn, onBack }) => 
                   setSelectedIndex(0);
                 }}
               >
-                Back <kbd className="text-[10px] opacity-50">Bksp</kbd>
+                Back <kbd className="hidden md:inline text-[10px] opacity-50">Bksp</kbd>
               </Button>
               <Button
                 variant="primary"
@@ -506,7 +506,7 @@ const ReturnsPanel = ({ isActive, completedBills, onProcessReturn, onBack }) => 
                 className="flex-1"
               >
                 {processing ? 'Processing...' : 'Process Return'}
-                {!processing && <kbd className="text-[10px] opacity-50">P</kbd>}
+                {!processing && <kbd className="hidden md:inline text-[10px] opacity-50">P</kbd>}
               </Button>
             </div>
           </div>

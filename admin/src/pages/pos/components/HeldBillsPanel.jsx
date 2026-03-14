@@ -89,7 +89,7 @@ const HeldBillsPanel = ({
           )}
         </div>
         {isFocused && heldBills.length > 0 && (
-          <span className="text-[10px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-[#2a2a2a] px-1.5 py-0.5 rounded">
+          <span className="hidden md:inline text-[10px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-[#2a2a2a] px-1.5 py-0.5 rounded">
             ↑↓ Enter Del
           </span>
         )}
@@ -110,38 +110,39 @@ const HeldBillsPanel = ({
           </Button>
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2 scrollbar-hide">
+        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1.5 md:space-y-2 scrollbar-hide">
           {heldBills.map((bill, index) => (
             <div
               key={bill.id}
               ref={(el) => (itemRefs.current[index] = el)}
               onClick={() => setSelectedIndex(index)}
-              className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${
+              className={`p-2 md:p-3 rounded-xl border-2 cursor-pointer transition-all ${
                 index === selectedIndex
                   ? 'border-primary-500 dark:border-primary-500 bg-primary-50/50 dark:bg-primary-900/10'
                   : 'border-gray-100 dark:border-[#2a2a2a] bg-gray-50 dark:bg-[#1a1a1a] hover:border-gray-200 dark:hover:border-[#3a3a3a]'
               }`}
             >
               {/* Time & Customer */}
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Clock size={13} className="text-gray-400" />
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="flex items-center justify-between mb-1 md:mb-2">
+                <div className="flex items-center gap-1.5 md:gap-2">
+                  <Clock size={12} className="text-gray-400 md:hidden" />
+                  <Clock size={13} className="text-gray-400 hidden md:block" />
+                  <span className="text-[11px] md:text-xs text-gray-500 dark:text-gray-400">
                     {formatTime(bill.created_at)}
                   </span>
                   {bill.customer && (
-                    <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">
+                    <span className="text-[11px] md:text-xs text-gray-700 dark:text-gray-300 font-medium">
                       {bill.customer}
                     </span>
                   )}
                 </div>
-                <span className="text-sm font-bold text-gray-900 dark:text-white">
+                <span className="text-xs md:text-sm font-bold text-gray-900 dark:text-white">
                   ${bill.totals.total.toFixed(2)}
                 </span>
               </div>
 
               {/* Items preview */}
-              <div className="flex flex-wrap gap-1 mb-2">
+              <div className="flex flex-wrap gap-1 mb-1 md:mb-2">
                 {bill.items.slice(0, 3).map((item, idx) => (
                   <span
                     key={idx}
@@ -159,10 +160,10 @@ const HeldBillsPanel = ({
 
               {/* Actions */}
               <div className="flex items-center justify-between">
-                <span className="text-[11px] text-gray-400 dark:text-gray-500">
+                <span className="text-[10px] md:text-[11px] text-gray-400 dark:text-gray-500">
                   {bill.items.length} item{bill.items.length !== 1 ? 's' : ''}
                 </span>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1">
                   <Button
                     variant="danger-outline"
                     size="sm"
@@ -171,10 +172,10 @@ const HeldBillsPanel = ({
                       e.stopPropagation();
                       onDelete(bill.id);
                     }}
-                    className="!h-7 !min-h-0 !px-2 !border-0"
+                    className="!h-6 md:!h-7 !min-h-0 !px-1.5 md:!px-2 !border-0"
                   >
                     {index === selectedIndex && (
-                      <kbd className="text-[9px] opacity-50">Del</kbd>
+                      <kbd className="hidden md:inline text-[9px] opacity-50">Del</kbd>
                     )}
                   </Button>
                   <Button
@@ -185,11 +186,11 @@ const HeldBillsPanel = ({
                       e.stopPropagation();
                       onResume(bill.id);
                     }}
-                    className="!h-7 !min-h-0 !px-2.5"
+                    className="!h-6 md:!h-7 !min-h-0 !px-2 md:!px-2.5"
                   >
                     Resume
                     {index === selectedIndex && (
-                      <kbd className="text-[9px] opacity-70">↵</kbd>
+                      <kbd className="hidden md:inline text-[9px] opacity-70">↵</kbd>
                     )}
                   </Button>
                 </div>
