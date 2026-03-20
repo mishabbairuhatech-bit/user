@@ -105,6 +105,8 @@ const defaultSettings = {
   borderRadius: 'rounded', // 'none', 'small', 'rounded', 'full'
   fontSize: 'medium', // 'small', 'medium', 'large'
   posCartPosition: 'right', // 'left', 'right'
+  posViewType: 'grid', // 'grid', 'table'
+  posSummaryPosition: 'right', // 'left', 'right' — table-view bill summary panel
 };
 
 export const SettingsContext = createContext(null);

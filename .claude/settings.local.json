@@ -11,7 +11,8 @@
       "Bash(find /Users/bairuhatechllp/Desktop/Projects/user/server -type f -name *Settings*)",
       "Bash(find /Users/bairuhatechllp/Desktop/Projects/user/server -type f -name *settings*)",
       "Bash(find /Users/bairuhatechllp/Desktop/Projects/user -type d \\\\\\(-iname *pos* -o -iname *point*sale* \\\\\\))",
-      "Bash(grep -r \"last:border\\\\|last:border-0\\\\|border-b.*last\\\\|first:rounded\\\\|last:rounded\" /Users/bairuhatechllp/Desktop/Projects/user/admin/src --include=*.jsx --include=*.tsx)"
+      "Bash(grep -r \"last:border\\\\|last:border-0\\\\|border-b.*last\\\\|first:rounded\\\\|last:rounded\" /Users/bairuhatechllp/Desktop/Projects/user/admin/src --include=*.jsx --include=*.tsx)",
+      "Bash(find /Users/bairuhatechllp/Desktop/Projects/user -name \"package.json\" -path \"*/admin/package.json\" -exec cat {})"
     ]
   }
 }

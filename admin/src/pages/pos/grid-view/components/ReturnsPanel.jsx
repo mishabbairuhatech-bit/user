@@ -3,7 +3,7 @@ import { Search, RotateCcw, ArrowLeft, Loader2, X, Check } from 'lucide-react';
 import { Button } from '@components/ui';
 import { TAX_RATE } from '../data/mockData';
 
-const ReturnsPanel = ({ isActive, completedBills, onProcessReturn, onBack }) => {
+const ReturnsPanel = ({ isActive, completedBills, onProcessReturn, onBack, position = 'right' }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBill, setSelectedBill] = useState(null);
   const [selectedItems, setSelectedItems] = useState({});
@@ -268,7 +268,11 @@ const ReturnsPanel = ({ isActive, completedBills, onProcessReturn, onBack }) => 
   }, [isActive, selectedBill, filteredBills, selectedIndex, selectedItems, hasSelectedItems, processing, onBack]);
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-[#121212] border-l border-gray-100 dark:border-[#2a2a2a] transition-colors">
+    <div className={`flex flex-col h-full bg-white dark:bg-[#121212] transition-colors ${
+      position === 'left'
+        ? 'border-r border-gray-100 dark:border-[#2a2a2a]'
+        : 'border-l border-gray-100 dark:border-[#2a2a2a]'
+    }`}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 h-14 border-b border-gray-100 dark:border-[#2a2a2a] shrink-0">
         <div className="flex items-center gap-2">

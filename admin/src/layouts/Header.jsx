@@ -26,13 +26,13 @@ const Header = ({ isMobile, onMenuClick }) => {
       {/* Right */}
       <div className="flex items-center gap-1">
         {/* POS Button */}
-        {/* <button
+        <button
           onClick={() => navigate('/pos')}
           className="flex items-center gap-1.5 px-3 py-1.5 text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
         >
           <Store size={16} strokeWidth={1.5} />
           <span className="text-sm font-medium hidden sm:inline">POS</span>
-        </button> */}
+        </button>
 
         <button className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] rounded-lg transition-colors">
           <Mail size={18} strokeWidth={1.5} />

@@ -600,6 +600,7 @@ const POSPage = () => {
                 completedBills={completedBills}
                 onProcessReturn={handleProcessReturn}
                 onBack={() => setShowReturnsPanel(false)}
+                position={isCartLeft ? 'left' : 'right'}
               />
             ) : showHeldBillsPanel ? (
               <HeldBillsPanel
@@ -608,6 +609,7 @@ const POSPage = () => {
                 onDelete={deleteHeldBill}
                 onBack={() => setShowHeldBillsPanel(false)}
                 isFocused={focusSection === 'cart'}
+                position={isCartLeft ? 'left' : 'right'}
               />
             ) : (
               <CartPanel
@@ -632,6 +634,7 @@ const POSPage = () => {
                 showPayment={showPaymentPanel}
                 onCompleteSale={handleCompleteSale}
                 onBackFromPayment={() => setShowPaymentPanel(false)}
+                position={isCartLeft ? 'left' : 'right'}
               />
             )}
           </div>

@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Pause, BarChart3, RotateCcw, Settings, Keyboard, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Pause, BarChart3, RotateCcw, Keyboard, Settings, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Badge, Button, Input } from '@components/ui';
+import { Badge, Button } from '@components/ui';
 import { useSettings } from '@hooks';
 
-const POSHeader = ({
-  searchQuery,
-  onSearchChange,
+const TableHeader = ({
   heldBillsCount,
   onHoldBillsClick,
   isHeldBillsActive = false,
@@ -40,7 +38,7 @@ const POSHeader = ({
           onClick={() => navigate('/admin/dashboard')}
           className="shrink-0"
         />
-        <span className="font-bold text-sm text-gray-900 dark:text-white hidden sm:inline">Grid Billing</span>
+        <span className="font-bold text-sm text-gray-900 dark:text-white hidden sm:inline">Table Billing</span>
         <div className="hidden md:flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 ml-2">
           <span>{currentDate}</span>
           <span className="text-gray-300 dark:text-gray-600">|</span>
@@ -48,11 +46,9 @@ const POSHeader = ({
         </div>
       </div>
 
-      {/* Right - Actions & Profile */}
+      {/* Right - Actions */}
       <div className="flex items-center gap-3 ml-4">
-        {/* Existing Action Buttons */}
         <div className="flex items-center gap-1.5 pr-3 border-r border-gray-200 dark:border-[#2a2a2a]">
-          {/* Returns */}
           <Button
             variant="ghost"
             size="sm"
@@ -62,8 +58,6 @@ const POSHeader = ({
             title="Returns (F3)"
             className={isReturnsActive ? '!bg-primary-100 dark:!bg-primary-900/30 !text-primary-600 dark:!text-primary-400' : ''}
           />
-
-          {/* Held Bills */}
           <Button
             variant="ghost"
             size="sm"
@@ -79,8 +73,6 @@ const POSHeader = ({
               </Badge>
             )}
           </Button>
-
-          {/* Reports */}
           <Button
             variant="ghost"
             size="sm"
@@ -89,8 +81,6 @@ const POSHeader = ({
             onClick={onReportsClick}
             title="Reports (F4)"
           />
-
-          {/* Keyboard Shortcuts */}
           <Button
             variant="ghost"
             size="sm"
@@ -99,8 +89,6 @@ const POSHeader = ({
             onClick={onKeyboardClick}
             title="Keyboard Shortcuts (F1 / ?)"
           />
-
-          {/* Settings */}
           <Button
             variant="ghost"
             size="sm"
@@ -135,4 +123,4 @@ const POSHeader = ({
   );
 };
 
-export default POSHeader;
+export default TableHeader;

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Play, Trash2, Clock, ShoppingCart, ArrowLeft } from 'lucide-react';
+import { Play, Trash2, Clock, ShoppingCart, X } from 'lucide-react';
 import { Button } from '@components/ui';
 
 const HeldBillsPanel = ({
@@ -8,6 +8,7 @@ const HeldBillsPanel = ({
   onDelete,
   onBack,
   isFocused = false,
+  position = 'right',
 }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const itemRefs = useRef([]);
@@ -67,19 +68,15 @@ const HeldBillsPanel = ({
   }, [isFocused, heldBills, selectedIndex, onResume, onDelete]);
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-[#121212] border-l border-gray-100 dark:border-[#2a2a2a] transition-colors">
+    <div className={`flex flex-col h-full bg-white dark:bg-[#121212] transition-colors ${
+      position === 'left'
+        ? 'border-r border-gray-100 dark:border-[#2a2a2a]'
+        : 'border-l border-gray-100 dark:border-[#2a2a2a]'
+    }`}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 h-14 border-b border-gray-100 dark:border-[#2a2a2a]">
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            icon={ArrowLeft}
-            iconOnly
-            onClick={onBack}
-            title="Back to cart (Esc)"
-          />
-          <span className="font-bold text-lg text-gray-900 dark:text-white">
+          <span className="font-bold text-sm text-gray-900 dark:text-white">
             Held Bills
           </span>
           {heldBills.length > 0 && (
@@ -88,26 +85,21 @@ const HeldBillsPanel = ({
             </span>
           )}
         </div>
-        {isFocused && heldBills.length > 0 && (
-          <span className="hidden md:inline text-[10px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-[#2a2a2a] px-1.5 py-0.5 rounded">
-            ↑↓ Enter Del
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {heldBills.length > 0 && (
+            <span className="text-[10px] text-gray-400 bg-gray-100 dark:bg-[#2a2a2a] px-1.5 py-0.5 rounded">
+              ↑↓ Enter Del
+            </span>
+          )}
+          <Button variant="ghost" size="sm" icon={X} iconOnly onClick={onBack} />
+        </div>
       </div>
 
       {heldBills.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-gray-400 dark:text-gray-500">
-          <ShoppingCart size={64} strokeWidth={1} className="mb-4 opacity-50" />
-          <p className="text-lg font-medium">No held bills</p>
-          <p className="text-sm text-center mt-1">Bills you hold will appear here</p>
-          <Button
-            variant="link"
-            size="sm"
-            onClick={onBack}
-            className="mt-4"
-          >
-            ← Back to cart
-          </Button>
+          <ShoppingCart size={48} strokeWidth={1} className="mb-3 opacity-50" />
+          <p className="text-sm font-medium">No held bills</p>
+          <p className="text-xs mt-1">Bills you hold will appear here</p>
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1.5 md:space-y-2 scrollbar-hide">

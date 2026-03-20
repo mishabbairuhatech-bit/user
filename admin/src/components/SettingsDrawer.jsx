@@ -1,12 +1,15 @@
 import { Check, RotateCcw } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Drawer } from '@components/ui';
 import { useSettings, primaryColors, fontFamilies } from '@/context/SettingsContext';
 
 const SettingsDrawer = () => {
   const { settings, updateSetting, resetSettings, isSettingsOpen, closeSettings } = useSettings();
   const location = useLocation();
+  const navigate = useNavigate();
   const isPOSPage = location.pathname.includes('/pos');
+  const isGridView = location.pathname === '/pos';
+  const isTableView = location.pathname === '/pos/table';
 
   const themeModes = [
     { value: 'light', label: 'Light' },
@@ -166,7 +169,9 @@ const SettingsDrawer = () => {
                   <button
                     key={font.value}
                     onClick={() => updateSetting('fontFamily', font.value)}
-                    className={`px-3 py-2 text-sm rounded-lg border transition-all text-left ${
+                    className={`px-3 py-2 text-sm border transition-all text-left ${
+                      settings.borderRadius === 'full' ? 'rounded-full' : 'rounded-lg'
+                    } ${
                       isActive
                         ? 'border-primary-600 bg-primary-50 dark:border-primary-500 dark:bg-transparent text-primary-700 dark:text-primary-400'
                         : 'border-gray-200 dark:border-[#333] text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-[#444]'
@@ -188,16 +193,51 @@ const SettingsDrawer = () => {
           </h3>
 
           {isPOSPage ? (
-            <SettingRow label="POS cart position" description="Which side the cart panel appears in POS" noBorder>
-              <SegmentedControl
-                options={[
-                  { value: 'left', label: 'Left' },
-                  { value: 'right', label: 'Right' },
-                ]}
-                value={settings.posCartPosition}
-                onChange={(val) => updateSetting('posCartPosition', val)}
-              />
-            </SettingRow>
+            <>
+              <SettingRow label="POS view type" description="Switch between grid and table billing">
+                <SegmentedControl
+                  options={[
+                    { value: 'grid', label: 'Grid' },
+                    { value: 'table', label: 'Table' },
+                  ]}
+                  value={isTableView ? 'table' : 'grid'}
+                  onChange={(val) => {
+                    updateSetting('posViewType', val);
+                    const targetPath = val === 'table' ? '/pos/table' : '/pos';
+                    if (location.pathname !== targetPath) {
+                      navigate(targetPath);
+                      closeSettings();
+                    }
+                  }}
+                />
+              </SettingRow>
+
+              {isGridView && (
+                <SettingRow label="Cart position" description="Which side the cart panel appears" noBorder>
+                  <SegmentedControl
+                    options={[
+                      { value: 'left', label: 'Left' },
+                      { value: 'right', label: 'Right' },
+                    ]}
+                    value={settings.posCartPosition}
+                    onChange={(val) => updateSetting('posCartPosition', val)}
+                  />
+                </SettingRow>
+              )}
+
+              {isTableView && (
+                <SettingRow label="Summary position" description="Which side the bill summary appears" noBorder>
+                  <SegmentedControl
+                    options={[
+                      { value: 'left', label: 'Left' },
+                      { value: 'right', label: 'Right' },
+                    ]}
+                    value={settings.posSummaryPosition}
+                    onChange={(val) => updateSetting('posSummaryPosition', val)}
+                  />
+                </SettingRow>
+              )}
+            </>
           ) : (
             <SettingRow label="Sidebar position" description="Choose which side the sidebar appears" noBorder>
               <SegmentedControl

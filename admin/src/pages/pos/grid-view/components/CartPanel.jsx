@@ -32,6 +32,7 @@ const CartPanel = ({
   showPayment = false,
   onCompleteSale,
   onBackFromPayment,
+  position = 'right',
 }) => {
   const itemRefs = useRef([]);
   const cartDiscountRef = useRef(null);
@@ -131,7 +132,11 @@ const CartPanel = ({
   }, [showPayment, processing, canComplete, handleComplete, onBackFromPayment, selectedMethod, totals.total]);
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-[#121212] border-l border-gray-100 dark:border-[#2a2a2a] transition-colors">
+    <div className={`flex flex-col h-full bg-white dark:bg-[#121212] transition-colors ${
+      position === 'left'
+        ? 'border-r border-gray-100 dark:border-[#2a2a2a]'
+        : 'border-l border-gray-100 dark:border-[#2a2a2a]'
+    }`}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 h-14 border-b border-gray-100 dark:border-[#2a2a2a]">
         {showPayment ? (

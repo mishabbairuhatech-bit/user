@@ -3,10 +3,21 @@ import { AdminLayout } from '@layouts';
 import { LoginPage, ChangePasswordPage, CreatePasskeyPage, ForgotPasswordPage, ResetPasswordPage } from '@pages/auth';
 import { DashboardPage, UIComponentsPage, UsersPage, UserDetailPage, UserCreatePage, SettingsPage } from '@/pages/admin';
 import { POSPage } from '@/pages/pos';
+import { TablePOSPage } from '@/pages/pos/table-view';
+import { useSettings } from '@/context/SettingsContext';
 import CookiePolicyPage from '@pages/CookiePolicyPage';
 import PrivateRoute from './PrivateRoute';
 import PublicRoute from './PublicRoute';
 import RootRedirect from './RootRedirect';
+
+// Redirects to the user's preferred POS view
+const POSRedirect = () => {
+  const { settings } = useSettings();
+  if (settings.posViewType === 'table') {
+    return <Navigate to="/pos/table" replace />;
+  }
+  return <POSPage />;
+};
 
 const AppRoutes = () => {
   return (
@@ -64,12 +75,22 @@ const AppRoutes = () => {
         }
       />
 
-      {/* POS - Protected, full screen */}
+      {/* POS - Protected, full screen (redirects based on saved view preference) */}
       <Route
         path="/pos"
         element={
           <PrivateRoute>
-            <POSPage />
+            <POSRedirect />
+          </PrivateRoute>
+        }
+      />
+
+      {/* POS Table View - Protected, full screen */}
+      <Route
+        path="/pos/table"
+        element={
+          <PrivateRoute>
+            <TablePOSPage />
           </PrivateRoute>
         }
       />
