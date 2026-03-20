@@ -322,7 +322,7 @@ const ReturnsPanel = ({ isActive, completedBills, onProcessReturn, onBack, posit
           </div>
 
           {/* Bills list — scrollable */}
-          <div className="flex-1 overflow-y-auto px-3 pb-3 space-y-1.5 scrollbar-hide">
+          <div className="flex-1 overflow-y-auto px-3 pb-8 md:pb-3 space-y-1.5 scrollbar-hide">
             {filteredBills.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-gray-400 dark:text-gray-500">
                 <RotateCcw size={48} className="mb-3 opacity-50" />
@@ -362,15 +362,15 @@ const ReturnsPanel = ({ isActive, completedBills, onProcessReturn, onBack, posit
             )}
           </div>
 
-          {/* Bottom — Cancel */}
-          <div className="shrink-0 p-3 border-t border-gray-100 dark:border-[#2a2a2a]">
+          {/* Bottom — Cancel (desktop only) */}
+          <div className="shrink-0 p-3 border-t border-gray-100 dark:border-[#2a2a2a] hidden md:block">
             <Button
               variant="outline"
               size="sm"
               onClick={onBack}
               className="w-full"
             >
-              Cancel <kbd className="hidden md:inline text-[10px] opacity-50 ml-1">Esc</kbd>
+              Cancel <kbd className="text-[10px] opacity-50 ml-1">Esc</kbd>
             </Button>
           </div>
         </>

@@ -58,10 +58,10 @@ const HeldBillsSidebar = ({ isOpen, heldBills, onResume, onDelete, onClose, posi
   if (!isOpen) return null;
 
   return (
-    <div className={`absolute top-0 bottom-0 w-[360px] bg-white dark:bg-[#121212] z-30 flex flex-col shadow-2xl ${
+    <div className={`absolute top-0 bottom-0 w-full md:w-[360px] bg-white dark:bg-[#121212] z-30 flex flex-col shadow-2xl ${
       position === 'left'
-        ? 'left-0 border-r border-gray-200 dark:border-[#2a2a2a]'
-        : 'right-0 border-l border-gray-200 dark:border-[#2a2a2a]'
+        ? 'left-0 md:border-r border-gray-200 dark:border-[#2a2a2a]'
+        : 'right-0 md:border-l border-gray-200 dark:border-[#2a2a2a]'
     }`}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 h-12 border-b border-gray-200 dark:border-[#2a2a2a] shrink-0">

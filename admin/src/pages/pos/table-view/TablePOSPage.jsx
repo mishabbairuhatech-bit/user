@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Modal } from '@components/ui';
+import { Receipt, X } from 'lucide-react';
+import { Modal, Button } from '@components/ui';
 import { useSettings } from '@hooks';
 import usePOS from '../grid-view/hooks/usePOS';
 
@@ -59,6 +60,10 @@ const TablePOSPage = () => {
   // Inline editing state — 'qty' | 'discount' | null
   const [editingField, setEditingField] = useState(null);
 
+  // Mobile state
+  const [showMobileSummary, setShowMobileSummary] = useState(false);
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 768);
+
   const barcodeInputRef = useRef(null);
   const cartDiscountRef = useRef(null);
   const totals = calculateTotals();
@@ -66,6 +71,13 @@ const TablePOSPage = () => {
   // Focus barcode input on mount
   useEffect(() => {
     barcodeInputRef.current?.focus();
+  }, []);
+
+  // Track mobile breakpoint
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Reset selected row when cart changes
@@ -177,6 +189,9 @@ const TablePOSPage = () => {
 
   // Keyboard shortcuts
   const handleKeyDown = useCallback((e) => {
+    // Skip all keyboard shortcuts on mobile
+    if (window.innerWidth < 768) return;
+
     // Skip if in input (except F-keys and Ctrl/Cmd combos)
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
       if (!e.key.startsWith('F') && !(e.ctrlKey || e.metaKey)) return;
@@ -467,6 +482,128 @@ const TablePOSPage = () => {
           else if (cart.length > 0) handleCheckout();
         }}
       />
+
+      {/* Mobile Summary FAB */}
+      {isMobile && cart.length > 0 && !showMobileSummary && !showPayment && (
+        <div className="md:hidden fixed bottom-20 right-4 z-40">
+          <Button
+            variant="primary"
+            size="lg"
+            onClick={() => setShowMobileSummary(true)}
+            className="!w-14 !h-14 !rounded-full shadow-lg !p-0 relative"
+          >
+            <Receipt size={22} />
+            <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+              {totals.itemCount}
+            </span>
+          </Button>
+        </div>
+      )}
+
+      {/* Mobile Summary Drawer */}
+      {showMobileSummary && (
+        <div className="md:hidden fixed inset-0 z-50">
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setShowMobileSummary(false)}
+          />
+          <div className="absolute bottom-0 left-0 right-0 max-h-[75vh] bg-white dark:bg-[#121212] rounded-t-2xl overflow-hidden flex flex-col">
+            {/* Handle */}
+            <div className="flex justify-center py-2 shrink-0">
+              <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
+            </div>
+
+            {/* Header */}
+            <div className="px-4 pb-2 shrink-0">
+              <h3 className="text-sm font-bold text-gray-900 dark:text-white">Bill Summary</h3>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500 dark:text-gray-400">Items</span>
+                <span className="font-semibold text-gray-900 dark:text-white">{cart.length} ({totals.itemCount} pcs)</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500 dark:text-gray-400">Gross Total</span>
+                <span className="font-semibold text-gray-900 dark:text-white font-mono">${totals.grossTotal.toFixed(2)}</span>
+              </div>
+              {totals.itemDiscountTotal > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500 dark:text-gray-400">Item Discounts</span>
+                  <span className="font-semibold text-green-600 dark:text-green-400 font-mono">-${totals.itemDiscountTotal.toFixed(2)}</span>
+                </div>
+              )}
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500 dark:text-gray-400">Subtotal</span>
+                <span className="font-semibold text-gray-900 dark:text-white font-mono">${totals.subtotal.toFixed(2)}</span>
+              </div>
+              {totals.discountAmount > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500 dark:text-gray-400">Cart Discount</span>
+                  <span className="font-semibold text-green-600 dark:text-green-400 font-mono">-${totals.discountAmount.toFixed(2)}</span>
+                </div>
+              )}
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500 dark:text-gray-400">Tax (5%)</span>
+                <span className="font-semibold text-gray-900 dark:text-white font-mono">${totals.tax.toFixed(2)}</span>
+              </div>
+              <div className="border-t-2 border-dashed border-gray-200 dark:border-[#333] !mt-4 !mb-2" />
+              <div className="flex justify-between items-center">
+                <span className="text-base font-bold text-gray-900 dark:text-white">TOTAL</span>
+                <span className="text-2xl font-extrabold text-primary-600 dark:text-primary-400 font-mono">${totals.total.toFixed(2)}</span>
+              </div>
+
+              {/* Cart Discount input */}
+              <div className="flex items-center justify-between pt-2">
+                <span className="text-sm text-gray-500 dark:text-gray-400">Cart Discount</span>
+                <div className="flex items-center bg-white dark:bg-[#1a1a1a] rounded border border-gray-200 dark:border-[#333] overflow-hidden h-8">
+                  <input
+                    type="number"
+                    min="0"
+                    value={discount || ''}
+                    onChange={(e) => setDiscount(Number(e.target.value) || 0)}
+                    placeholder="0"
+                    className="w-14 h-full text-xs text-center bg-transparent border-none outline-none text-gray-900 dark:text-white font-mono"
+                  />
+                  <select
+                    value={discountType}
+                    onChange={(e) => setDiscountType(e.target.value)}
+                    className="h-full px-1.5 text-xs bg-gray-50 dark:bg-[#0d0d0d] border-l border-gray-200 dark:border-[#333] outline-none text-gray-500 dark:text-gray-400"
+                  >
+                    <option value="percent">%</option>
+                    <option value="fixed">$</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-3 !mt-4">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => setShowMobileSummary(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  onClick={() => {
+                    setShowMobileSummary(false);
+                    handleCheckout();
+                  }}
+                  disabled={cart.length === 0}
+                  className="flex-1"
+                >
+                  Checkout · ${totals.total.toFixed(2)}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modals (reused from grid-view) */}
       <GridHeldBillsWarningModal

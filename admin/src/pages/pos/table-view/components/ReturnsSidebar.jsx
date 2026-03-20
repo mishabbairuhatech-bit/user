@@ -223,10 +223,10 @@ const ReturnsSidebar = ({ isOpen, completedBills, onProcessReturn, onClose, posi
   if (!isOpen) return null;
 
   return (
-    <div className={`absolute top-0 bottom-0 w-[380px] bg-white dark:bg-[#121212] z-30 flex flex-col shadow-2xl ${
+    <div className={`absolute top-0 bottom-0 w-full md:w-[380px] bg-white dark:bg-[#121212] z-30 flex flex-col shadow-2xl ${
       position === 'left'
-        ? 'left-0 border-r border-gray-200 dark:border-[#2a2a2a]'
-        : 'right-0 border-l border-gray-200 dark:border-[#2a2a2a]'
+        ? 'left-0 md:border-r border-gray-200 dark:border-[#2a2a2a]'
+        : 'right-0 md:border-l border-gray-200 dark:border-[#2a2a2a]'
     }`}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 h-12 border-b border-gray-200 dark:border-[#2a2a2a] shrink-0">
@@ -268,7 +268,7 @@ const ReturnsSidebar = ({ isOpen, completedBills, onProcessReturn, onClose, posi
           </div>
 
           {/* Bills list */}
-          <div className="flex-1 overflow-y-auto px-3 pb-3 space-y-1.5 scrollbar-hide">
+          <div className="flex-1 overflow-y-auto px-3 pb-8 md:pb-3 space-y-1.5 scrollbar-hide">
             {filteredBills.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                 <RotateCcw size={40} className="mb-3 opacity-50" />
@@ -303,7 +303,7 @@ const ReturnsSidebar = ({ isOpen, completedBills, onProcessReturn, onClose, posi
             )}
           </div>
 
-          <div className="shrink-0 p-3 border-t border-gray-200 dark:border-[#2a2a2a]">
+          <div className="shrink-0 p-3 border-t border-gray-200 dark:border-[#2a2a2a] hidden md:block">
             <Button variant="outline" size="sm" onClick={onClose} className="w-full">
               Cancel <kbd className="ml-1 text-[10px] opacity-50">Esc</kbd>
             </Button>

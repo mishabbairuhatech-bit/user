@@ -123,52 +123,53 @@ const ActionBar = ({
   if (showPayment) {
     return (
       <div className="shrink-0 bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-[#2a2a2a] px-4 py-3">
-        <div className="flex items-center gap-4 max-w-5xl mx-auto">
-          {/* Back */}
-          <Button
-            variant="ghost"
-            size="sm"
-            icon={ArrowLeft}
-            iconOnly
-            onClick={onTogglePayment}
-            title="Cancel (Esc)"
-          />
-
-          {/* Payment Methods */}
-          <div className="flex items-center gap-1.5">
-            {paymentMethods.map((method, index) => {
-              const Icon = method.icon;
-              const isSelected = index === selectedMethodIndex;
-              return (
-                <button
-                  key={method.id}
-                  onClick={() => setSelectedMethodIndex(index)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all text-sm ${
-                    isSelected
-                      ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                      : 'border-gray-200 dark:border-[#2a2a2a] hover:border-gray-300 dark:hover:border-[#3a3a3a]'
-                  }`}
-                >
-                  <div className={`w-6 h-6 rounded-full ${method.color} flex items-center justify-center text-white shrink-0`}>
-                    <Icon size={13} />
-                  </div>
-                  <span className={`font-medium ${isSelected ? 'text-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400'}`}>
-                    {method.name}
-                  </span>
-                  <kbd className="text-[10px] text-gray-400 bg-gray-100 dark:bg-[#2a2a2a] px-1 rounded">
-                    {method.shortcut}
-                  </kbd>
-                </button>
-              );
-            })}
+        <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 max-w-5xl mx-auto">
+          {/* Row 1: Back + Payment Methods */}
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              icon={ArrowLeft}
+              iconOnly
+              onClick={onTogglePayment}
+              title="Cancel (Esc)"
+            />
+            <div className="flex items-center gap-1.5">
+              {paymentMethods.map((method, index) => {
+                const Icon = method.icon;
+                const isSelected = index === selectedMethodIndex;
+                return (
+                  <button
+                    key={method.id}
+                    onClick={() => setSelectedMethodIndex(index)}
+                    className={`flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-2 rounded-lg border-2 transition-all text-sm ${
+                      isSelected
+                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                        : 'border-gray-200 dark:border-[#2a2a2a] hover:border-gray-300 dark:hover:border-[#3a3a3a]'
+                    }`}
+                  >
+                    <div className={`w-6 h-6 rounded-full ${method.color} flex items-center justify-center text-white shrink-0`}>
+                      <Icon size={13} />
+                    </div>
+                    <span className={`font-medium ${isSelected ? 'text-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400'}`}>
+                      {method.name}
+                    </span>
+                    <kbd className="hidden md:inline text-[10px] text-gray-400 bg-gray-100 dark:bg-[#2a2a2a] px-1 rounded">
+                      {method.shortcut}
+                    </kbd>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Cash Amount */}
+          {/* Row 2 (mobile) / inline (desktop): Cash Amount */}
           {selectedMethod === 'cash' && (
-            <div className="flex items-center gap-2 flex-1 max-w-md">
+            <div className="flex items-center gap-2 flex-1 max-w-md overflow-x-auto scrollbar-hide">
               <input
                 ref={amountRef}
                 type="text"
+                inputMode="decimal"
                 value={amountTendered}
                 onChange={(e) => setAmountTendered(e.target.value)}
                 onKeyDown={(e) => {
@@ -181,29 +182,26 @@ const ActionBar = ({
                   }
                   e.stopPropagation();
                 }}
-                placeholder="Amount tendered (Tab)"
-                className="w-36 h-9 px-3 text-center text-sm font-semibold font-mono bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] rounded-lg outline-none text-gray-900 dark:text-white focus:border-primary-500 transition-colors"
+                placeholder="Amount"
+                className="w-28 md:w-36 h-9 px-3 text-center text-sm font-semibold font-mono bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] rounded-lg outline-none text-gray-900 dark:text-white focus:border-primary-500 transition-colors shrink-0"
               />
-              {/* Quick amounts */}
               {quickAmounts.map((amount, idx) => (
                 <button
                   key={amount}
                   onClick={() => setAmountTendered(String(amount))}
-                  className="px-2.5 py-1.5 text-xs font-medium bg-gray-100 dark:bg-[#222] hover:bg-gray-200 dark:hover:bg-[#333] text-gray-600 dark:text-gray-400 rounded-md transition-colors"
+                  className="px-2 md:px-2.5 py-1.5 text-xs font-medium bg-gray-100 dark:bg-[#222] hover:bg-gray-200 dark:hover:bg-[#333] text-gray-600 dark:text-gray-400 rounded-md transition-colors shrink-0"
                 >
-                  <span>${amount}</span>
-                  <kbd className="hidden md:inline ml-1 text-[9px] text-gray-400">{idx + 4}</kbd>
+                  ${amount}
                 </button>
               ))}
               <button
                 onClick={() => setAmountTendered(String(Math.ceil(totals.total)))}
-                className="px-2.5 py-1.5 text-xs font-medium bg-primary-100 dark:bg-primary-900/20 hover:bg-primary-200 dark:hover:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-md transition-colors"
+                className="px-2 md:px-2.5 py-1.5 text-xs font-medium bg-primary-100 dark:bg-primary-900/20 hover:bg-primary-200 dark:hover:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-md transition-colors shrink-0"
               >
-                Exact <kbd className="hidden md:inline text-[9px] opacity-60">E</kbd>
+                Exact
               </button>
-              {/* Change */}
               {Number(amountTendered) > 0 && (
-                <div className={`px-3 py-1.5 rounded-lg text-sm font-bold ${
+                <div className={`px-2.5 py-1.5 rounded-lg text-xs md:text-sm font-bold shrink-0 whitespace-nowrap ${
                   change >= 0 ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400'
                 }`}>
                   {change >= 0 ? 'Change' : 'Due'}: ${Math.abs(change).toFixed(2)}
@@ -220,10 +218,9 @@ const ActionBar = ({
             disabled={!canComplete || processing}
             loading={processing}
             prefixIcon={!processing ? Check : undefined}
-            className="ml-auto !px-6"
+            className="md:ml-auto !px-6 w-full md:w-auto"
           >
             {processing ? 'Processing...' : 'Complete Sale'}
-            {!processing && <kbd className="ml-2 text-[10px] opacity-60">Enter</kbd>}
           </Button>
         </div>
       </div>
@@ -267,13 +264,13 @@ const ActionBar = ({
           </span>
         </div>
 
-        {/* Checkout */}
+        {/* Checkout — desktop only (mobile uses summary drawer) */}
         <Button
           variant="primary"
           size="lg"
           onClick={onTogglePayment}
           disabled={cart.length === 0}
-          className="!px-8"
+          className="!px-8 hidden md:flex"
         >
           <CreditCard size={18} className="mr-2" />
           Checkout

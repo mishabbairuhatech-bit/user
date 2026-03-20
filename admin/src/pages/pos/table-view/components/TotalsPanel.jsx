@@ -15,7 +15,7 @@ const TotalsPanel = ({
   const discountRef = externalDiscountRef || localRef;
 
   return (
-    <div className={`w-[320px] shrink-0 bg-gray-50 dark:bg-[#111] flex flex-col ${
+    <div className={`hidden md:flex w-[320px] shrink-0 bg-gray-50 dark:bg-[#111] flex-col ${
       position === 'left'
         ? 'border-r border-gray-200 dark:border-[#2a2a2a]'
         : 'border-l border-gray-200 dark:border-[#2a2a2a]'
