@@ -138,7 +138,7 @@ const PaymentPanel = ({ isActive, totals, cart = [], onComplete, onBack }) => {
         }
       }
 
-      // Block Tab and other navigation from leaking
+      // Block Tab from leaking
       if (e.key === 'Tab') {
         e.preventDefault();
         e.stopPropagation();

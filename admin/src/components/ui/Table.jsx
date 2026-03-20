@@ -246,7 +246,7 @@ const Table = forwardRef(({
                 <tr
                   key={row.id || rowIndex}
                   className={`
-                    transition-colors border-b border-gray-200 dark:border-[#424242]
+                    transition-colors border-b border-gray-200 dark:border-[#424242] last:border-b-0
                     ${onRowClick ? 'cursor-pointer' : ''}
                     ${activeRowId && row.id === activeRowId
                       ? 'bg-gray-100 dark:bg-[#2a2a2a]'

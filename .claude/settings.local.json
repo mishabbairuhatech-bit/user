@@ -9,7 +9,9 @@
       "Bash(find /Users/bairuhatechllp/Desktop/Projects/user/admin/src -type f \\\\\\(-name *context* -o -name *provider* \\\\\\))",
       "Bash(npx tsc:*)",
       "Bash(find /Users/bairuhatechllp/Desktop/Projects/user/server -type f -name *Settings*)",
-      "Bash(find /Users/bairuhatechllp/Desktop/Projects/user/server -type f -name *settings*)"
+      "Bash(find /Users/bairuhatechllp/Desktop/Projects/user/server -type f -name *settings*)",
+      "Bash(find /Users/bairuhatechllp/Desktop/Projects/user -type d \\\\\\(-iname *pos* -o -iname *point*sale* \\\\\\))",
+      "Bash(grep -r \"last:border\\\\|last:border-0\\\\|border-b.*last\\\\|first:rounded\\\\|last:rounded\" /Users/bairuhatechllp/Desktop/Projects/user/admin/src --include=*.jsx --include=*.tsx)"
     ]
   }
 }
