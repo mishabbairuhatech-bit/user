@@ -15,14 +15,14 @@ const TotalsPanel = ({
   const discountRef = externalDiscountRef || localRef;
 
   return (
-    <div className={`hidden md:flex w-[320px] shrink-0 bg-gray-50 dark:bg-[#111] flex-col ${
+    <div className={`flex w-full h-full bg-gray-50 dark:bg-[#111] flex-col ${
       position === 'left'
         ? 'border-r border-gray-200 dark:border-[#2a2a2a]'
         : 'border-l border-gray-200 dark:border-[#2a2a2a]'
     }`}>
       {/* Summary Header — matches BillingTable column header height */}
-      <div className="shrink-0 px-4 flex items-center bg-gray-100 dark:bg-[#161616] border-b border-gray-200 dark:border-[#2a2a2a]">
-        <h3 className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider py-2.5">
+      <div className="shrink-0 h-9 px-4 flex items-center bg-gray-100 dark:bg-[#161616] border-b border-gray-200 dark:border-[#2a2a2a]">
+        <h3 className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
           Bill Summary
         </h3>
       </div>

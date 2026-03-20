@@ -3,7 +3,7 @@ import { Search, RotateCcw, X, Check } from 'lucide-react';
 import { Button } from '@components/ui';
 import { TAX_RATE } from '../../grid-view/data/mockData';
 
-const ReturnsSidebar = ({ isOpen, completedBills, onProcessReturn, onClose, position = 'right' }) => {
+const ReturnsSidebar = ({ isOpen, completedBills, onProcessReturn, onClose, position = 'right', inline = false }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBill, setSelectedBill] = useState(null);
   const [selectedItems, setSelectedItems] = useState({});
@@ -223,19 +223,27 @@ const ReturnsSidebar = ({ isOpen, completedBills, onProcessReturn, onClose, posi
   if (!isOpen) return null;
 
   return (
-    <div className={`absolute top-0 bottom-0 w-full md:w-[380px] bg-white dark:bg-[#121212] z-30 flex flex-col shadow-2xl ${
-      position === 'left'
-        ? 'left-0 md:border-r border-gray-200 dark:border-[#2a2a2a]'
-        : 'right-0 md:border-l border-gray-200 dark:border-[#2a2a2a]'
-    }`}>
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 h-12 border-b border-gray-200 dark:border-[#2a2a2a] shrink-0">
+    <div className={`${
+      inline
+        ? 'flex flex-col h-full bg-white dark:bg-[#121212] transition-colors'
+        : `absolute top-0 bottom-0 w-full md:w-[380px] bg-white dark:bg-[#121212] z-30 flex flex-col shadow-2xl ${
+            position === 'left'
+              ? 'left-0 md:border-r border-gray-200 dark:border-[#2a2a2a]'
+              : 'right-0 md:border-l border-gray-200 dark:border-[#2a2a2a]'
+          }`
+    } ${inline ? (position === 'left' ? 'border-r border-gray-200 dark:border-[#2a2a2a]' : 'border-l border-gray-200 dark:border-[#2a2a2a]') : ''}`}>
+      {/* Header — matches BillingTable column header height when inline */}
+      <div className={`flex items-center justify-between px-4 border-b border-gray-200 dark:border-[#2a2a2a] shrink-0 ${
+        inline ? 'h-9 bg-gray-100 dark:bg-[#161616]' : 'h-12'
+      }`}>
         <div className="flex items-center gap-2">
-          <RotateCcw size={16} className="text-primary-500" />
-          <span className="font-bold text-sm text-gray-900 dark:text-white">Returns</span>
+          {!inline && <RotateCcw size={16} className="text-primary-500" />}
+          <span className={`font-semibold ${inline ? 'text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-wider' : 'text-sm text-gray-900 dark:text-white font-bold'}`}>
+            Returns
+          </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-gray-400 bg-gray-100 dark:bg-[#2a2a2a] px-1.5 py-0.5 rounded">
+          <span className="hidden md:inline text-[10px] text-gray-400 bg-gray-200 dark:bg-[#2a2a2a] px-1.5 py-0.5 rounded">
             ↑↓ Enter {selectedBill ? '+- P Bksp' : ''}
           </span>
           <Button variant="ghost" size="sm" icon={X} iconOnly onClick={onClose} />
@@ -303,11 +311,6 @@ const ReturnsSidebar = ({ isOpen, completedBills, onProcessReturn, onClose, posi
             )}
           </div>
 
-          <div className="shrink-0 p-3 border-t border-gray-200 dark:border-[#2a2a2a] hidden md:block">
-            <Button variant="outline" size="sm" onClick={onClose} className="w-full">
-              Cancel <kbd className="ml-1 text-[10px] opacity-50">Esc</kbd>
-            </Button>
-          </div>
         </>
       ) : (
         <>

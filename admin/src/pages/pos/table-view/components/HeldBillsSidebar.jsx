@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Play, Trash2, Clock, ShoppingCart, X } from 'lucide-react';
 import { Button } from '@components/ui';
 
-const HeldBillsSidebar = ({ isOpen, heldBills, onResume, onDelete, onClose, position = 'right' }) => {
+const HeldBillsSidebar = ({ isOpen, heldBills, onResume, onDelete, onClose, position = 'right', inline = false }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const itemRefs = useRef([]);
 
@@ -58,23 +58,31 @@ const HeldBillsSidebar = ({ isOpen, heldBills, onResume, onDelete, onClose, posi
   if (!isOpen) return null;
 
   return (
-    <div className={`absolute top-0 bottom-0 w-full md:w-[360px] bg-white dark:bg-[#121212] z-30 flex flex-col shadow-2xl ${
-      position === 'left'
-        ? 'left-0 md:border-r border-gray-200 dark:border-[#2a2a2a]'
-        : 'right-0 md:border-l border-gray-200 dark:border-[#2a2a2a]'
-    }`}>
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 h-12 border-b border-gray-200 dark:border-[#2a2a2a] shrink-0">
+    <div className={`${
+      inline
+        ? 'flex flex-col h-full bg-white dark:bg-[#121212] transition-colors'
+        : `absolute top-0 bottom-0 w-full md:w-[360px] bg-white dark:bg-[#121212] z-30 flex flex-col shadow-2xl ${
+            position === 'left'
+              ? 'left-0 md:border-r border-gray-200 dark:border-[#2a2a2a]'
+              : 'right-0 md:border-l border-gray-200 dark:border-[#2a2a2a]'
+          }`
+    } ${inline ? (position === 'left' ? 'border-r border-gray-200 dark:border-[#2a2a2a]' : 'border-l border-gray-200 dark:border-[#2a2a2a]') : ''}`}>
+      {/* Header — matches BillingTable column header height when inline */}
+      <div className={`flex items-center justify-between px-4 border-b border-gray-200 dark:border-[#2a2a2a] shrink-0 ${
+        inline ? 'h-9 bg-gray-100 dark:bg-[#161616]' : 'h-12'
+      }`}>
         <div className="flex items-center gap-2">
-          <span className="font-bold text-sm text-gray-900 dark:text-white">Held Bills</span>
+          <span className={`font-semibold ${inline ? 'text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-wider' : 'text-sm text-gray-900 dark:text-white font-bold'}`}>
+            Held Bills
+          </span>
           {heldBills.length > 0 && (
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-[#2a2a2a] px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-[#2a2a2a] px-1.5 py-0.5 rounded-full">
               {heldBills.length}
             </span>
           )}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-gray-400 bg-gray-100 dark:bg-[#2a2a2a] px-1.5 py-0.5 rounded">
+          <span className="hidden md:inline text-[10px] text-gray-400 bg-gray-200 dark:bg-[#2a2a2a] px-1.5 py-0.5 rounded">
             ↑↓ Enter Del
           </span>
           <Button variant="ghost" size="sm" icon={X} iconOnly onClick={onClose} />

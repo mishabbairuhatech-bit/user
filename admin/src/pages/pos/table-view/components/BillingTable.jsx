@@ -37,15 +37,15 @@ const BillingTable = ({
       {/* ===== DESKTOP TABLE (hidden on mobile) ===== */}
       <div className="hidden md:flex flex-col flex-1 overflow-hidden">
         {/* Table Header */}
-        <div className="shrink-0 grid grid-cols-[50px_90px_1fr_100px_100px_120px_110px_44px] gap-0 bg-gray-100 dark:bg-[#161616] border-b border-gray-200 dark:border-[#2a2a2a] text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-          <div className="px-3 py-2.5 text-center">#</div>
-          <div className="px-3 py-2.5">Barcode</div>
-          <div className="px-3 py-2.5">Item Name</div>
-          <div className="px-3 py-2.5 text-right">Price</div>
-          <div className="px-3 py-2.5 text-center">Qty</div>
-          <div className="px-3 py-2.5 text-center">Discount</div>
-          <div className="px-3 py-2.5 text-right">Amount</div>
-          <div className="px-3 py-2.5"></div>
+        <div className="shrink-0 h-9 grid grid-cols-[50px_90px_1fr_100px_100px_120px_110px_44px] gap-0 bg-gray-100 dark:bg-[#161616] border-b border-gray-200 dark:border-[#2a2a2a] text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider items-center">
+          <div className="px-3 text-center">#</div>
+          <div className="px-3">Barcode</div>
+          <div className="px-3">Item Name</div>
+          <div className="px-3 text-right">Price</div>
+          <div className="px-3 text-center">Qty</div>
+          <div className="px-3 text-center">Discount</div>
+          <div className="px-3 text-right">Amount</div>
+          <div className="px-3"></div>
         </div>
 
         {/* Table Body */}

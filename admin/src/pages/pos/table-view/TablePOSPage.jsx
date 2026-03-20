@@ -413,64 +413,98 @@ const TablePOSPage = () => {
         onKeyboardClick={() => setShowShortcutsModal(true)}
       />
 
-      {/* Barcode Input Bar */}
-      <BarcodeInput
-        onAddItem={handleAddItem}
-        inputRef={barcodeInputRef}
-        customer={customer}
-        onCustomerChange={setCustomer}
-        reversed={isSummaryLeft}
-      />
-
-      {/* Main Content: Table + Totals Panel */}
-      <div className={`flex-1 flex overflow-hidden relative ${isSummaryLeft ? 'flex-row-reverse' : 'flex-row'}`}>
-        {/* Billing Table */}
-        <BillingTable
-          cart={cart}
-          onUpdateQuantity={updateQuantity}
-          onUpdateItemDiscount={updateItemDiscount}
-          onUpdateItemDiscountType={updateItemDiscountType}
-          onRemove={removeFromCart}
-          selectedIndex={selectedRowIndex}
-          onSelectIndex={setSelectedRowIndex}
-          editingField={editingField}
-          onEditDone={() => setEditingField(null)}
+      {/* Barcode Input Bar — dims when held bills/returns/payment active */}
+      <div className={`relative transition-opacity ${showHeldBills || showReturns || showPayment ? 'opacity-40 pointer-events-none select-none' : ''}`}>
+        <BarcodeInput
+          onAddItem={handleAddItem}
+          inputRef={barcodeInputRef}
+          customer={customer}
+          onCustomerChange={setCustomer}
+          reversed={isSummaryLeft}
         />
-
-        {/* Totals Panel */}
-        <TotalsPanel
-          totals={totals}
-          cart={cart}
-          discount={discount}
-          discountType={discountType}
-          onSetDiscount={setDiscount}
-          onSetDiscountType={setDiscountType}
-          position={isSummaryLeft ? 'left' : 'right'}
-          cartDiscountRef={cartDiscountRef}
-        />
-
-        {/* Held Bills Sidebar (overlay) */}
-        <HeldBillsSidebar
-          isOpen={showHeldBills}
-          heldBills={heldBills}
-          onResume={handleResumeBill}
-          onDelete={deleteHeldBill}
-          onClose={() => setShowHeldBills(false)}
-          position={isSummaryLeft ? 'left' : 'right'}
-        />
-
-        {/* Returns Sidebar (overlay) */}
-        <ReturnsSidebar
-          isOpen={showReturns}
-          completedBills={completedBills}
-          onProcessReturn={handleProcessReturn}
-          onClose={() => setShowReturns(false)}
-          position={isSummaryLeft ? 'left' : 'right'}
-        />
+        {(showHeldBills || showReturns || showPayment) && (
+          <div className="absolute inset-0 z-10" />
+        )}
       </div>
 
-      {/* Action Bar / Payment Bar */}
-      <ActionBar
+      {/* Main Content: Table + Side Panel */}
+      <div className={`flex-1 flex overflow-hidden relative ${isSummaryLeft ? 'flex-row-reverse' : 'flex-row'}`}>
+        {/* Billing Table — dims when held bills/returns/payment active */}
+        <div className={`flex-1 flex flex-col overflow-hidden relative transition-opacity ${showHeldBills || showReturns || showPayment ? 'opacity-40 pointer-events-none select-none' : ''}`}>
+          <BillingTable
+            cart={cart}
+            onUpdateQuantity={updateQuantity}
+            onUpdateItemDiscount={updateItemDiscount}
+            onUpdateItemDiscountType={updateItemDiscountType}
+            onRemove={removeFromCart}
+            selectedIndex={selectedRowIndex}
+            onSelectIndex={setSelectedRowIndex}
+            editingField={editingField}
+            onEditDone={() => setEditingField(null)}
+          />
+          {/* Block interaction overlay */}
+          {(showHeldBills || showReturns || showPayment) && (
+            <div className="absolute inset-0 z-10" />
+          )}
+        </div>
+
+        {/* Right Side Panel — switches between TotalsPanel / HeldBills / Returns */}
+        <div className={`hidden md:block w-[380px] flex-shrink-0`}>
+          {showReturns ? (
+            <ReturnsSidebar
+              isOpen={showReturns}
+              completedBills={completedBills}
+              onProcessReturn={handleProcessReturn}
+              onClose={() => setShowReturns(false)}
+              position={isSummaryLeft ? 'left' : 'right'}
+              inline
+            />
+          ) : showHeldBills ? (
+            <HeldBillsSidebar
+              isOpen={showHeldBills}
+              heldBills={heldBills}
+              onResume={handleResumeBill}
+              onDelete={deleteHeldBill}
+              onClose={() => setShowHeldBills(false)}
+              position={isSummaryLeft ? 'left' : 'right'}
+              inline
+            />
+          ) : (
+            <TotalsPanel
+              totals={totals}
+              cart={cart}
+              discount={discount}
+              discountType={discountType}
+              onSetDiscount={setDiscount}
+              onSetDiscountType={setDiscountType}
+              position={isSummaryLeft ? 'left' : 'right'}
+              cartDiscountRef={cartDiscountRef}
+            />
+          )}
+        </div>
+
+        {/* Mobile-only: full-screen overlays for Held Bills / Returns */}
+        <div className="md:hidden">
+          <HeldBillsSidebar
+            isOpen={showHeldBills}
+            heldBills={heldBills}
+            onResume={handleResumeBill}
+            onDelete={deleteHeldBill}
+            onClose={() => setShowHeldBills(false)}
+            position="right"
+          />
+          <ReturnsSidebar
+            isOpen={showReturns}
+            completedBills={completedBills}
+            onProcessReturn={handleProcessReturn}
+            onClose={() => setShowReturns(false)}
+            position="right"
+          />
+        </div>
+      </div>
+
+      {/* Action Bar / Payment Bar — hidden when Returns or Held Bills active */}
+      {!showReturns && !showHeldBills && <ActionBar
         cart={cart}
         totals={totals}
         onHold={handleHoldBill}
@@ -481,7 +515,7 @@ const TablePOSPage = () => {
           if (showPayment) setShowPayment(false);
           else if (cart.length > 0) handleCheckout();
         }}
-      />
+      />}
 
       {/* Mobile Summary FAB */}
       {isMobile && cart.length > 0 && !showMobileSummary && !showPayment && (
