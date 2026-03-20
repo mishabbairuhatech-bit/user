@@ -66,11 +66,11 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
   return (
     <aside className={`h-full w-full flex flex-col transition-colors duration-300 ${isCollapsed ? 'bg-white dark:bg-[#121212]' : 'bg-white dark:bg-[#171717]'}`}>
       {/* Top — Logo & Toggle */}
-      <div className={`group/top h-14 flex items-center flex-shrink-0 ${isCollapsed ? 'justify-center px-0.5' : 'justify-between px-4'}`}>
+      <div className={`group/top h-12 flex items-center flex-shrink-0 ${isCollapsed ? 'justify-center px-0.5' : 'justify-between px-4'}`}>
         {isCollapsed && isTablet ? (
           /* Tablet collapsed: just logo, no hover icon */
           <div className="w-8 h-8 flex items-center justify-center">
-            <svg viewBox="0 0 40 40" className="w-5 h-5">
+            <svg viewBox="0 0 40 40" className="w-7 h-7">
               <circle cx="20" cy="20" r="17" fill="none" className="stroke-primary-700" strokeWidth="2.5" />
               <circle cx="20" cy="20" r="9" fill="none" className="stroke-primary-700" strokeWidth="2.5" />
               <circle cx="20" cy="20" r="2.5" className="fill-primary-700" />
@@ -88,7 +88,7 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
               {logoHovered ? (
                 <PanelRight size={18} className="text-gray-500 dark:text-gray-400" />
               ) : (
-                <svg viewBox="0 0 40 40" className="w-5 h-5">
+                <svg viewBox="0 0 40 40" className="w-7 h-7">
                   <circle cx="20" cy="20" r="17" fill="none" className="stroke-primary-700" strokeWidth="2.5" />
                   <circle cx="20" cy="20" r="9" fill="none" className="stroke-primary-700" strokeWidth="2.5" />
                   <circle cx="20" cy="20" r="2.5" className="fill-primary-700" />

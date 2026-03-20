@@ -6,11 +6,6 @@ const AccountSettings = () => {
 
   return (
     <div className="space-y-2">
-      {/* Title */}
-      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Account kkk</h2>
-
-      <div className="h-px bg-gray-100 dark:bg-[#2a2a2a]" />
-
       {/* Profile Section */}
       <div className="py-2">
         <div className="flex items-start gap-4">

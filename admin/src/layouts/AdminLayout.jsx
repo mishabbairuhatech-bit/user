@@ -71,7 +71,7 @@ const AdminLayout = () => {
 
   const sidebarEl = !isMobile && (
     <aside
-      className={`${isSidebarCollapsed || isTablet ? 'w-[44px]' : 'w-[260px]'} flex-shrink-0 h-full ${isRight ? 'border-l' : 'border-r'
+      className={`${isSidebarCollapsed || isTablet ? 'w-12' : 'w-[260px]'} flex-shrink-0 h-full ${isRight ? 'border-l' : 'border-r'
         } border-gray-200 dark:border-[#2a2a2a] transition-all duration-300`}
     >
       <Sidebar
