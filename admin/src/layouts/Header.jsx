@@ -43,6 +43,7 @@ const Header = ({ isMobile, onMenuClick }) => {
             size="sm"
             icon={Mail}
             iconOnly
+            onClick={() => navigate('/mail')}
           />
         </Tooltip>
 

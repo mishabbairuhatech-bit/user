@@ -107,6 +107,7 @@ const defaultSettings = {
   posCartPosition: 'right', // 'left', 'right'
   posViewType: 'grid', // 'grid', 'table'
   posSummaryPosition: 'right', // 'left', 'right' — table-view bill summary panel
+  mailSidebarPosition: 'left', // 'left', 'right' — mail portal sidebar + list position
 };
 
 export const SettingsContext = createContext(null);

@@ -10,6 +10,7 @@ const SettingsDrawer = () => {
   const isPOSPage = location.pathname.includes('/pos');
   const isGridView = location.pathname === '/pos';
   const isTableView = location.pathname === '/pos/table';
+  const isMailPage = location.pathname === '/mail';
 
   const themeModes = [
     { value: 'light', label: 'Light' },
@@ -238,6 +239,17 @@ const SettingsDrawer = () => {
                 </SettingRow>
               )}
             </>
+          ) : isMailPage ? (
+            <SettingRow label="Mail position" description="Which side the mailbox panel appears" noBorder>
+              <SegmentedControl
+                options={[
+                  { value: 'left', label: 'Left' },
+                  { value: 'right', label: 'Right' },
+                ]}
+                value={settings.mailSidebarPosition}
+                onChange={(val) => updateSetting('mailSidebarPosition', val)}
+              />
+            </SettingRow>
           ) : (
             <SettingRow label="Sidebar position" description="Choose which side the sidebar appears" noBorder>
               <SegmentedControl

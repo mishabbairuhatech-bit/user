@@ -4,6 +4,7 @@ import { LoginPage, ChangePasswordPage, CreatePasskeyPage, ForgotPasswordPage, R
 import { DashboardPage, UIComponentsPage, UsersPage, UserDetailPage, UserCreatePage, SettingsPage } from '@/pages/admin';
 import { POSPage } from '@/pages/pos';
 import { TablePOSPage } from '@/pages/pos/table-view';
+import { MailPage } from '@/pages/mail-portal';
 import { useSettings } from '@/context/SettingsContext';
 import CookiePolicyPage from '@pages/CookiePolicyPage';
 import PrivateRoute from './PrivateRoute';
@@ -91,6 +92,16 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <TablePOSPage />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Mail Portal - Protected, full screen */}
+      <Route
+        path="/mail"
+        element={
+          <PrivateRoute>
+            <MailPage />
           </PrivateRoute>
         }
       />
