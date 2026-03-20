@@ -1,7 +1,7 @@
 import { ShoppingCart, Trash2, Pause, Percent, Banknote, CreditCard, Smartphone, Check, ArrowLeft, Loader2 } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Button, Input } from '@components/ui';
-import CartItem from './CartItem';
+import GridCartItem from './GridCartItem';
 
 const paymentMethods = [
   { id: 'cash', name: 'Cash', icon: Banknote, color: 'bg-green-500' },
@@ -414,7 +414,7 @@ const CartPanel = ({
           <div className="flex-1 overflow-y-auto px-4 pt-4 pb-2 scrollbar-hide">
             {cart.map((item, index) => (
               <div key={item.product.id} ref={el => itemRefs.current[index] = el} className="mt-1">
-                <CartItem
+                <GridCartItem
                   item={item}
                   onUpdateQuantity={onUpdateQuantity}
                   onUpdateDiscount={onUpdateItemDiscount}

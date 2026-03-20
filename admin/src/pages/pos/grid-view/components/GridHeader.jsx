@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Pause, BarChart3, RotateCcw, Keyboard, Settings, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Pause, BarChart3, RotateCcw, Settings, Keyboard, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Badge, Button, Tooltip } from '@components/ui';
+import { Badge, Button, Input, Tooltip } from '@components/ui';
 import { useSettings } from '@hooks';
 
-const TableHeader = ({
+const POSHeader = ({
+  searchQuery,
+  onSearchChange,
   heldBillsCount,
   onHoldBillsClick,
   isHeldBillsActive = false,
@@ -40,7 +42,7 @@ const TableHeader = ({
             className="shrink-0"
           />
         </Tooltip>
-        <span className="font-bold text-sm text-gray-900 dark:text-white hidden sm:inline">Table Billing</span>
+        <span className="font-bold text-sm text-gray-900 dark:text-white hidden sm:inline">Grid Billing</span>
         <div className="hidden md:flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 ml-2">
           <span>{currentDate}</span>
           <span className="text-gray-300 dark:text-gray-600">|</span>
@@ -48,7 +50,7 @@ const TableHeader = ({
         </div>
       </div>
 
-      {/* Right - Actions */}
+      {/* Right - Actions & Profile */}
       <div className="flex items-center gap-3 ml-4">
         <div className="flex items-center gap-1.5 pr-3 border-r border-gray-200 dark:border-[#2a2a2a]">
           <Tooltip content="Returns (F3)" position="bottom">
@@ -136,4 +138,4 @@ const TableHeader = ({
   );
 };
 
-export default TableHeader;
+export default POSHeader;

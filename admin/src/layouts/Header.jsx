@@ -1,5 +1,6 @@
 import { Bell, Mail, Settings, ChartNoAxesGantt, Store } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Button, Tooltip } from '@components/ui';
 import { useSettings } from '@hooks';
 
 const Header = ({ isMobile, onMenuClick }) => {
@@ -12,43 +13,57 @@ const Header = ({ isMobile, onMenuClick }) => {
       <div className="flex items-center gap-3">
         {/* Mobile hamburger */}
         {isMobile && (
-          <button
-            onClick={onMenuClick}
-            className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] rounded-lg transition-colors"
-          >
-            <ChartNoAxesGantt size={20} strokeWidth={1.5} />
-          </button>
+          <Tooltip content="Menu" position="bottom">
+            <Button
+              variant="ghost"
+              size="sm"
+              icon={ChartNoAxesGantt}
+              iconOnly
+              onClick={onMenuClick}
+            />
+          </Tooltip>
         )}
-
-
       </div>
 
       {/* Right */}
-      <div className="flex items-center gap-1">
-        {/* POS Button */}
-        <button
-          onClick={() => navigate('/pos')}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
-        >
-          <Store size={16} strokeWidth={1.5} />
-          <span className="text-sm font-medium hidden sm:inline">POS</span>
-        </button>
+      <div className="flex items-center gap-1.5">
+        <Tooltip content="POS" position="bottom">
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={Store}
+            iconOnly
+            onClick={() => navigate('/pos')}
+          />
+        </Tooltip>
 
-        <button className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] rounded-lg transition-colors">
-          <Mail size={18} strokeWidth={1.5} />
-        </button>
+        <Tooltip content="Mail" position="bottom">
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={Mail}
+            iconOnly
+          />
+        </Tooltip>
 
-        <button className="relative p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] rounded-lg transition-colors">
-          <Bell size={18} strokeWidth={1.5} />
-        </button>
+        <Tooltip content="Notifications" position="bottom">
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={Bell}
+            iconOnly
+          />
+        </Tooltip>
 
-        <button
-          onClick={openSettings}
-          className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] rounded-lg transition-colors"
-        >
-          <Settings size={18} strokeWidth={1.5} />
-        </button>
-
+        <Tooltip content="Settings" position="bottom">
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={Settings}
+            iconOnly
+            onClick={openSettings}
+          />
+        </Tooltip>
       </div>
     </header>
   );

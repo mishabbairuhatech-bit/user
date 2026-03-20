@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import ProductCard from './ProductCard';
+import GridProductCard from './GridProductCard';
 
 const ProductGrid = ({ products, cart, onAddToCart, onUpdateQuantity, loading, selectedIndex }) => {
   const itemRefs = useRef([]);
@@ -50,7 +50,7 @@ const ProductGrid = ({ products, cart, onAddToCart, onUpdateQuantity, loading, s
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-7 4xl:grid-cols-8 gap-[5px] p-3 pb-6">
       {products.map((product, index) => (
         <div key={product.id} ref={el => itemRefs.current[index] = el}>
-          <ProductCard
+          <GridProductCard
             product={product}
             onAdd={onAddToCart}
             onUpdateQuantity={onUpdateQuantity}

@@ -1,19 +1,18 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
-import { ShoppingCart, LayoutGrid, Home, Clock, Bookmark, Settings, Pause, RotateCcw, BarChart3, Keyboard, Search, X } from 'lucide-react';
-import { categories, products } from './data/mockData';
-import { Modal, Input, Button } from '@components/ui';
+import { Button, Input, Modal } from '@components/ui';
 import { useSettings } from '@hooks';
+import { Search, ShoppingCart, X } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import GridBillPreview from './components/GridBillPreview';
+import GridCartPanel from './components/GridCartPanel';
+import GridCategoryTabs from './components/GridCategoryTabs';
+import GridDailyReportModal from './components/GridDailyReportModal';
+import GridHeader from './components/GridHeader';
+import GridHeldBillsPanel from './components/GridHeldBillsPanel';
+import GridHeldBillsWarningModal from './components/GridHeldBillsWarningModal';
+import GridProductGrid from './components/GridProductGrid';
+import GridReturnsPanel from './components/GridReturnsPanel';
+import { categories, products } from './data/mockData';
 import usePOS from './hooks/usePOS';
-import POSHeader from './components/POSHeader';
-import CategoryTabs from './components/CategoryTabs';
-import ProductGrid from './components/ProductGrid';
-import CartPanel from './components/CartPanel';
-import PaymentPanel from './components/PaymentPanel';
-import HeldBillsPanel from './components/HeldBillsPanel';
-import HeldBillsWarningModal from './components/HeldBillsWarningModal';
-import BillPreview from './components/BillPreview';
-import ReturnsPanel from './components/ReturnsPanel';
-import DailyReportModal from './components/DailyReportModal';
 
 const POSPage = () => {
   const { settings } = useSettings();
@@ -547,7 +546,7 @@ const POSPage = () => {
     <div className="h-screen flex bg-white dark:bg-[#0a0a0a]">
       <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-[#0a0a0a]">
         {/* Header */}
-        <POSHeader
+        <GridHeader
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           heldBillsCount={heldBills.length}
@@ -564,7 +563,7 @@ const POSPage = () => {
           {/* Products panel */}
           <div className={`flex-1 flex flex-col overflow-hidden relative transition-opacity ${showPaymentPanel || showReturnsPanel || showHeldBillsPanel ? 'opacity-40 pointer-events-none select-none' : ''}`}>
             {/* Categories */}
-            <CategoryTabs
+            <GridCategoryTabs
               categories={categories}
               activeCategory={activeCategory}
               onCategoryChange={(catId) => {
@@ -577,7 +576,7 @@ const POSPage = () => {
 
             {/* Products grid */}
             <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#0a0a0a] scrollbar-hide outline-none transition-colors">
-              <ProductGrid
+              <GridProductGrid
                 products={filteredProducts}
                 cart={cart}
                 onAddToCart={addToCart}
@@ -595,7 +594,7 @@ const POSPage = () => {
           {/* Cart panel / Held Bills panel - Desktop */}
           <div className="hidden md:block w-[380px] flex-shrink-0">
             {showReturnsPanel ? (
-              <ReturnsPanel
+              <GridReturnsPanel
                 isActive={showReturnsPanel}
                 completedBills={completedBills}
                 onProcessReturn={handleProcessReturn}
@@ -603,7 +602,7 @@ const POSPage = () => {
                 position={isCartLeft ? 'left' : 'right'}
               />
             ) : showHeldBillsPanel ? (
-              <HeldBillsPanel
+              <GridHeldBillsPanel
                 heldBills={heldBills}
                 onResume={handleResumeBill}
                 onDelete={deleteHeldBill}
@@ -612,7 +611,7 @@ const POSPage = () => {
                 position={isCartLeft ? 'left' : 'right'}
               />
             ) : (
-              <CartPanel
+              <GridCartPanel
                 cart={cart}
                 totals={totals}
                 discount={discount}
@@ -677,7 +676,7 @@ const POSPage = () => {
                   <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
                 </div>
                 {showReturnsPanel ? (
-                  <ReturnsPanel
+                  <GridReturnsPanel
                     isActive={showReturnsPanel}
                     completedBills={completedBills}
                     onProcessReturn={(originalBill, returnItems) => {
@@ -690,7 +689,7 @@ const POSPage = () => {
                     }}
                   />
                 ) : showHeldBillsPanel ? (
-                  <HeldBillsPanel
+                  <GridHeldBillsPanel
                     heldBills={heldBills}
                     onResume={(billId) => {
                       handleResumeBill(billId);
@@ -704,7 +703,7 @@ const POSPage = () => {
                     isFocused={false}
                   />
                 ) : (
-                  <CartPanel
+                  <GridCartPanel
                     cart={cart}
                     totals={totals}
                     discount={discount}
@@ -735,7 +734,7 @@ const POSPage = () => {
         )}
 
         {/* Modals */}
-        <HeldBillsWarningModal
+        <GridHeldBillsWarningModal
           isOpen={!!cartWarningContext}
           onClose={() => setCartWarningContext(null)}
           onHoldBill={handleWarningHoldBill}
@@ -743,13 +742,13 @@ const POSPage = () => {
           context={cartWarningContext}
         />
 
-        <BillPreview
+        <GridBillPreview
           isOpen={!!completedBill}
           onClose={() => setCompletedBill(null)}
           bill={completedBill}
         />
 
-        <DailyReportModal
+        <GridDailyReportModal
           isOpen={showReportModal}
           onClose={() => setShowReportModal(false)}
           report={getDailyReport()}

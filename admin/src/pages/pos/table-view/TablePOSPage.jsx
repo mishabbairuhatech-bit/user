@@ -13,9 +13,9 @@ import HeldBillsSidebar from './components/HeldBillsSidebar';
 import ReturnsSidebar from './components/ReturnsSidebar';
 
 // Reuse modals from grid-view
-import BillPreview from '../grid-view/components/BillPreview';
-import DailyReportModal from '../grid-view/components/DailyReportModal';
-import HeldBillsWarningModal from '../grid-view/components/HeldBillsWarningModal';
+import GridBillPreview from '../grid-view/components/GridBillPreview';
+import GridDailyReportModal from '../grid-view/components/GridDailyReportModal';
+import GridHeldBillsWarningModal from '../grid-view/components/GridHeldBillsWarningModal';
 
 const TablePOSPage = () => {
   const { settings } = useSettings();
@@ -469,7 +469,7 @@ const TablePOSPage = () => {
       />
 
       {/* Modals (reused from grid-view) */}
-      <HeldBillsWarningModal
+      <GridHeldBillsWarningModal
         isOpen={!!cartWarningContext}
         onClose={() => setCartWarningContext(null)}
         onHoldBill={handleWarningHoldBill}
@@ -477,13 +477,13 @@ const TablePOSPage = () => {
         context={cartWarningContext}
       />
 
-      <BillPreview
+      <GridBillPreview
         isOpen={!!completedBill}
         onClose={() => setCompletedBill(null)}
         bill={completedBill}
       />
 
-      <DailyReportModal
+      <GridDailyReportModal
         isOpen={showReportModal}
         onClose={() => setShowReportModal(false)}
         report={getDailyReport()}
