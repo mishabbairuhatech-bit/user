@@ -62,7 +62,7 @@ const MailDetail = ({ mail, onBack, onToggleStar, onDelete }) => {
 
           {/* Sender */}
           <div className="flex items-start gap-3 mb-6">
-            <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-sm font-semibold text-primary-700 dark:text-primary-400 flex-shrink-0">
+            <div className="w-10 h-10 rounded-full bg-primary-600/15 dark:bg-primary-500/15 flex items-center justify-center text-sm font-semibold text-primary-700 dark:text-primary-400 flex-shrink-0">
               {mail.avatar}
             </div>
 

@@ -38,17 +38,17 @@ const MailList = ({ mails, selectedMailId, onSelectMail, onToggleStar }) => {
             onClick={() => onSelectMail(mail)}
             className={`flex items-start gap-3 px-4 py-3 border-b border-gray-50 dark:border-[#1e1e1e] cursor-pointer transition-colors ${
               isSelected
-                ? 'bg-primary-50 dark:bg-primary-900/10 border-l-2 !border-l-primary-600'
+                ? 'bg-gray-100 dark:bg-[#1e1e1e] border-l-2 !border-l-primary-600'
                 : mail.read
                 ? 'hover:bg-gray-50 dark:hover:bg-[#1a1a1a]'
-                : 'bg-blue-50/40 dark:bg-blue-900/5 hover:bg-blue-50/70 dark:hover:bg-blue-900/10'
+                : 'bg-gray-50 dark:bg-[#161616] hover:bg-gray-100 dark:hover:bg-[#1a1a1a]'
             }`}
           >
             {/* Avatar */}
             <div
               className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 ${
                 !mail.read
-                  ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400'
+                  ? 'bg-primary-600/15 dark:bg-primary-500/15 text-primary-700 dark:text-primary-400'
                   : 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-500 dark:text-gray-400'
               }`}
             >

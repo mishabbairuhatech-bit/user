@@ -165,7 +165,7 @@ const MailPage = () => {
                 onClick={() => handleFolderChange(folder.id)}
                 className={`px-3 py-1 text-xs font-medium rounded-full whitespace-nowrap transition-colors shrink-0 ${
                   activeFolder === folder.id
-                    ? 'bg-primary-100 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400'
+                    ? 'bg-gray-200 dark:bg-[#2a2a2a] text-primary-700 dark:text-primary-400'
                     : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2a2a2a]'
                 }`}
               >
