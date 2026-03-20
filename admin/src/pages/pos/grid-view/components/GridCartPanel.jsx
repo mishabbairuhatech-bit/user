@@ -1,4 +1,4 @@
-import { ShoppingCart, Trash2, Pause, Percent, Banknote, CreditCard, Smartphone, Check, ArrowLeft, Loader2 } from 'lucide-react';
+import { ShoppingCart, Trash2, Pause, Banknote, CreditCard, Smartphone, Check, ArrowLeft } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Button, Input } from '@components/ui';
 import GridCartItem from './GridCartItem';
@@ -132,11 +132,10 @@ const CartPanel = ({
   }, [showPayment, processing, canComplete, handleComplete, onBackFromPayment, selectedMethod, totals.total]);
 
   return (
-    <div className={`flex flex-col h-full bg-white dark:bg-[#121212] transition-colors ${
-      position === 'left'
+    <div className={`flex flex-col h-full bg-white dark:bg-[#121212] transition-colors ${position === 'left'
         ? 'border-r border-gray-100 dark:border-[#2a2a2a]'
         : 'border-l border-gray-100 dark:border-[#2a2a2a]'
-    }`}>
+      }`}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 h-14 border-b border-gray-100 dark:border-[#2a2a2a]">
         {showPayment ? (
@@ -164,11 +163,6 @@ const CartPanel = ({
               <span className="font-bold text-lg text-gray-900 dark:text-white">
                 Detail Items
               </span>
-              {isFocused && (
-                <span className="hidden md:inline text-[10px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-[#2a2a2a] px-1.5 py-0.5 rounded">
-                  ↑↓ +/- D S T Y
-                </span>
-              )}
             </div>
             <div className="flex items-center gap-1.5">
               <Button
@@ -288,18 +282,16 @@ const CartPanel = ({
                     variant={isSelected ? 'outline' : 'ghost'}
                     size="sm"
                     onClick={() => setSelectedMethodIndex(index)}
-                    className={`!flex !items-center !justify-center gap-1.5 !py-2 !px-2 !rounded-lg !border-2 ${
-                      isSelected
+                    className={`!flex !items-center !justify-center gap-1.5 !py-2 !px-2 !rounded-lg !border-2 ${isSelected
                         ? '!border-primary-500 !bg-primary-50 dark:!bg-primary-900/20'
                         : '!border-gray-200 dark:!border-[#2a2a2a] hover:!border-gray-300 dark:hover:!border-[#424242]'
-                    }`}
+                      }`}
                   >
                     <div className={`w-7 h-7 rounded-full ${method.color} flex items-center justify-center text-white shrink-0`}>
                       <Icon size={14} />
                     </div>
-                    <span className={`text-xs font-medium ${
-                      isSelected ? 'text-primary-600 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300'
-                    }`}>
+                    <span className={`text-xs font-medium ${isSelected ? 'text-primary-600 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300'
+                      }`}>
                       {method.name}
                     </span>
                   </Button>
@@ -358,17 +350,14 @@ const CartPanel = ({
 
                 {/* Change */}
                 {Number(amountTendered) > 0 && (
-                  <div className={`p-2 rounded-lg flex justify-between items-center ${
-                    change >= 0 ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'
-                  }`}>
-                    <span className={`text-xs ${
-                      change >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'
+                  <div className={`p-2 rounded-lg flex justify-between items-center ${change >= 0 ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'
                     }`}>
+                    <span className={`text-xs ${change >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'
+                      }`}>
                       {change >= 0 ? 'Change' : 'Amount Due'}
                     </span>
-                    <span className={`text-base font-bold ${
-                      change >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'
-                    }`}>
+                    <span className={`text-base font-bold ${change >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'
+                      }`}>
                       ${Math.abs(change).toFixed(2)}
                     </span>
                   </div>

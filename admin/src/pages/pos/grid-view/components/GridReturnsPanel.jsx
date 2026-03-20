@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Search, RotateCcw, ArrowLeft, Loader2, X, Check } from 'lucide-react';
+import { Search, RotateCcw, ArrowLeft, X, Check } from 'lucide-react';
 import { Button } from '@components/ui';
 import { TAX_RATE } from '../data/mockData';
 

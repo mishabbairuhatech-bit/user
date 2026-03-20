@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from 'react';
-import { Printer, Download, X, Check, RotateCcw } from 'lucide-react';
+import { Printer, X, Check, RotateCcw } from 'lucide-react';
 import { Modal, Button } from '@components/ui';
 
 const BillPreview = ({ isOpen, onClose, bill }) => {

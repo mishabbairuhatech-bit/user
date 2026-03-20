@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import GridProductCard from './GridProductCard';
 
-const ProductGrid = ({ products, cart, onAddToCart, onUpdateQuantity, loading, selectedIndex }) => {
+const ProductGrid = ({ products, cart, onAddToCart, onUpdateQuantity, selectedIndex }) => {
   const itemRefs = useRef([]);
 
   // Get cart quantities for each product
@@ -20,19 +20,6 @@ const ProductGrid = ({ products, cart, onAddToCart, onUpdateQuantity, loading, s
     }
   }, [selectedIndex]);
 
-  if (loading) {
-    return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-7 4xl:grid-cols-8 gap-[5px] p-3">
-        {[...Array(12)].map((_, i) => (
-          <div key={i} className="animate-pulse">
-            <div className="aspect-square bg-gray-200 dark:bg-[#2a2a2a] rounded-xl" />
-            <div className="mt-2 h-4 bg-gray-200 dark:bg-[#2a2a2a] rounded w-3/4" />
-            <div className="mt-1.5 h-6 bg-gray-200 dark:bg-[#2a2a2a] rounded w-1/2" />
-          </div>
-        ))}
-      </div>
-    );
-  }
 
   if (!products || products.length === 0) {
     return (
