@@ -13,6 +13,7 @@ import {
 import { LoginSession } from '../../sessions/entities/login-session.entity';
 import { PasswordHistory } from '../../password-history/entities/password-history.entity';
 import { Passkey } from '../../passkey/entities/passkey.entity';
+import { FaceData } from '../../face-auth/entities/face-data.entity';
 
 @Table({ tableName: 'users', timestamps: true, underscored: true })
 export class User extends Model {
@@ -132,6 +133,9 @@ export class User extends Model {
 
   @HasMany(() => Passkey)
   passkeys: Passkey[];
+
+  @HasMany(() => FaceData)
+  faceData: FaceData[];
 
   get fullName(): string {
     return `${this.first_name} ${this.last_name}`;

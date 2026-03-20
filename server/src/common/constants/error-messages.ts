@@ -47,6 +47,12 @@ export const ERROR_MESSAGES = {
     'Credential appears to be cloned. Passkey has been disabled for security.',
   PASSKEY_CHALLENGE_EXPIRED: 'Passkey challenge has expired. Please try again.',
 
+  // Face Auth
+  FACE_NOT_FOUND: 'Face data not found.',
+  FACE_NOT_REGISTERED: 'No face data registered for this account. Please register your face in Settings first.',
+  FACE_NO_MATCH: 'Face does not match. Please try again.',
+  FACE_INVALID_DESCRIPTOR: 'Invalid face data. Please try scanning your face again.',
+
   // Rate Limiting
   RATE_LIMITED: 'Too many requests. Please try again later.',
 

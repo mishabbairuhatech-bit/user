@@ -5,6 +5,7 @@ import { User } from '../../users/entities/user.entity';
 import { LoginSession } from '../../sessions/entities/login-session.entity';
 import { PasswordHistory } from '../../password-history/entities/password-history.entity';
 import { Passkey } from '../../passkey/entities/passkey.entity';
+import { FaceData } from '../../face-auth/entities/face-data.entity';
 import { SEED_USERS } from './seed-data';
 
 dotenv.config();
@@ -21,7 +22,7 @@ async function seed() {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    models: [User, LoginSession, PasswordHistory, Passkey],
+    models: [User, LoginSession, PasswordHistory, Passkey, FaceData],
     logging: false,
     ...(dbSsl
       ? { dialectOptions: { ssl: { require: true, rejectUnauthorized: false } } }

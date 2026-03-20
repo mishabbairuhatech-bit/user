@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, Smartphone, Mail, Key, Shield, QrCode, Copy, Check, Monitor, Laptop, TabletSmartphone, Globe, ArrowRight, MapPin, Clock, Trash2, Fingerprint } from 'lucide-react';
+import { ChevronRight, Smartphone, Mail, Key, Shield, QrCode, Copy, Check, Monitor, Laptop, TabletSmartphone, Globe, ArrowRight, MapPin, Clock, Trash2, Fingerprint, ScanFace } from 'lucide-react';
 import { Switch, Modal, Button, Input, ConfirmModal } from '@components/ui';
 import { useAuth } from '@hooks';
 import api from '@services/api';
 import API from '@services/endpoints';
+import FaceCamera from '@components/FaceCamera';
 
 const SecuritySettings = () => {
   const { user } = useAuth();
@@ -16,6 +17,7 @@ const SecuritySettings = () => {
   const [totpMfaEnabled, setTotpMfaEnabled] = useState(false);
   const [mfaMethod, setMfaMethod] = useState(null);
   const [passkeys, setPasskeys] = useState([]);
+  const [faceData, setFaceData] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [currentSessionId, setCurrentSessionId] = useState(null);
   const [mfaTypeToDisable, setMfaTypeToDisable] = useState(null); // 'email' or 'totp'
@@ -25,6 +27,7 @@ const SecuritySettings = () => {
   const [showEmailMfaModal, setShowEmailMfaModal] = useState(false);
   const [showRecoveryCodesModal, setShowRecoveryCodesModal] = useState(false);
   const [showDisableMfaModal, setShowDisableMfaModal] = useState(false);
+  const [showFaceRegisterModal, setShowFaceRegisterModal] = useState(false);
   const [showTrustedDevicesModal, setShowTrustedDevicesModal] = useState(false);
   const [confirmModal, setConfirmModal] = useState({
     isOpen: false,
@@ -56,6 +59,7 @@ const SecuritySettings = () => {
       setTotpMfaEnabled(user.totp_mfa_enabled || false);
       setMfaMethod(user.mfa_method || null);
       loadPasskeys();
+      loadFaceData();
       loadSessions();
     }
   }, [user]);
@@ -66,6 +70,15 @@ const SecuritySettings = () => {
       setPasskeys(res.data.data || res.data || []);
     } catch (err) {
       console.error('Failed to load passkeys:', err);
+    }
+  };
+
+  const loadFaceData = async () => {
+    try {
+      const res = await api.get(API.FACE_AUTH_LIST);
+      setFaceData(res.data.data || res.data || []);
+    } catch (err) {
+      console.error('Failed to load face data:', err);
     }
   };
 
@@ -230,6 +243,42 @@ const SecuritySettings = () => {
           setConfirmModal(prev => ({ ...prev, isOpen: false }));
         } catch (err) {
           alert(err.response?.data?.message || 'Failed to delete passkey');
+          setConfirmModal(prev => ({ ...prev, isOpen: false }));
+        }
+      },
+    });
+  };
+
+  // ─── Face ID ──────────────────────────────────────────────────────
+
+  const handleFaceDescriptorCaptured = async (descriptor) => {
+    try {
+      setLoading(true);
+      setError('');
+      await api.post(API.FACE_AUTH_REGISTER, { descriptor, label: 'Face ID' });
+      await loadFaceData();
+      setShowFaceRegisterModal(false);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to register face.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteFace = (faceId) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Remove Face ID',
+      message: 'Are you sure you want to remove this Face ID data?',
+      variant: 'danger',
+      confirmText: 'Remove',
+      onConfirm: async () => {
+        try {
+          await api.delete(`${API.FACE_AUTH_DELETE}/${faceId}`);
+          await loadFaceData();
+          setConfirmModal(prev => ({ ...prev, isOpen: false }));
+        } catch (err) {
+          alert(err.response?.data?.message || 'Failed to delete face data');
           setConfirmModal(prev => ({ ...prev, isOpen: false }));
         }
       },
@@ -454,6 +503,55 @@ const SecuritySettings = () => {
                   onClick={() => handleDeletePasskey(pk.id)}
                   className="p-2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 transition-colors"
                   title="Remove passkey"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="h-px bg-gray-100 dark:bg-[#2a2a2a]" />
+
+      {/* Face ID */}
+      <div className="py-1">
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex-1">
+            <h3 className="text-sm font-normal text-gray-900 dark:text-white mb-1">Face ID</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Use facial recognition to log in securely without a password.
+            </p>
+          </div>
+          <button
+            onClick={() => { setShowFaceRegisterModal(true); setError(''); }}
+            className="flex items-center gap-1 text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-300 ml-1"
+          >
+            <span>Add</span>
+            <ChevronRight size={18} />
+          </button>
+        </div>
+
+        {/* Face ID List */}
+        {faceData.length > 0 && (
+          <div className="mt-3 space-y-2">
+            {faceData.map((face) => (
+              <div key={face.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#1a1a1a] rounded-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-primary-100 dark:bg-transparent flex items-center justify-center flex-shrink-0">
+                    <ScanFace className="w-4 h-4 text-primary-600 dark:text-gray-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{face.label || 'Face ID'}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Added {new Date(face.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleDeleteFace(face.id)}
+                  className="p-2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 transition-colors"
+                  title="Remove face data"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -978,6 +1076,36 @@ const SecuritySettings = () => {
               })}
             </div>
           )}
+        </div>
+      </Modal>
+
+      {/* Face Registration Modal */}
+      <Modal
+        isOpen={showFaceRegisterModal}
+        onClose={() => { setShowFaceRegisterModal(false); setError(''); }}
+        title=""
+        size="md"
+      >
+        <div className="space-y-4 py-4">
+          <div className="text-center mb-4">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              Register Face ID
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Position your face in the camera and click capture to register.
+            </p>
+          </div>
+
+          {error && (
+            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <p className="text-sm text-red-600 dark:text-red-400 text-center">{error}</p>
+            </div>
+          )}
+
+          <FaceCamera
+            onDescriptorCaptured={handleFaceDescriptorCaptured}
+            onError={(msg) => setError(msg)}
+          />
         </div>
       </Modal>
 

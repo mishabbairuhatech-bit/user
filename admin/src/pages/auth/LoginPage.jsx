@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
-import { ArrowUpRight, Shield, Key, Fingerprint } from 'lucide-react';
+import { ArrowUpRight, Shield, Key, Fingerprint, ScanFace } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthLayout } from '@layouts';
 import { Button, Input, Checkbox } from '@components/ui';
@@ -8,6 +8,7 @@ import { useAuth } from '@hooks';
 import api from '@services/api';
 import API from '@services/endpoints';
 import { startAuthentication } from '@simplewebauthn/browser';
+import FaceCamera from '@components/FaceCamera';
 
 // Google Icon Component
 const GoogleIcon = () => (
@@ -34,6 +35,11 @@ const LoginPage = () => {
   // Passkey state
   const [showPasskeyLogin, setShowPasskeyLogin] = useState(false);
   const [passkeyEmail, setPasskeyEmail] = useState('');
+
+  // Face ID state
+  const [showFaceLogin, setShowFaceLogin] = useState(false);
+  const [faceEmail, setFaceEmail] = useState('');
+  const [showFaceCamera, setShowFaceCamera] = useState(false);
 
   // Geolocation state
   const [userLocation, setUserLocation] = useState({ latitude: null, longitude: null });
@@ -118,8 +124,8 @@ const LoginPage = () => {
 
   // Initialize Google One Tap
   useEffect(() => {
-    // Skip if MFA or Passkey screens are shown
-    if (mfaRequired || showPasskeyLogin) return;
+    // Skip if MFA, Passkey, or Face Login screens are shown
+    if (mfaRequired || showPasskeyLogin || showFaceLogin) return;
 
     const initializeGoogleOneTap = () => {
       if (window.google?.accounts?.id) {
@@ -156,7 +162,7 @@ const LoginPage = () => {
       // Cleanup
       return () => clearInterval(checkGoogle);
     }
-  }, [handleGoogleOneTapCallback, mfaRequired, showPasskeyLogin]);
+  }, [handleGoogleOneTapCallback, mfaRequired, showPasskeyLogin, showFaceLogin]);
 
   const onSubmit = async (data) => {
     setIsLoading(true);
@@ -278,6 +284,122 @@ const LoginPage = () => {
       setIsLoading(false);
     }
   };
+
+  // Face ID authentication handler
+  const handleFaceDescriptorForLogin = async (descriptor) => {
+    if (!faceEmail || !faceEmail.includes('@')) {
+      setApiError('Please enter a valid email address');
+      return;
+    }
+
+    setIsLoading(true);
+    setApiError('');
+
+    try {
+      const result = await api.post(API.FACE_AUTH_AUTHENTICATE, {
+        email: faceEmail,
+        descriptor,
+        device_name: 'Web Browser',
+        device_type: 'web',
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
+      });
+
+      // Fetch user data to update auth context
+      await fetchUser();
+      navigate('/admin/dashboard');
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Face ID login failed. Please try again.';
+      setApiError(msg);
+      setShowFaceCamera(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Show Face ID Login screen
+  if (showFaceLogin) {
+    return (
+      <AuthLayout>
+        <div className="mb-8 text-center">
+          <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900/20">
+            <ScanFace className="w-8 h-8 text-primary-600 dark:text-primary-400" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Face ID Login</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Enter your email and scan your face to sign in.
+          </p>
+        </div>
+
+        {apiError && (
+          <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm">
+            {apiError}
+          </div>
+        )}
+
+        {!showFaceCamera ? (
+          <div className="space-y-5">
+            <Input
+              label="Email address"
+              type="email"
+              value={faceEmail}
+              onChange={(e) => setFaceEmail(e.target.value)}
+              placeholder="Enter your email"
+              variant="floating"
+              autoFocus
+            />
+
+            <Button
+              className="w-full"
+              size="md"
+              loading={isLoading}
+              onClick={() => {
+                if (!faceEmail || !faceEmail.includes('@')) {
+                  setApiError('Please enter a valid email address');
+                  return;
+                }
+                setApiError('');
+                setShowFaceCamera(true);
+              }}
+            >
+              Continue
+            </Button>
+
+            <button
+              type="button"
+              className="w-full text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 py-2"
+              onClick={() => {
+                setShowFaceLogin(false);
+                setFaceEmail('');
+                setShowFaceCamera(false);
+                setApiError('');
+              }}
+            >
+              Back to login
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-5">
+            <FaceCamera
+              onDescriptorCaptured={handleFaceDescriptorForLogin}
+              onError={(msg) => setApiError(msg)}
+            />
+
+            <button
+              type="button"
+              className="w-full text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 py-2"
+              onClick={() => {
+                setShowFaceCamera(false);
+                setApiError('');
+              }}
+            >
+              Back
+            </button>
+          </div>
+        )}
+      </AuthLayout>
+    );
+  }
 
   // Show Passkey Login screen
   if (showPasskeyLogin) {
@@ -427,11 +549,22 @@ const LoginPage = () => {
       <Button
         variant="outline"
         size="md"
-        className="w-full mb-6"
+        className="w-full mb-3"
         onClick={() => setShowPasskeyLogin(true)}
         prefixIcon={() => <Fingerprint className="w-5 h-5" />}
       >
         Login with Passkey
+      </Button>
+
+      {/* Face ID Login Button */}
+      <Button
+        variant="outline"
+        size="md"
+        className="w-full mb-6"
+        onClick={() => setShowFaceLogin(true)}
+        prefixIcon={() => <ScanFace className="w-5 h-5" />}
+      >
+        Login with Face ID
       </Button>
 
       {/* Divider */}

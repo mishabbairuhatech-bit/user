@@ -33,6 +33,7 @@ const publicRoutes = [
   'auth/google/one-tap',
   'passkey/auth/options',
   'passkey/auth/verify',
+  'face-auth/authenticate',
 ];
 
 // Response interceptor — auto-refresh on 401

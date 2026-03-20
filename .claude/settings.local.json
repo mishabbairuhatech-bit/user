@@ -17,7 +17,16 @@
       "Bash(mv CartPanel.jsx GridCartPanel.jsx)",
       "Bash(mv CartItem.jsx GridCartItem.jsx)",
       "Bash(mv CategoryTabs.jsx GridCategoryTabs.jsx)",
-      "Bash(mv ProductGrid.jsx GridProductGrid.jsx)"
+      "Bash(mv ProductGrid.jsx GridProductGrid.jsx)",
+      "Bash(xargs ls:*)",
+      "Bash(npm install:*)",
+      "Bash(python3 -c \"import json; json.load\\(open\\(''tiny_face_detector_model-weights_manifest.json''\\)\\)\")",
+      "Bash(python3 -c \"import json; json.load\\(open\\(''face_landmark_68_model-weights_manifest.json''\\)\\)\")",
+      "Bash(python3 -c \"import json; json.load\\(open\\(''face_recognition_model-weights_manifest.json''\\)\\)\")",
+      "Bash(xxd)",
+      "Bash(xxd tiny_face_detector_model-shard1)",
+      "Bash(xxd /Users/bairuhatechllp/Desktop/Projects/user/admin/public/models/face-api/tiny_face_detector_model-shard1)",
+      "Bash(npm uninstall:*)"
     ]
   }
 }

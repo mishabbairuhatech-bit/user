@@ -39,6 +39,13 @@ const API = {
   PASSKEY_LIST: "passkey/list",
   PASSKEY_DELETE: "passkey", // append /:id
 
+  // Face Auth
+  FACE_AUTH_REGISTER: "face-auth/register",
+  FACE_AUTH_AUTHENTICATE: "face-auth/authenticate",
+  FACE_AUTH_LIST: "face-auth/list",
+  FACE_AUTH_STATUS: "face-auth/status",
+  FACE_AUTH_DELETE: "face-auth", // append /:id
+
   // Users
   USERS_LIST: "users",
   USERS_CREATE: "users",

@@ -10,6 +10,7 @@ import { SessionsModule } from './sessions/sessions.module';
 import { PasswordHistoryModule } from './password-history/password-history.module';
 import { MfaModule } from './mfa/mfa.module';
 import { PasskeyModule } from './passkey/passkey.module';
+import { FaceAuthModule } from './face-auth/face-auth.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { PasskeyModule } from './passkey/passkey.module';
     PasswordHistoryModule,
     MfaModule,
     PasskeyModule,
+    FaceAuthModule,
   ],
   providers: [
     {
