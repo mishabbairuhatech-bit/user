@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { X, Maximize2 } from 'lucide-react';
 import { Badge, Avatar, Spinner } from '@components/ui';
 import api from '@services/api';
 import API from '@services/endpoints';
 import QUERY_KEY from '@services/queryKeys';
 
 const UserDetailPanel = ({ userId, onClose }) => {
+  const navigate = useNavigate();
   const { data, isLoading } = useQuery({
     queryKey: [QUERY_KEY.USERS_DETAIL, userId],
     queryFn: async () => {
@@ -43,12 +45,22 @@ const UserDetailPanel = ({ userId, onClose }) => {
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200 dark:border-[#424242] flex-shrink-0">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white">User Details</h3>
-        <button
-          onClick={onClose}
-          className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2a2a2a] transition-colors"
-        >
-          <X size={16} className="text-gray-500" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => navigate(`/admin/users/${userId}`)}
+            className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2a2a2a] transition-colors"
+            title="Expand"
+          >
+            <Maximize2 size={14} className="text-gray-500" />
+          </button>
+          <button
+            onClick={onClose}
+            className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2a2a2a] transition-colors"
+            title="Close"
+          >
+            <X size={16} className="text-gray-500" />
+          </button>
+        </div>
       </div>
 
       {/* Content */}

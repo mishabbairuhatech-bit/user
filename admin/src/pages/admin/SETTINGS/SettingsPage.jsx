@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Bell,
   Shield,
@@ -14,11 +15,19 @@ const settingsTabs = [
   { id: 'account', label: 'Account', icon: UserCircle },
 ];
 
+const validTabIds = settingsTabs.map((t) => t.id);
+
 const SettingsPage = () => {
-  const [activeTab, setActiveTab] = useState('notifications');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const activeTab = validTabIds.includes(tabParam) ? tabParam : 'notifications';
+
+  const setActiveTab = useCallback((tabId) => {
+    setSearchParams({ tab: tabId }, { replace: true });
+  }, [setSearchParams]);
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="flex flex-col" style={{ height: 'calc(100vh - 120px)' }}>
       <PageHeader
         title="Settings"
         subtitle="Manage your account settings and preferences"
@@ -27,9 +36,9 @@ const SettingsPage = () => {
         }}
       />
 
-      <div className="flex-1 flex flex-col md:flex-row overflow-hidden mt-6">
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0 mt-6">
         {/* Mobile Top Tabs */}
-        <div className="md:hidden border-b border-gray-200 dark:border-[#2a2a2a] overflow-x-auto mb-4">
+        <div className="md:hidden border-b border-gray-200 dark:border-[#2a2a2a] overflow-x-auto mb-4 flex-shrink-0">
           <div className="flex gap-1 p-2 min-w-max">
             {settingsTabs.map((tab) => {
               const Icon = tab.icon;
@@ -51,7 +60,7 @@ const SettingsPage = () => {
         </div>
 
         {/* Desktop Left Sidebar Navigation */}
-        <div className="hidden md:block w-64 overflow-y-auto">
+        <div className="hidden md:block w-64 flex-shrink-0 overflow-y-auto">
           <div className="py-4 space-y-1">
             {settingsTabs.map((tab) => {
               const Icon = tab.icon;
@@ -73,7 +82,7 @@ const SettingsPage = () => {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto md:mx-4">
+        <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide md:mx-4 pb-6">
           <div>
             {activeTab === 'notifications' && (
               <div className="text-center">

@@ -106,7 +106,7 @@ const Pagination = forwardRef(({
                   }}
                   className={`
                     w-full px-2.5 py-1.5 text-xs text-left hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors
-                    ${size === pageSize ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30' : 'text-gray-900 dark:text-[rgba(255,255,255,0.85)]'}
+                    ${size === pageSize ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-[#2a2a2a]' : 'text-gray-900 dark:text-[rgba(255,255,255,0.85)]'}
                     first:rounded-t-md last:rounded-b-md
                   `}
                 >

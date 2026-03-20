@@ -176,11 +176,11 @@ const Table = forwardRef(({
   const showHeader = title || headerActions || hasViewToggle;
   const showFooter = showPagination && onPageChange && viewMode === 'list';
 
-  // Render table content
-  const renderTableContent = () => (
-    <div className="overflow-x-auto scrollbar-hide">
+  // Render table column headers (fixed)
+  const renderTableHead = () => (
+    <div className="overflow-x-auto scrollbar-hide flex-shrink-0 border-b border-gray-200 dark:border-[#424242]">
       <table className={`w-max min-w-full table-fixed ${bordered ? 'border border-gray-200 dark:border-[#424242]' : ''}`}>
-        <thead className="bg-gray-50 dark:bg-[#2a2a2a] border-gray-200 dark:border-[#424242]">
+        <thead className="bg-gray-50 dark:bg-[#2a2a2a]">
           <tr>
             {selectable && (
               <th scope="col" className={`${headerPaddingClass} w-12`}>
@@ -213,6 +213,14 @@ const Table = forwardRef(({
             ))}
           </tr>
         </thead>
+      </table>
+    </div>
+  );
+
+  // Render table body rows (scrollable)
+  const renderTableBody = () => (
+    <div className="overflow-x-auto scrollbar-hide">
+      <table className={`w-max min-w-full table-fixed ${bordered ? 'border border-gray-200 dark:border-[#424242]' : ''}`}>
         <tbody className="bg-white dark:bg-[#121212]">
           {loading ? (
             <tr>
@@ -272,6 +280,14 @@ const Table = forwardRef(({
         </tbody>
       </table>
     </div>
+  );
+
+  // Render table content (head + body combined for non-list views)
+  const renderTableContent = () => (
+    <>
+      {renderTableHead()}
+      {renderTableBody()}
+    </>
   );
 
   // Render grid content
@@ -360,10 +376,10 @@ const Table = forwardRef(({
   };
 
   return (
-    <div ref={ref} className={`bg-white dark:bg-[#121212] rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-[#424242] ${className}`} {...props}>
-      {/* Header */}
+    <div ref={ref} className={`bg-white dark:bg-[#121212] rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-[#424242] flex flex-col h-full ${className}`} {...props}>
+      {/* Header — fixed at top */}
       {showHeader && (
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-[#424242] flex flex-wrap items-center justify-between gap-4">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-[#424242] flex flex-wrap items-center justify-between gap-4 flex-shrink-0">
           {title && (
             <h3 className="text-lg font-semibold text-gray-900 dark:text-[rgba(255,255,255,0.85)]">{title}</h3>
           )}
@@ -405,12 +421,17 @@ const Table = forwardRef(({
         </div>
       )}
 
-      {/* Content */}
-      {renderContent()}
+      {/* Table column headers — fixed below header */}
+      {viewMode === 'list' && renderTableHead()}
 
-      {/* Footer with Pagination */}
+      {/* Content — scrollable middle */}
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide">
+        {viewMode === 'list' ? renderTableBody() : renderContent()}
+      </div>
+
+      {/* Footer with Pagination — fixed at bottom */}
       {showFooter && (
-        <div className="px-6 py-4 border-gray-200 dark:border-[#424242]">
+        <div className="px-6 py-4 border-t border-gray-200 dark:border-[#424242] flex-shrink-0">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

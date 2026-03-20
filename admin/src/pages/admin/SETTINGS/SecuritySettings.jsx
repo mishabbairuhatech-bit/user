@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, Smartphone, Mail, Key, Shield, QrCode, Copy, Check, Monitor, Laptop, TabletSmartphone, Globe, ArrowRight, MapPin, Clock, Trash2 } from 'lucide-react';
+import { ChevronRight, Smartphone, Mail, Key, Shield, QrCode, Copy, Check, Monitor, Laptop, TabletSmartphone, Globe, ArrowRight, MapPin, Clock, Trash2, Fingerprint } from 'lucide-react';
 import { Switch, Modal, Button, Input, ConfirmModal } from '@components/ui';
 import { useAuth } from '@hooks';
 import api from '@services/api';
 import API from '@services/endpoints';
-import { startRegistration, startAuthentication } from '@simplewebauthn/browser';
 
 const SecuritySettings = () => {
   const { user } = useAuth();
@@ -24,7 +23,6 @@ const SecuritySettings = () => {
   // Modals
   const [showAuthenticatorModal, setShowAuthenticatorModal] = useState(false);
   const [showEmailMfaModal, setShowEmailMfaModal] = useState(false);
-  const [showPasskeyModal, setShowPasskeyModal] = useState(false);
   const [showRecoveryCodesModal, setShowRecoveryCodesModal] = useState(false);
   const [showDisableMfaModal, setShowDisableMfaModal] = useState(false);
   const [showTrustedDevicesModal, setShowTrustedDevicesModal] = useState(false);
@@ -34,7 +32,8 @@ const SecuritySettings = () => {
     message: '',
     variant: 'danger',
     confirmText: 'Confirm',
-    onConfirm: () => {},
+    loading: false,
+    onConfirm: () => { },
   });
 
   // Data
@@ -46,7 +45,6 @@ const SecuritySettings = () => {
   // Form data
   const [totpCode, setTotpCode] = useState('');
   const [password, setPassword] = useState('');
-  const [passkeyName, setPasskeyName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [emailSent, setEmailSent] = useState(false);
@@ -214,53 +212,8 @@ const SecuritySettings = () => {
 
   // ─── Passkey (WebAuthn) ─────────────────────────────────────────────
 
-  const handleAddPasskey = async () => {
-    setShowPasskeyModal(true);
-    setPasskeyName('');
-    setError('');
-  };
-
-  const handleRegisterPasskey = async () => {
-    if (!passkeyName.trim()) {
-      setError('Please enter a name for this passkey');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError('');
-
-      // Get registration options from server
-      const optionsRes = await api.post(API.PASSKEY_REGISTER_OPTIONS);
-      const { options } = optionsRes.data.data || optionsRes.data;
-
-      // Start WebAuthn registration
-      const attResp = await startRegistration(options);
-
-      // Verify registration with server
-      await api.post(API.PASSKEY_REGISTER_VERIFY, {
-        response: attResp,
-        device_name: passkeyName,
-      });
-
-      setShowPasskeyModal(false);
-      setPasskeyName('');
-      await loadPasskeys();
-    } catch (err) {
-      if (err.name === 'NotAllowedError') {
-        setError('Passkey registration was cancelled. Please make sure Windows Hello or another authenticator is set up on your device.');
-      } else if (err.name === 'NotSupportedError') {
-        setError('Passkeys are not supported on this device or browser.');
-      } else if (err.name === 'SecurityError') {
-        setError('Security error. Make sure you are using HTTPS or localhost.');
-      } else if (err.name === 'InvalidStateError') {
-        setError('This passkey is already registered on your account.');
-      } else {
-        setError(err.response?.data?.message || err.message || 'Failed to register passkey');
-      }
-    } finally {
-      setLoading(false);
-    }
+  const handleAddPasskey = () => {
+    navigate('/create-passkey?returnTab=security');
   };
 
   const handleDeletePasskey = (passkeyId) => {
@@ -448,16 +401,11 @@ const SecuritySettings = () => {
 
   return (
     <div className="space-y-2">
-      {/* Title */}
-      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Security</h2>
-
-      <div className="h-px bg-gray-100 dark:bg-[#2a2a2a]" />
-
       {/* Password */}
       <div className="flex items-center justify-between py-2">
         <h3 className="text-sm font-normal text-gray-900 dark:text-white">Password</h3>
         <button
-          onClick={() => navigate('/change-password')}
+          onClick={() => navigate('/change-password?returnTab=security')}
           className="flex items-center gap-1 text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-300"
         >
           <span>Change</span>
@@ -476,7 +424,10 @@ const SecuritySettings = () => {
               Use your device's biometric authentication for secure, passwordless login.
             </p>
           </div>
-          <button className="flex items-center gap-1 text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-300 ml-1">
+          <button
+            onClick={handleAddPasskey}
+            className="flex items-center gap-1 text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-300 ml-1"
+          >
             <span>Add</span>
             <ChevronRight size={18} />
           </button>
@@ -486,21 +437,25 @@ const SecuritySettings = () => {
         {passkeys.length > 0 && (
           <div className="mt-3 space-y-2">
             {passkeys.map((pk) => (
-              <div key={pk.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#1a1a1a] rounded-lg">
+              <div key={pk.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#1a1a1a] rounded-xl">
                 <div className="flex items-center gap-3">
-                  <Key className="w-4 h-4 text-gray-500" />
+                  <div className="w-9 h-9 rounded-full bg-primary-100 dark:bg-transparent flex items-center justify-center flex-shrink-0">
+                    <Fingerprint className="w-4 h-4 text-primary-600 dark:text-gray-400" />
+                  </div>
                   <div>
-                    <p className="text-sm text-gray-900 dark:text-white">{pk.device_name}</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{pk.device_name}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {pk.last_used_at ? `Last used: ${new Date(pk.last_used_at).toLocaleDateString()}` : 'Never used'}
+                      Created {new Date(pk.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {pk.last_used_at ? ` · Last used ${new Date(pk.last_used_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}` : ' · Never used'}
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => handleDeletePasskey(pk.id)}
-                  className="text-sm text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400"
+                  className="p-2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 transition-colors"
+                  title="Remove passkey"
                 >
-                  Remove
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             ))}
@@ -610,13 +565,15 @@ const SecuritySettings = () => {
               message: 'Are you sure you want to log out?',
               variant: 'danger',
               confirmText: 'Log Out',
+              loading: false,
               onConfirm: async () => {
                 try {
+                  setConfirmModal(prev => ({ ...prev, loading: true }));
                   await api.post(API.LOGOUT);
                   window.location.href = '/login';
                 } catch (err) {
+                  setConfirmModal(prev => ({ ...prev, loading: false }));
                   alert('Failed to logout');
-                  setConfirmModal(prev => ({ ...prev, isOpen: false }));
                 }
               },
             });
@@ -648,13 +605,15 @@ const SecuritySettings = () => {
                 message: 'This will log you out of all devices including this one. Continue?',
                 variant: 'danger',
                 confirmText: 'Log Out All',
+                loading: false,
                 onConfirm: async () => {
                   try {
+                    setConfirmModal(prev => ({ ...prev, loading: true }));
                     await api.post(API.LOGOUT_ALL);
                     window.location.href = '/login';
                   } catch (err) {
+                    setConfirmModal(prev => ({ ...prev, loading: false }));
                     alert('Failed to logout all sessions');
-                    setConfirmModal(prev => ({ ...prev, isOpen: false }));
                   }
                 },
               });
@@ -849,50 +808,6 @@ const SecuritySettings = () => {
         )}
       </Modal>
 
-      {/* Passkey Registration Modal */}
-      <Modal
-        isOpen={showPasskeyModal}
-        onClose={() => setShowPasskeyModal(false)}
-        title="Add Passkey"
-        size="md"
-      >
-        <form onSubmit={(e) => { e.preventDefault(); handleRegisterPasskey(); }} className="space-y-4">
-          <div className="text-center">
-            <Key className="w-12 h-12 mx-auto text-primary-600 dark:text-primary-400 mb-4" />
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Passkeys use your device's biometric authentication or security key for secure, passwordless login.
-            </p>
-          </div>
-
-          {error && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-            </div>
-          )}
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Device Name
-            </label>
-            <Input
-              type="text"
-              value={passkeyName}
-              onChange={(e) => setPasskeyName(e.target.value)}
-              placeholder="e.g., MacBook Pro, iPhone 15"
-            />
-          </div>
-
-          <div className="flex gap-3">
-            <Button type="button" variant="outline" onClick={() => setShowPasskeyModal(false)} className="flex-1">
-              Cancel
-            </Button>
-            <Button type="submit" loading={loading} className="flex-1">
-              Register Passkey
-            </Button>
-          </div>
-        </form>
-      </Modal>
-
       {/* Recovery Codes Modal */}
       <Modal
         isOpen={showRecoveryCodesModal}
@@ -981,7 +896,7 @@ const SecuritySettings = () => {
         size="md"
       >
         <div className="space-y-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
             After you sign in, a device becomes trusted. When you log in somewhere new, we'll send a prompt to your trusted devices for approval. You can remove a device from this list at any time.
           </p>
 
@@ -993,15 +908,20 @@ const SecuritySettings = () => {
           ) : (
             <div className="space-y-1 max-h-[400px] overflow-y-auto scrollbar-hide">
               {sessions.map((session) => {
+                // Pick icon based on OS — detect phone/tablet vs desktop
+                const osLower = (session.os || '').toLowerCase();
                 const DeviceIcon =
-                  session.device_type === 'mobile' ? Smartphone :
-                    session.device_type === 'tablet' ? TabletSmartphone :
-                      session.device_type === 'desktop' ? Monitor :
-                        Smartphone;
+                  /iphone|ios|android/i.test(osLower) ? Smartphone :
+                    /ipad/i.test(osLower) ? TabletSmartphone :
+                      /mac|windows|linux|chrome\s?os/i.test(osLower) ? Monitor :
+                        session.device_type === 'mobile' ? Smartphone :
+                          session.device_type === 'tablet' ? TabletSmartphone :
+                            Monitor;
 
-                // Format device name like "iOS 26.2 iPhone" or "Windows 11 Chrome"
-                const deviceName = session.device_name ||
-                  `${session.os || 'Unknown'} ${session.browser || 'Device'}`;
+                // Format device name: "macOS · Chrome" or "iOS · Safari"
+                const deviceName = session.os && session.browser
+                  ? `${session.os} · ${session.browser}`
+                  : session.device_name || `${session.os || 'Unknown'} ${session.browser || 'Device'}`;
 
                 // Format location like "Kozhikode, IN"
                 const locationParts = [];
@@ -1041,7 +961,7 @@ const SecuritySettings = () => {
                           )}
                         </div>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          Last logged in on {formattedLogin}{location ? ` from ${location}` : ''}
+                          {formattedLogin}{location ? ` · ${location}` : ''}{session.timezone ? ` · ${session.timezone}` : ''}
                         </p>
                       </div>
                     </div>
@@ -1064,12 +984,13 @@ const SecuritySettings = () => {
       {/* Confirm Modal */}
       <ConfirmModal
         isOpen={confirmModal.isOpen}
-        onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+        onClose={() => { if (!confirmModal.loading) setConfirmModal(prev => ({ ...prev, isOpen: false })); }}
         onConfirm={confirmModal.onConfirm}
         title={confirmModal.title}
         message={confirmModal.message}
         variant={confirmModal.variant}
         confirmText={confirmModal.confirmText}
+        loading={confirmModal.loading}
       />
     </div>
   );

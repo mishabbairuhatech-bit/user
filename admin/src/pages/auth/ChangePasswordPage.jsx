@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Lock, CheckCircle, XCircle } from 'lucide-react';
 import { AuthLayout } from '@layouts';
 import { Button, Input } from '@components/ui';
@@ -8,6 +8,8 @@ import API from '@services/endpoints';
 
 const ChangePasswordPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const returnTab = searchParams.get('returnTab');
 
   // Form state
   const [oldPassword, setOldPassword] = useState('');
@@ -204,7 +206,7 @@ const ChangePasswordPage = () => {
           variant="ghost"
           className="w-full"
           size="md"
-          onClick={() => navigate('/admin/settings')}
+          onClick={() => navigate(returnTab ? `/admin/settings?tab=${returnTab}` : '/admin/settings')}
           disabled={loading}
         >
           Back to Settings

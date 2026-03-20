@@ -6,6 +6,7 @@ const SplitterLayout = ({
   initialRightWidth = 350,
   minRightWidth = 200,
   maxRightWidth = 500,
+  maxRightPercent = 40,
   className = ''
 }) => {
   const [rightWidth, setRightWidth] = useState(initialRightWidth);
@@ -23,17 +24,17 @@ const SplitterLayout = ({
 
   const onDrag = useCallback((e) => {
     if (!isDragging || !containerRef.current) return;
-    
-    // Using rect coordinates
+
     const containerRect = containerRef.current.getBoundingClientRect();
-    
-    // Calculate right width from mouse X to right edge of the container
     const newWidth = containerRect.right - e.clientX;
-    
-    // Clamp the width
-    const clampedWidth = Math.max(minRightWidth, Math.min(newWidth, maxRightWidth));
+
+    // Cap at maxRightWidth pixels AND maxRightPercent of container
+    const percentMax = containerRect.width * (maxRightPercent / 100);
+    const effectiveMax = Math.min(maxRightWidth, percentMax);
+
+    const clampedWidth = Math.max(minRightWidth, Math.min(newWidth, effectiveMax));
     setRightWidth(clampedWidth);
-  }, [isDragging, minRightWidth, maxRightWidth]);
+  }, [isDragging, minRightWidth, maxRightWidth, maxRightPercent]);
 
   useEffect(() => {
     if (isDragging) {
@@ -70,7 +71,7 @@ const SplitterLayout = ({
       {rightPanel && (
         <div 
           role="separator"
-          className={`relative flex-shrink-0 cursor-col-resize transition-all duration-150 ease-in-out border-l border-gray-200 dark:border-[#2a2a2a] group ${isDragging ? 'bg-primary-500 border-primary-500' : 'bg-transparent hover:bg-primary-400 hover:border-primary-400'}`}
+          className={`relative flex-shrink-0 cursor-col-resize transition-all duration-150 ease-in-out group ${isDragging ? 'bg-primary-500' : 'bg-transparent hover:bg-primary-400'}`}
           style={{ width: '4px' }}
           onMouseDown={startDragging}
         >
@@ -83,7 +84,7 @@ const SplitterLayout = ({
       {rightPanel && (
         <div 
           style={{ width: `${rightWidth}px` }}
-          className="h-full flex flex-col flex-shrink-0 overflow-hidden bg-gray-50 dark:bg-[#141414] relative"
+          className="h-full flex flex-col flex-shrink-0 overflow-hidden relative"
         >
           {/* Prevent pointer events from interfering with dragging if rightPanel has iframes or things that eat events */}
           {isDragging && (

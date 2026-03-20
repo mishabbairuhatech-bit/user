@@ -3,7 +3,13 @@
     "allow": [
       "Bash(npm install google-auth-library)",
       "Bash(npm run:*)",
-      "Bash(npx vite:*)"
+      "Bash(npx vite:*)",
+      "Bash(node:*)",
+      "Bash(find /Users/bairuhatechllp/Desktop/Projects/user -type f -name *auth*context* -o -name *AuthContext*)",
+      "Bash(find /Users/bairuhatechllp/Desktop/Projects/user/admin/src -type f \\\\\\(-name *context* -o -name *provider* \\\\\\))",
+      "Bash(npx tsc:*)",
+      "Bash(find /Users/bairuhatechllp/Desktop/Projects/user/server -type f -name *Settings*)",
+      "Bash(find /Users/bairuhatechllp/Desktop/Projects/user/server -type f -name *settings*)"
     ]
   }
 }

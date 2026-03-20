@@ -31,6 +31,8 @@ const publicRoutes = [
   'auth/mfa/verify',
   'auth/refresh',
   'auth/google/one-tap',
+  'passkey/auth/options',
+  'passkey/auth/verify',
 ];
 
 // Response interceptor — auto-refresh on 401

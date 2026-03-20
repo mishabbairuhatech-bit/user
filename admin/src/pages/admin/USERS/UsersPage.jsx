@@ -145,7 +145,7 @@ const UsersPage = () => {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4 h-[calc(100vh-80px)] lg:h-[calc(100vh-96px)]">
       <PageHeader
         title="Users"
         subtitle="Manage and view all registered users"
@@ -156,7 +156,7 @@ const UsersPage = () => {
       </PageHeader>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 flex-shrink-0">
         <div className="w-full sm:w-80">
           <Input
             prefixIcon={Search}
@@ -169,43 +169,44 @@ const UsersPage = () => {
       </div>
 
       {/* Table + Detail Panel */}
-      <div className="bg-white dark:bg-[#121212] rounded-2xl border border-gray-100 dark:border-[#424242] shadow-sm overflow-hidden flex h-[calc(100vh-230px)]">
+      <div className="overflow-hidden flex flex-1 min-h-0">
         <SplitterLayout
           initialRightWidth={380}
           minRightWidth={300}
           maxRightWidth={600}
           className="bg-transparent dark:bg-transparent"
           leftPanel={
-            <div className="h-full w-full overflow-y-auto scrollbar-hide">
-              <Table
-                columns={columns}
-                data={users}
-                loading={isLoading}
-                emptyMessage="No users found"
-                sortColumn={sortColumn}
-                sortDirection={sortDirection}
-                onSort={handleSort}
-                onRowClick={handleRowClick}
-                activeRowId={selectedUserId}
-                showPagination
-                currentPage={page}
-                totalPages={meta.total_pages || 1}
-                onPageChange={setPage}
-                pageSize={pageSize}
-                onPageSizeChange={handlePageSizeChange}
-                pageSizeOptions={[10, 20, 50, 100]}
-                className="border-0 rounded-none shadow-none"
-              />
-            </div>
+            <Table
+              columns={columns}
+              data={users}
+              loading={isLoading}
+              emptyMessage="No users found"
+              sortColumn={sortColumn}
+              sortDirection={sortDirection}
+              onSort={handleSort}
+              onRowClick={handleRowClick}
+              activeRowId={selectedUserId}
+              showPagination
+              currentPage={page}
+              totalPages={meta.total_pages || 1}
+              onPageChange={setPage}
+              pageSize={pageSize}
+              onPageSizeChange={handlePageSizeChange}
+              pageSizeOptions={[10, 20, 50, 100]}
+            />
           }
           rightPanel={
             (showCreateForm && isDesktop) ? (
-              <UserCreateForm onClose={() => setShowCreateForm(false)} />
+              <div className="h-full bg-white dark:bg-[#121212] rounded-2xl border border-gray-100 dark:border-[#424242] shadow-sm overflow-hidden">
+                <UserCreateForm onClose={() => setShowCreateForm(false)} />
+              </div>
             ) : (!showCreateForm && selectedUserId && isDesktop) ? (
-              <UserDetailPanel
-                userId={selectedUserId}
-                onClose={() => setSelectedUserId(null)}
-              />
+              <div className="h-full bg-white dark:bg-[#121212] rounded-2xl border border-gray-100 dark:border-[#424242] shadow-sm overflow-hidden">
+                <UserDetailPanel
+                  userId={selectedUserId}
+                  onClose={() => setSelectedUserId(null)}
+                />
+              </div>
             ) : null
           }
         />

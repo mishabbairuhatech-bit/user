@@ -13,17 +13,17 @@ const variants = {
 
 const sizeClasses = {
   sm: {
-    button: 'px-3 py-1.5 text-xs min-h-[32px]',
+    button: 'px-3 py-1.5 text-xs min-h-[32px] gap-1.5',
     icon: 'w-3.5 h-3.5',
     spinner: 'h-3 w-3',
   },
   md: {
-    button: 'px-4 py-2 text-sm min-h-[38px]',
+    button: 'px-4 py-2 text-sm min-h-[38px] gap-2',
     icon: 'w-4 h-4',
     spinner: 'h-4 w-4',
   },
   lg: {
-    button: 'px-6 py-2.5 text-base min-h-[46px]',
+    button: 'px-6 py-2.5 text-base min-h-[46px] gap-2.5',
     icon: 'w-5 h-5',
     spinner: 'h-5 w-5',
   },
@@ -67,16 +67,16 @@ const Button = forwardRef(({
       {...props}
     >
       {loading ? (
-        <svg className={`animate-spin ${children ? '-ml-1 mr-2' : ''} ${sizes.spinner}`} fill="none" viewBox="0 0 24 24">
+        <svg className={`animate-spin ${sizes.spinner}`} fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
         </svg>
       ) : IconComponent ? (
-        <IconComponent className={`${sizes.icon} ${children ? 'mr-2' : ''}`} />
+        <IconComponent className={sizes.icon} />
       ) : null}
       {children}
       {SuffixIcon && !loading && (
-        <SuffixIcon className={`${sizes.icon} ${children ? 'ml-2' : ''}`} />
+        <SuffixIcon className={sizes.icon} />
       )}
     </button>
   );

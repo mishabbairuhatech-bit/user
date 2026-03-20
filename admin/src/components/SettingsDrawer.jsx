@@ -168,7 +168,7 @@ const SettingsDrawer = () => {
                     onClick={() => updateSetting('fontFamily', font.value)}
                     className={`px-3 py-2 text-sm rounded-lg border transition-all text-left ${
                       isActive
-                        ? 'border-primary-600 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400'
+                        ? 'border-primary-600 bg-primary-50 dark:border-primary-500 dark:bg-transparent text-primary-700 dark:text-primary-400'
                         : 'border-gray-200 dark:border-[#333] text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-[#444]'
                     }`}
                     style={{ fontFamily: font.value }}

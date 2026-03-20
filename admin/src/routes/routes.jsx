@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AdminLayout } from '@layouts';
-import { LoginPage, ChangePasswordPage, ForgotPasswordPage, ResetPasswordPage } from '@pages/auth';
+import { LoginPage, ChangePasswordPage, CreatePasskeyPage, ForgotPasswordPage, ResetPasswordPage } from '@pages/auth';
 import { DashboardPage, UIComponentsPage, UsersPage, UserDetailPage, UserCreatePage, SettingsPage } from '@/pages/admin';
 import { POSPage } from '@/pages/pos';
 import CookiePolicyPage from '@pages/CookiePolicyPage';
@@ -50,6 +50,16 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <ChangePasswordPage />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Create Passkey - Protected but uses AuthLayout */}
+      <Route
+        path="/create-passkey"
+        element={
+          <PrivateRoute>
+            <CreatePasskeyPage />
           </PrivateRoute>
         }
       />
