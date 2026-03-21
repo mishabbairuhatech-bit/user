@@ -25,10 +25,6 @@ import { Tooltip, Dropdown, ConfirmModal } from '@components/ui';
 
 const allMenuItems = [
   { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutGrid, permission: 'dashboard:view' },
-  { name: 'Tasks', path: '/admin/tasks', icon: ClipboardList, badge: '12+' },
-  { name: 'Calendar', path: '/admin/calendar', icon: Calendar },
-  { name: 'Analytics', path: '/admin/analytics', icon: BarChart3 },
-  { name: 'Team', path: '/admin/team', icon: Users },
   { name: 'UI Components', path: '/admin/ui-components', icon: Palette },
 ];
 
@@ -205,102 +201,102 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
 
         {/* Users Section */}
         {userItems.length > 0 && (<>
-        {!isCollapsed && (
-          <div className="px-4 mb-2">
-            <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Users</span>
-          </div>
-        )}
-        <ul className={`space-y-0.5 ${isCollapsed ? 'px-0.5 flex flex-col items-center' : 'px-2'} mb-4`}>
-          {userItems.map((item) => {
-            const link = (
-              <NavLink
-                to={item.path}
-                onClick={handleMobileNavClick}
-                className={({ isActive }) =>
-                  `flex items-center ${isCollapsed ? 'justify-center w-8 h-8' : 'gap-3 px-3 py-2 w-full'} rounded-lg transition-colors ${isActive
-                    ? 'bg-gray-100 dark:bg-[#2a2a2a] text-primary-700 dark:text-primary-400 font-medium'
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'
-                  }`
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <item.icon
-                      size={18}
-                      strokeWidth={isActive ? 2 : 1.5}
-                      className="flex-shrink-0"
-                    />
-                    {!isCollapsed && (
-                      <span className="text-sm flex-1">{item.name}</span>
-                    )}
-                  </>
-                )}
-              </NavLink>
-            );
+          {!isCollapsed && (
+            <div className="px-4 mb-2">
+              <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Users</span>
+            </div>
+          )}
+          <ul className={`space-y-0.5 ${isCollapsed ? 'px-0.5 flex flex-col items-center' : 'px-2'} mb-4`}>
+            {userItems.map((item) => {
+              const link = (
+                <NavLink
+                  to={item.path}
+                  onClick={handleMobileNavClick}
+                  className={({ isActive }) =>
+                    `flex items-center ${isCollapsed ? 'justify-center w-8 h-8' : 'gap-3 px-3 py-2 w-full'} rounded-lg transition-colors ${isActive
+                      ? 'bg-gray-100 dark:bg-[#2a2a2a] text-primary-700 dark:text-primary-400 font-medium'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <item.icon
+                        size={18}
+                        strokeWidth={isActive ? 2 : 1.5}
+                        className="flex-shrink-0"
+                      />
+                      {!isCollapsed && (
+                        <span className="text-sm flex-1">{item.name}</span>
+                      )}
+                    </>
+                  )}
+                </NavLink>
+              );
 
-            return (
-              <li key={item.path}>
-                {isCollapsed ? (
-                  <Tooltip content={item.name} position="right">
-                    {link}
-                  </Tooltip>
-                ) : (
-                  link
-                )}
-              </li>
-            );
-          })}
-        </ul>
+              return (
+                <li key={item.path}>
+                  {isCollapsed ? (
+                    <Tooltip content={item.name} position="right">
+                      {link}
+                    </Tooltip>
+                  ) : (
+                    link
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         </>)}
 
         {/* Role Management Section */}
         {roleItems.length > 0 && (<>
-        {!isCollapsed && (
-          <div className="px-4 mb-2">
-            <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Role Management</span>
-          </div>
-        )}
-        <ul className={`space-y-0.5 ${isCollapsed ? 'px-0.5 flex flex-col items-center' : 'px-2'} mb-4`}>
-          {roleItems.map((item) => {
-            const link = (
-              <NavLink
-                to={item.path}
-                onClick={handleMobileNavClick}
-                className={({ isActive }) =>
-                  `flex items-center ${isCollapsed ? 'justify-center w-8 h-8' : 'gap-3 px-3 py-2 w-full'} rounded-lg transition-colors ${isActive
-                    ? 'bg-gray-100 dark:bg-[#2a2a2a] text-primary-700 dark:text-primary-400 font-medium'
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'
-                  }`
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <item.icon
-                      size={18}
-                      strokeWidth={isActive ? 2 : 1.5}
-                      className="flex-shrink-0"
-                    />
-                    {!isCollapsed && (
-                      <span className="text-sm flex-1">{item.name}</span>
-                    )}
-                  </>
-                )}
-              </NavLink>
-            );
+          {!isCollapsed && (
+            <div className="px-4 mb-2">
+              <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Role Management</span>
+            </div>
+          )}
+          <ul className={`space-y-0.5 ${isCollapsed ? 'px-0.5 flex flex-col items-center' : 'px-2'} mb-4`}>
+            {roleItems.map((item) => {
+              const link = (
+                <NavLink
+                  to={item.path}
+                  onClick={handleMobileNavClick}
+                  className={({ isActive }) =>
+                    `flex items-center ${isCollapsed ? 'justify-center w-8 h-8' : 'gap-3 px-3 py-2 w-full'} rounded-lg transition-colors ${isActive
+                      ? 'bg-gray-100 dark:bg-[#2a2a2a] text-primary-700 dark:text-primary-400 font-medium'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <item.icon
+                        size={18}
+                        strokeWidth={isActive ? 2 : 1.5}
+                        className="flex-shrink-0"
+                      />
+                      {!isCollapsed && (
+                        <span className="text-sm flex-1">{item.name}</span>
+                      )}
+                    </>
+                  )}
+                </NavLink>
+              );
 
-            return (
-              <li key={item.path}>
-                {isCollapsed ? (
-                  <Tooltip content={item.name} position="right">
-                    {link}
-                  </Tooltip>
-                ) : (
-                  link
-                )}
-              </li>
-            );
-          })}
-        </ul>
+              return (
+                <li key={item.path}>
+                  {isCollapsed ? (
+                    <Tooltip content={item.name} position="right">
+                      {link}
+                    </Tooltip>
+                  ) : (
+                    link
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         </>)}
 
         {/* General Section */}
