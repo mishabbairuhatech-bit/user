@@ -33,6 +33,8 @@ const LoginPage = () => {
 
   // Passkey state
   const [passkeyLoading, setPasskeyLoading] = useState(false);
+  const [showPasskeyLogin, setShowPasskeyLogin] = useState(false);
+  const [passkeyEmail, setPasskeyEmail] = useState('');
 
   // Geolocation state
   const [userLocation, setUserLocation] = useState({ latitude: null, longitude: null });

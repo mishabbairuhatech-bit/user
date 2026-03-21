@@ -44,6 +44,7 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
   const [logoHovered, setLogoHovered] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
   const userMenuRef = useRef(null);
 
   useEffect(() => {
@@ -438,15 +439,18 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
       {/* Logout Confirmation Modal */}
       <ConfirmModal
         isOpen={showLogoutModal}
-        onClose={() => setShowLogoutModal(false)}
-        onConfirm={() => {
-          logout();
+        onClose={() => !logoutLoading && setShowLogoutModal(false)}
+        onConfirm={async () => {
+          setLogoutLoading(true);
+          await logout();
+          setLogoutLoading(false);
           setShowLogoutModal(false);
         }}
         title="Log Out"
         message="Are you sure you want to log out?"
         variant="danger"
         confirmText="Log Out"
+        loading={logoutLoading}
       />
     </aside>
   );
