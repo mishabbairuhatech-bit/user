@@ -46,6 +46,16 @@ const API = {
   USERS_DETAIL: "users", // append /:id
   USERS_ME: "users/me",
   USERS_ME_UPDATE: "users/me",
+  USERS_ASSIGN_ROLE: "users", // append /:id/role
+
+  // Roles & Permissions
+  ROLES_LIST: "roles",
+  ROLES_CREATE: "roles",
+  ROLES_DETAIL: "roles", // append /:id
+  ROLES_UPDATE: "roles", // append /:id
+  ROLES_DELETE: "roles", // append /:id
+  PERMISSIONS_ALL: "roles/permissions/all",
+  PERMISSIONS_GROUPED: "roles/permissions/grouped",
 };
 
 export default API;

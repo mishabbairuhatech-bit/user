@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards, ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AssignRoleDto } from '../roles/dto/assign-role.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RequirePermissions } from '../common/decorators/require-permissions.decorator';
 import { UserById } from '../common/decorators/user-by-id.decorator';
 import { PaginationQueryDto } from '../common/dto';
 
@@ -55,5 +57,19 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'User not found.' })
   async findOne(@Param('id') id: string) {
     return await this.usersService.findByIdOrFail(id);
+  }
+
+  @Patch(':id/role')
+  @RequirePermissions('roles:assign')
+  @ApiOperation({ summary: 'Assign a role to a user' })
+  @ApiParam({ name: 'id', description: 'User UUID' })
+  @ApiResponse({ status: 200, description: 'Role assigned successfully.' })
+  @ApiResponse({ status: 400, description: 'Cannot assign inactive role or last super admin.' })
+  @ApiResponse({ status: 404, description: 'User or role not found.' })
+  async assignRole(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: AssignRoleDto,
+  ) {
+    return await this.usersService.assignRole(id, dto.role_id);
   }
 }

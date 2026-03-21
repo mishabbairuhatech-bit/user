@@ -39,6 +39,7 @@ const Select = forwardRef(({
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [alignRight, setAlignRight] = useState(false);
+  const [openAbove, setOpenAbove] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef(null);
   const inputRef = useRef(null);
@@ -57,6 +58,8 @@ const Select = forwardRef(({
       const rect = containerRef.current.getBoundingClientRect();
       const spaceOnRight = window.innerWidth - rect.left;
       setAlignRight(spaceOnRight < 250);
+      const spaceBelow = window.innerHeight - rect.bottom;
+      setOpenAbove(spaceBelow < 240 && rect.top > spaceBelow);
     }
   }, [isOpen]);
 
@@ -153,7 +156,7 @@ const Select = forwardRef(({
 
         {isOpen && !disabled && (
           <div
-            className={`absolute z-50 top-full mt-1 bg-white dark:bg-[#121212] border border-gray-200 dark:border-[#424242] rounded-xl shadow-xl max-h-60 overflow-y-auto w-full ${alignRight ? 'right-0' : 'left-0'}`}
+            className={`absolute z-50 bg-white dark:bg-[#121212] border border-gray-200 dark:border-[#424242] rounded-xl shadow-xl max-h-60 overflow-y-auto w-full ${alignRight ? 'right-0' : 'left-0'} ${openAbove ? 'bottom-full mb-1' : 'top-full mt-1'}`}
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             <style>{`

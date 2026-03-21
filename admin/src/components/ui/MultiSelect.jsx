@@ -47,6 +47,7 @@ const MultiSelect = forwardRef(({
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [alignRight, setAlignRight] = useState(false);
+  const [openAbove, setOpenAbove] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef(null);
   const inputRef = useRef(null);
@@ -65,6 +66,8 @@ const MultiSelect = forwardRef(({
       const rect = containerRef.current.getBoundingClientRect();
       const spaceOnRight = window.innerWidth - rect.left;
       setAlignRight(spaceOnRight < 250);
+      const spaceBelow = window.innerHeight - rect.bottom;
+      setOpenAbove(spaceBelow < 240 && rect.top > spaceBelow);
     }
   }, [isOpen]);
 
@@ -149,7 +152,7 @@ const MultiSelect = forwardRef(({
   };
 
   return (
-    <div className="w-full relative" ref={containerRef}>
+    <div className="w-full" ref={containerRef}>
       {label && (
         <label className={`block font-medium text-black dark:text-[rgba(255,255,255,0.85)] mb-1 ${sizes.label}`}>
           {label}
@@ -158,7 +161,7 @@ const MultiSelect = forwardRef(({
       <div
         ref={ref}
         className={`
-          w-full border rounded-xl shadow-sm cursor-pointer
+          relative w-full border rounded-xl shadow-sm cursor-pointer
           bg-white dark:bg-[#121212] flex items-center
           ${sizes.input}
           ${disabled ? 'bg-gray-100 dark:bg-[#2a2a2a] cursor-not-allowed' : ''}
@@ -185,43 +188,43 @@ const MultiSelect = forwardRef(({
             <ChevronDown className={`${sizes.icon} text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
           )}
         </div>
-      </div>
 
-      {isOpen && !disabled && (
-        <div
-          className={`absolute z-50 top-full mt-1 bg-white dark:bg-[#121212] border border-gray-200 dark:border-[#424242] rounded-xl shadow-xl max-h-60 overflow-y-auto w-full ${alignRight ? 'right-0' : 'left-0'}`}
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          <style>{`
-            .hide-scrollbar::-webkit-scrollbar {
-              display: none;
-            }
-          `}</style>
-          <div className="hide-scrollbar">
-            {filteredOptions.length === 0 ? (
-              <div className="px-3 py-2 text-gray-500 text-sm">No options found</div>
-            ) : (
-              filteredOptions.map((option) => (
-                <div
-                  key={option.value}
-                  className={`
-                    px-3 py-2 cursor-pointer flex items-center justify-between
-                    ${value.includes(option.value) ? 'bg-primary-50 dark:bg-[#2a2a2a] text-primary-600 dark:text-primary-400' : 'text-black dark:text-[rgba(255,255,255,0.85)] hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'}
-                    ${option.disabled ? 'opacity-50 cursor-not-allowed' : ''}
-                  `}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleToggle(option);
-                  }}
-                >
-                  <span>{option.label}</span>
-                  {value.includes(option.value) && <Check className="w-4 h-4" />}
-                </div>
-              ))
-            )}
+        {isOpen && !disabled && (
+          <div
+            className={`absolute z-50 bg-white dark:bg-[#121212] border border-gray-200 dark:border-[#424242] rounded-xl shadow-xl max-h-60 overflow-y-auto w-full ${alignRight ? 'right-0' : 'left-0'} ${openAbove ? 'bottom-full mb-1' : 'top-full mt-1'}`}
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            <style>{`
+              .hide-scrollbar::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
+            <div className="hide-scrollbar">
+              {filteredOptions.length === 0 ? (
+                <div className="px-3 py-2 text-gray-500 text-sm">No options found</div>
+              ) : (
+                filteredOptions.map((option) => (
+                  <div
+                    key={option.value}
+                    className={`
+                      px-3 py-2 cursor-pointer flex items-center justify-between
+                      ${value.includes(option.value) ? 'bg-primary-50 dark:bg-[#2a2a2a] text-primary-600 dark:text-primary-400' : 'text-black dark:text-[rgba(255,255,255,0.85)] hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'}
+                      ${option.disabled ? 'opacity-50 cursor-not-allowed' : ''}
+                    `}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggle(option);
+                    }}
+                  >
+                    <span>{option.label}</span>
+                    {value.includes(option.value) && <Check className="w-4 h-4" />}
+                  </div>
+                ))
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
       {error && (
         <p className="mt-1 text-[11px] text-red-600">{error}</p>
       )}

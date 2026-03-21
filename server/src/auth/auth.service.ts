@@ -540,11 +540,27 @@ export class AuthService {
 
   async getMe(userId: string) {
     try {
-      const user = await this.usersService.findById(userId);
+      const user = await this.usersService.findByIdWithRole(userId);
       if (!user) {
         throw new UnauthorizedException(ERROR_MESSAGES.USER_NOT_FOUND);
       }
-      return user;
+
+      const userData = user.toJSON();
+
+      // Build permissions array from role
+      let permissions: string[] = [];
+      if (userData.role) {
+        if (userData.role.slug === 'super_admin') {
+          permissions = ['*'];
+        } else if (userData.role.permissions) {
+          permissions = userData.role.permissions.map((p: any) => p.slug);
+        }
+      }
+
+      return {
+        ...userData,
+        permissions,
+      };
     } catch (error) {
       console.error('AuthService.getMe error:', error);
       if (error instanceof UnauthorizedException) throw error;
@@ -583,7 +599,9 @@ export class AuthService {
         },
       );
 
-      const userData = user.toJSON();
+      // Re-fetch user with role data for the login response
+      const userWithRole = await this.usersService.findByIdWithRole(user.id);
+      const userData = userWithRole ? userWithRole.toJSON() : user.toJSON();
       const {
         password_hash,
         password_reset_token,
@@ -595,10 +613,20 @@ export class AuthService {
         ...safeUser
       } = userData;
 
+      // Build permissions array
+      let permissions: string[] = [];
+      if (safeUser.role) {
+        if (safeUser.role.slug === 'super_admin') {
+          permissions = ['*'];
+        } else if (safeUser.role.permissions) {
+          permissions = safeUser.role.permissions.map((p: any) => p.slug);
+        }
+      }
+
       return {
         access_token: accessToken,
         refresh_token: refreshJwt,
-        user: safeUser,
+        user: { ...safeUser, permissions },
       };
     } catch (error) {
       console.error('AuthService.completeLogin error:', error);

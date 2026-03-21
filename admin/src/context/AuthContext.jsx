@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useState, useEffect, useCallback, useMemo } from 'react';
 import api from '../services/api';
 import API from '../services/endpoints';
 
@@ -6,18 +6,26 @@ export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [permissions, setPermissions] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const updateUserData = useCallback((data) => {
+    setUser(data);
+    setPermissions(data?.permissions || []);
+  }, []);
 
   useEffect(() => {
     api.get(API.GET_ME)
       .then((res) => {
-        setUser(res.data.data || res.data);
+        const data = res.data.data || res.data;
+        updateUserData(data);
       })
       .catch(() => {
         setUser(null);
+        setPermissions([]);
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [updateUserData]);
 
   const logout = useCallback(async () => {
     try {
@@ -26,12 +34,14 @@ export const AuthProvider = ({ children }) => {
       // ignore — clear local state regardless
     }
     setUser(null);
+    setPermissions([]);
   }, []);
 
   // Listen for auth:expired from api interceptor (refresh token failed)
   useEffect(() => {
     const handleAuthExpired = () => {
       setUser(null);
+      setPermissions([]);
     };
     window.addEventListener('auth:expired', handleAuthExpired);
     return () => window.removeEventListener('auth:expired', handleAuthExpired);
@@ -58,7 +68,7 @@ export const AuthProvider = ({ children }) => {
 
       // Cookies are set by the server — fetch user profile
       const meRes = await api.get(API.GET_ME);
-      setUser(meRes.data.data || meRes.data);
+      updateUserData(meRes.data.data || meRes.data);
 
       return data;
     } catch (error) {
@@ -70,22 +80,38 @@ export const AuthProvider = ({ children }) => {
   const fetchUser = useCallback(async () => {
     try {
       const meRes = await api.get(API.GET_ME);
-      setUser(meRes.data.data || meRes.data);
-      return meRes.data.data || meRes.data;
+      const data = meRes.data.data || meRes.data;
+      updateUserData(data);
+      return data;
     } catch (error) {
       setUser(null);
+      setPermissions([]);
       throw error;
     }
-  }, []);
+  }, [updateUserData]);
 
-  const value = {
+  // Permission checkers
+  const hasPermission = useCallback((permission) => {
+    if (permissions.includes('*')) return true;
+    return permissions.includes(permission);
+  }, [permissions]);
+
+  const hasAnyPermission = useCallback((...perms) => {
+    if (permissions.includes('*')) return true;
+    return perms.some((p) => permissions.includes(p));
+  }, [permissions]);
+
+  const value = useMemo(() => ({
     user,
     loading,
     isAuthenticated: !!user,
+    permissions,
+    hasPermission,
+    hasAnyPermission,
     login,
     logout,
     fetchUser,
-  };
+  }), [user, loading, permissions, hasPermission, hasAnyPermission, logout, fetchUser]);
 
   return (
     <AuthContext.Provider value={value}>

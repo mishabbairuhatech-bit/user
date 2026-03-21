@@ -10,6 +10,8 @@ import { SessionsModule } from './sessions/sessions.module';
 import { PasswordHistoryModule } from './password-history/password-history.module';
 import { MfaModule } from './mfa/mfa.module';
 import { PasskeyModule } from './passkey/passkey.module';
+import { RolesModule } from './roles/roles.module';
+import { PermissionsGuard } from './common/guards/permissions.guard';
 
 @Module({
   imports: [
@@ -37,11 +39,16 @@ import { PasskeyModule } from './passkey/passkey.module';
     PasswordHistoryModule,
     MfaModule,
     PasskeyModule,
+    RolesModule,
   ],
   providers: [
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: PermissionsGuard,
     },
   ],
 })

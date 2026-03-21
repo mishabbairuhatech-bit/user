@@ -29,3 +29,4 @@ export { default as PageHeader } from './PageHeader';
 export { default as ToastProvider, useToast } from './Toast';
 export { default as Notification } from './Notification';
 export { default as SplitterLayout } from './SplitterLayout';
+export { default as Collapse } from './Collapse';

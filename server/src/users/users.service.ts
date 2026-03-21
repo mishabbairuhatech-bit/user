@@ -1,9 +1,11 @@
-import { Injectable, Inject, NotFoundException, InternalServerErrorException, ConflictException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, InternalServerErrorException, ConflictException, BadRequestException } from '@nestjs/common';
 import { Op, WhereOptions, literal } from 'sequelize';
 import * as bcrypt from 'bcrypt';
 import { REPOSITORY } from '../common/constants/app.constants';
 import { ERROR_MESSAGES } from '../common/constants/error-messages';
 import { User } from './entities/user.entity';
+import { Role } from '../roles/entities/role.entity';
+import { Permission } from '../roles/entities/permission.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationQueryDto, PaginatedResponseDto } from '../common/dto';
@@ -275,7 +277,10 @@ export class UsersService {
         attributes: [
           'id', 'email', 'first_name', 'last_name',
           [literal("first_name || ' ' || last_name"), 'name'],
-          'phone', 'avatar_url', 'is_active', 'created_at',
+          'phone', 'avatar_url', 'is_active', 'role_id', 'created_at',
+        ],
+        include: [
+          { model: Role, attributes: ['id', 'name', 'slug'] },
         ],
         order: [[query.sort_by, query.sort_order]],
         limit: query.limit,
@@ -298,6 +303,70 @@ export class UsersService {
     } catch (error) {
       console.error('UsersService.findAll error:', error);
       throw new InternalServerErrorException('Failed to fetch users.');
+    }
+  }
+
+  async findByIdWithRole(id: string): Promise<User | null> {
+    try {
+      return await this.userRepository.findOne({
+        where: { id, is_deleted: false },
+        attributes: {
+          exclude: [
+            'password_hash', 'totp_secret', 'mfa_code',
+            'mfa_code_expires', 'recovery_codes',
+            'password_reset_token', 'password_reset_expires',
+            'failed_login_attempts', 'locked_until',
+            'is_deleted', 'google_id',
+          ],
+        },
+        include: [{
+          model: Role,
+          attributes: ['id', 'name', 'slug'],
+          include: [{ model: Permission, through: { attributes: [] } }],
+        }],
+      });
+    } catch (error) {
+      console.error('UsersService.findByIdWithRole error:', error);
+      throw new InternalServerErrorException('Failed to find user with role.');
+    }
+  }
+
+  async assignRole(userId: string, roleId: string): Promise<User> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { id: userId, is_deleted: false },
+        include: [{ model: Role }],
+      });
+      if (!user) throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
+
+      const role = await Role.findByPk(roleId);
+      if (!role) throw new NotFoundException('Role not found');
+      if (!role.is_active) throw new BadRequestException('Cannot assign an inactive role');
+
+      // Prevent removing the last super admin
+      if (user.role?.slug === 'super_admin') {
+        const superAdminRole = await Role.findOne({ where: { slug: 'super_admin' } });
+        if (superAdminRole) {
+          const superAdminCount = await this.userRepository.count({
+            where: { role_id: superAdminRole.id, is_deleted: false },
+          });
+          if (superAdminCount <= 1 && roleId !== superAdminRole.id) {
+            throw new BadRequestException(
+              'Cannot change role: this is the last Super Admin account',
+            );
+          }
+        }
+      }
+
+      await user.update({ role_id: roleId });
+      return this.findByIdWithRole(userId) as Promise<User>;
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) throw error;
+      console.error('UsersService.assignRole error:', error);
+      throw new InternalServerErrorException('Failed to assign role.');
     }
   }
 }

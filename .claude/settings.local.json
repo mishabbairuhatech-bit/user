@@ -17,7 +17,11 @@
       "Bash(mv CartPanel.jsx GridCartPanel.jsx)",
       "Bash(mv CartItem.jsx GridCartItem.jsx)",
       "Bash(mv CategoryTabs.jsx GridCategoryTabs.jsx)",
-      "Bash(mv ProductGrid.jsx GridProductGrid.jsx)"
+      "Bash(mv ProductGrid.jsx GridProductGrid.jsx)",
+      "Bash(kill 4339)",
+      "Bash(pkill -f \"ts-node src/main.ts\")",
+      "Bash(pkill -f nodemon)",
+      "Bash(npx ts-node:*)"
     ]
   }
 }

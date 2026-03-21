@@ -282,12 +282,100 @@ const Table = forwardRef(({
     </div>
   );
 
-  // Render table content (head + body combined for non-list views)
+  // Render table content (head + body in a single table)
   const renderTableContent = () => (
-    <>
-      {renderTableHead()}
-      {renderTableBody()}
-    </>
+    <table className={`w-max min-w-full table-fixed ${bordered ? 'border border-gray-200 dark:border-[#424242]' : ''}`}>
+      <thead className="bg-gray-50 dark:bg-[#2a2a2a] sticky top-0 z-20">
+        <tr>
+          {selectable && (
+            <th scope="col" className={`${headerPaddingClass} w-12`}>
+              <Checkbox
+                checked={isAllSelected}
+                indeterminate={isIndeterminate}
+                onChange={handleSelectAll}
+                size="md"
+              />
+            </th>
+          )}
+          {columns.map((column, index) => (
+            <th
+              key={column.key}
+              scope="col"
+              className={`
+                ${headerPaddingClass} text-left text-sm font-medium text-gray-900 dark:text-[rgba(255,255,255,0.85)]
+                ${column.sortable ? 'cursor-pointer select-none hover:text-gray-700 dark:hover:text-white' : ''}
+                ${column.headerClassName || ''}
+                ${getFixedClassName(column, true)}
+              `}
+              style={{ width: column.width, ...getFixedStyle(column, index) }}
+              onClick={() => handleSort(column)}
+            >
+              <div className="flex items-center gap-1.5">
+                <span>{column.header}</span>
+                {renderSortIcon(column)}
+              </div>
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody className="bg-white dark:bg-[#121212]">
+        {loading ? (
+          <tr>
+            <td colSpan={totalColumns} className="px-6 py-12 text-center">
+              <div className="flex items-center justify-center">
+                <svg className="animate-spin h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+              </div>
+            </td>
+          </tr>
+        ) : data.length === 0 ? (
+          <tr>
+            <td colSpan={totalColumns} className="px-6 py-12 text-center text-gray-500 dark:text-[rgba(255,255,255,0.55)]">
+              {emptyMessage}
+            </td>
+          </tr>
+        ) : (
+          data.map((row, rowIndex) => {
+            const isSelected = selectedRows.includes(row.id);
+            return (
+              <tr
+                key={row.id || rowIndex}
+                className={`
+                  transition-colors border-b border-gray-200 dark:border-[#424242] last:border-b-0
+                  ${onRowClick ? 'cursor-pointer' : ''}
+                  ${activeRowId && row.id === activeRowId
+                    ? 'bg-gray-100 dark:bg-[#2a2a2a]'
+                    : striped && rowIndex % 2 === 1 ? 'bg-gray-50/50 dark:bg-[#2a2a2a]/50' : 'bg-white dark:bg-[#121212]'}
+                  ${activeRowId && row.id === activeRowId ? '' : 'hover:bg-gray-50/50 dark:hover:bg-[#2a2a2a]/50'}
+                `}
+                onClick={() => onRowClick && onRowClick(row)}
+              >
+                {selectable && (
+                  <td className={`${paddingClass} w-12`} onClick={(e) => e.stopPropagation()}>
+                    <Checkbox
+                      checked={isSelected}
+                      onChange={() => handleSelectRow({ stopPropagation: () => { } }, row)}
+                      size="md"
+                    />
+                  </td>
+                )}
+                {columns.map((column, index) => (
+                  <td
+                    key={column.key}
+                    className={`${paddingClass} text-sm text-gray-900 dark:text-[rgba(255,255,255,0.85)] whitespace-nowrap ${column.cellClassName || ''} ${getFixedClassName(column, false)}`}
+                    style={{ width: column.width, ...getFixedStyle(column, index) }}
+                  >
+                    {column.render ? column.render(row[column.key], row) : row[column.key]}
+                  </td>
+                ))}
+              </tr>
+            );
+          })
+        )}
+      </tbody>
+    </table>
   );
 
   // Render grid content
@@ -421,12 +509,9 @@ const Table = forwardRef(({
         </div>
       )}
 
-      {/* Table column headers — fixed below header */}
-      {viewMode === 'list' && renderTableHead()}
-
       {/* Content — scrollable middle */}
-      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide">
-        {viewMode === 'list' ? renderTableBody() : renderContent()}
+      <div className="flex-1 min-h-0 overflow-auto scrollbar-hide">
+        {viewMode === 'list' ? renderTableContent() : renderContent()}
       </div>
 
       {/* Footer with Pagination — fixed at bottom */}

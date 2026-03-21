@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Maximize2 } from 'lucide-react';
 import { Input, Button, Select, MultiSelect } from '@components/ui';
 import { useToast } from '@components/ui/Toast';
@@ -45,6 +45,7 @@ const initialForm = {
   phone: '',
   timezone: 'UTC',
   language: ['en'],
+  role_id: '',
 };
 
 const UserCreateForm = ({ onClose }) => {
@@ -53,6 +54,16 @@ const UserCreateForm = ({ onClose }) => {
   const toast = useToast();
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
+
+  const { data: roles = [] } = useQuery({
+    queryKey: [QUERY_KEY.ROLES_LIST],
+    queryFn: async () => {
+      const res = await api.get(API.ROLES_LIST);
+      return res.data.data || res.data;
+    },
+  });
+
+  const roleOptions = roles.map((r) => ({ value: r.id, label: r.name }));
 
   const handleChange = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -103,6 +114,7 @@ const UserCreateForm = ({ onClose }) => {
     if (form.phone.trim()) payload.phone = form.phone.trim();
     if (form.timezone) payload.timezone = form.timezone;
     if (form.language && form.language.length > 0) payload.language = form.language[0];
+    if (form.role_id) payload.role_id = form.role_id;
 
     mutation.mutate(payload);
   };
@@ -122,74 +134,84 @@ const UserCreateForm = ({ onClose }) => {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto scrollbar-hide px-5 py-4 flex flex-col">
-        <div className="space-y-3 flex-1">
-          <div className="grid grid-cols-2 gap-2">
+      <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
+        <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-4">
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                label="First Name"
+                placeholder="John"
+                value={form.first_name}
+                onChange={handleChange('first_name')}
+                error={errors.first_name}
+                size="sm"
+              />
+              <Input
+                label="Last Name"
+                placeholder="Doe"
+                value={form.last_name}
+                onChange={handleChange('last_name')}
+                error={errors.last_name}
+                size="sm"
+              />
+            </div>
             <Input
-              label="First Name"
-              placeholder="John"
-              value={form.first_name}
-              onChange={handleChange('first_name')}
-              error={errors.first_name}
+              label="Email"
+              type="email"
+              placeholder="john@example.com"
+              value={form.email}
+              onChange={handleChange('email')}
+              error={errors.email}
               size="sm"
             />
             <Input
-              label="Last Name"
-              placeholder="Doe"
-              value={form.last_name}
-              onChange={handleChange('last_name')}
-              error={errors.last_name}
+              label="Password"
+              type="password"
+              placeholder="Min 8 characters"
+              value={form.password}
+              onChange={handleChange('password')}
+              error={errors.password}
               size="sm"
             />
-          </div>
-          <Input
-            label="Email"
-            type="email"
-            placeholder="john@example.com"
-            value={form.email}
-            onChange={handleChange('email')}
-            error={errors.email}
-            size="sm"
-          />
-          <Input
-            label="Password"
-            type="password"
-            placeholder="Min 8 characters"
-            value={form.password}
-            onChange={handleChange('password')}
-            error={errors.password}
-            size="sm"
-          />
-          <Input
-            label="Phone"
-            placeholder="+1234567890"
-            value={form.phone}
-            onChange={handleChange('phone')}
-            error={errors.phone}
-            size="sm"
-          />
-          <div className="grid grid-cols-2 gap-2">
+            <Input
+              label="Phone"
+              placeholder="+1234567890"
+              value={form.phone}
+              onChange={handleChange('phone')}
+              error={errors.phone}
+              size="sm"
+            />
             <Select
-              label="Timezone"
-              options={timezoneOptions}
-              value={form.timezone}
-              onChange={(val) => setForm((prev) => ({ ...prev, timezone: val }))}
-              error={errors.timezone}
+              label="Role"
+              options={roleOptions}
+              value={form.role_id}
+              onChange={(val) => setForm((prev) => ({ ...prev, role_id: val }))}
+              placeholder="Select a role"
               size="sm"
             />
-            <MultiSelect
-              label="Language"
-              options={languageOptions}
-              value={form.language}
-              onChange={(val) => setForm((prev) => ({ ...prev, language: val }))}
-              error={errors.language}
-              size="sm"
-            />
+            <div className="grid grid-cols-2 gap-2">
+              <Select
+                label="Timezone"
+                options={timezoneOptions}
+                value={form.timezone}
+                onChange={(val) => setForm((prev) => ({ ...prev, timezone: val }))}
+                error={errors.timezone}
+                size="sm"
+              />
+              <MultiSelect
+                label="Language"
+                options={languageOptions}
+                value={form.language}
+                onChange={(val) => setForm((prev) => ({ ...prev, language: val }))}
+                error={errors.language}
+                size="sm"
+              />
+            </div>
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-2 mt-5 pt-4 border-t border-gray-200 dark:border-[#424242] flex-shrink-0">
+        {/* Actions - fixed at bottom */}
+        <div className="flex items-center gap-2 px-5 py-3 border-t border-gray-200 dark:border-[#424242] flex-shrink-0">
           <Button type="submit" size="sm" loading={mutation.isPending} className="flex-1">
             Create User
           </Button>

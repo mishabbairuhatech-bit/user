@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AdminLayout } from '@layouts';
 import { LoginPage, ChangePasswordPage, CreatePasskeyPage, ForgotPasswordPage, ResetPasswordPage } from '@pages/auth';
-import { DashboardPage, UIComponentsPage, UsersPage, UserDetailPage, UserCreatePage, SettingsPage } from '@/pages/admin';
+import { DashboardPage, UIComponentsPage, UsersPage, UserDetailPage, UserCreatePage, SettingsPage, RolesPage, RoleFormPage, RoleCreatePage } from '@/pages/admin';
 import { POSPage } from '@/pages/pos';
 import { TablePOSPage } from '@/pages/pos/table-view';
 import { MailPage } from '@/pages/mail-portal';
@@ -122,6 +122,9 @@ const AppRoutes = () => {
         <Route path="users/create" element={<UserCreatePage />} />
         <Route path="users/:id" element={<UserDetailPage />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="roles" element={<RolesPage />} />
+        <Route path="roles/create" element={<RoleCreatePage />} />
+        <Route path="roles/:id/edit" element={<RoleFormPage />} />
       </Route>
 
       {/* Redirect root to dashboard if authenticated, otherwise to login */}

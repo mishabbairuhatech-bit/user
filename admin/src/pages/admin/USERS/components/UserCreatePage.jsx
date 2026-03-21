@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
 import { PageHeader, Button, Card, Input, Select, MultiSelect } from '@components/ui';
 import { useToast } from '@components/ui/Toast';
@@ -45,6 +45,7 @@ const initialForm = {
   phone: '',
   timezone: 'UTC',
   language: ['en'],
+  role_id: '',
 };
 
 const UserCreatePage = () => {
@@ -53,6 +54,16 @@ const UserCreatePage = () => {
   const toast = useToast();
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
+
+  const { data: roles = [] } = useQuery({
+    queryKey: [QUERY_KEY.ROLES_LIST],
+    queryFn: async () => {
+      const res = await api.get(API.ROLES_LIST);
+      return res.data.data || res.data;
+    },
+  });
+
+  const roleOptions = roles.map((r) => ({ value: r.id, label: r.name }));
 
   const handleChange = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -103,6 +114,7 @@ const UserCreatePage = () => {
     if (form.phone.trim()) payload.phone = form.phone.trim();
     if (form.timezone) payload.timezone = form.timezone;
     if (form.language && form.language.length > 0) payload.language = form.language[0];
+    if (form.role_id) payload.role_id = form.role_id;
 
     mutation.mutate(payload);
   };
@@ -166,6 +178,13 @@ const UserCreatePage = () => {
               value={form.phone}
               onChange={handleChange('phone')}
               error={errors.phone}
+            />
+            <Select
+              label="Role"
+              options={roleOptions}
+              value={form.role_id}
+              onChange={(val) => setForm((prev) => ({ ...prev, role_id: val }))}
+              placeholder="Select a role"
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Select

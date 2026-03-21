@@ -9,10 +9,13 @@ import {
   UpdatedAt,
   HasMany,
   Unique,
+  ForeignKey,
+  BelongsTo,
 } from 'sequelize-typescript';
 import { LoginSession } from '../../sessions/entities/login-session.entity';
 import { PasswordHistory } from '../../password-history/entities/password-history.entity';
 import { Passkey } from '../../passkey/entities/passkey.entity';
+import { Role } from '../../roles/entities/role.entity';
 
 @Table({ tableName: 'users', timestamps: true, underscored: true })
 export class User extends Model {
@@ -116,6 +119,14 @@ export class User extends Model {
   @Default('local')
   @Column({ type: DataType.STRING(20), allowNull: false })
   auth_provider: string;
+
+  // Role association
+  @ForeignKey(() => Role)
+  @Column({ type: DataType.UUID, allowNull: true })
+  role_id: string;
+
+  @BelongsTo(() => Role)
+  role: Role;
 
   @CreatedAt
   created_at: Date;

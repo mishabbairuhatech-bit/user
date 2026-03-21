@@ -1,6 +1,9 @@
 export { default as DashboardPage } from './DASHBOARD/DashboardPage';
 export { default as UIComponentsPage } from './UI/UIComponentsPage';
 export { default as UsersPage } from './USERS/UsersPage';
-export { default as UserDetailPage } from './USERS/UserDetailPage';
-export { default as UserCreatePage } from './USERS/UserCreatePage';
+export { default as UserDetailPage } from './USERS/components/UserDetailPage';
+export { default as UserCreatePage } from './USERS/components/UserCreatePage';
 export { default as SettingsPage } from './SETTINGS/SettingsPage';
+export { default as RolesPage } from './ROLES/RolesPage';
+export { default as RoleFormPage } from './ROLES/RoleFormPage';
+export { default as RoleCreatePage } from './ROLES/components/RoleCreatePage';

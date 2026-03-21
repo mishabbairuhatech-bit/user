@@ -33,6 +33,7 @@ import {
   PageHeader,
   useToast,
   Notification,
+  Collapse,
 } from '@components/ui';
 import {
   Edit,
@@ -1765,6 +1766,53 @@ const UIComponentsPage = () => {
             </div>
           </div>
         </Card>
+      </section>
+
+      {/* Collapse Section */}
+      <section>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-[rgba(255,255,255,0.85)] mb-4">Collapse / Accordion</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Basic Collapse */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Basic Collapse</h3>
+            <Collapse title="What is your return policy?">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                We offer a 30-day return policy for all unused items in their original packaging. Contact our support team to initiate a return.
+              </p>
+            </Collapse>
+            <Collapse title="How long does shipping take?" defaultOpen>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Standard shipping takes 5-7 business days. Express shipping is available for 2-3 business day delivery.
+              </p>
+            </Collapse>
+            <Collapse title="Do you offer international shipping?" icon={<Globe size={16} />}>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Yes, we ship to over 50 countries worldwide. Shipping rates and delivery times vary by location.
+              </p>
+            </Collapse>
+          </div>
+
+          {/* Collapse with suffix & borderless */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">With Suffix & Borderless</h3>
+            <Collapse
+              title="User Management"
+              icon={<Users size={16} />}
+              suffix={<Badge variant="info" type="soft" size="sm">3 permissions</Badge>}
+            >
+              <div className="space-y-1">
+                <p className="text-sm text-gray-600 dark:text-gray-400">users.create</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">users.read</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">users.delete</p>
+              </div>
+            </Collapse>
+            <Collapse title="Borderless collapse item" bordered={false}>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                This collapse has no border styling, useful for nested or minimal layouts.
+              </p>
+            </Collapse>
+          </div>
+        </div>
       </section>
 
       {/* Cards Section */}
