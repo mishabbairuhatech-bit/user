@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Fingerprint, Shield, Check, ArrowLeft } from 'lucide-react';
+import { Fingerprint, Shield, Check, ArrowLeft, Lock, Bell } from 'lucide-react';
 import { AuthLayout } from '@layouts';
 import { Button, Input } from '@components/ui';
 import api from '@services/api';
@@ -24,14 +24,46 @@ const CreatePasskeyPage = () => {
   const [searchParams] = useSearchParams();
   const returnTab = searchParams.get('returnTab') || 'security';
 
-  const [step, setStep] = useState('create'); // 'create' | 'registering' | 'success'
+  const [step, setStep] = useState('verify'); // 'verify' | 'create' | 'registering' | 'success'
+  const [password, setPassword] = useState('');
   const [passkeyName, setPasskeyName] = useState(getDeviceName());
   const [createdName, setCreatedName] = useState('');
+  const [hasExistingPasskeys, setHasExistingPasskeys] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleBack = () => {
     navigate(`/admin/settings?tab=${returnTab}`);
+  };
+
+  const handleVerifyPassword = async () => {
+    if (!password.trim()) {
+      setError('Please enter your password');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+      await api.post(API.PASSKEY_VERIFY_PASSWORD, { password });
+
+      // Check if user already has passkeys registered
+      try {
+        const res = await api.get(API.PASSKEY_LIST);
+        const passkeys = res.data.data || res.data || [];
+        setHasExistingPasskeys(passkeys.length > 0);
+      } catch {
+        // Ignore — proceed without the check
+      }
+
+      setStep('create');
+      setPassword('');
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Incorrect password. Please try again.';
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCreatePasskey = async () => {
@@ -62,7 +94,7 @@ const CreatePasskeyPage = () => {
       } else if (err.name === 'SecurityError') {
         setError('Security error. Make sure you are using HTTPS or localhost.');
       } else if (err.name === 'InvalidStateError') {
-        setError('This passkey is already registered on your account.');
+        setError('This passkey has already been registered.');
       } else {
         setError(err.response?.data?.message || err.message || 'Failed to create passkey. Please try again.');
       }
@@ -70,6 +102,73 @@ const CreatePasskeyPage = () => {
       setLoading(false);
     }
   };
+
+  // ─── Verify password state ────────────────────────────────────────
+  if (step === 'verify') {
+    const handleVerifySubmit = (e) => {
+      e.preventDefault();
+      handleVerifyPassword();
+    };
+
+    return (
+      <AuthLayout>
+        <div className="mb-8 text-center">
+          <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 dark:bg-transparent">
+            <Lock className="w-8 h-8 text-primary-600 dark:text-gray-400" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Verify your identity</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Enter your password to add a new passkey to your account.
+          </p>
+        </div>
+
+        {error && (
+          <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleVerifySubmit} className="space-y-5">
+          <Input
+            label="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter your password"
+            variant="floating"
+            autoFocus
+            disabled={loading}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleVerifyPassword();
+              }
+            }}
+          />
+
+          <Button
+            type="submit"
+            className="w-full"
+            size="md"
+            loading={loading}
+          >
+            {loading ? 'Verifying...' : 'Continue'}
+          </Button>
+
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full"
+            size="md"
+            onClick={handleBack}
+            disabled={loading}
+          >
+            Back to Settings
+          </Button>
+        </form>
+      </AuthLayout>
+    );
+  }
 
   // ─── Success state ─────────────────────────────────────────────────
   if (step === 'success') {
@@ -162,8 +261,9 @@ const CreatePasskeyPage = () => {
 
       {/* Error */}
       {error && (
-        <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm">
-          {error}
+        <div className="mb-4 p-3 rounded-xl bg-blue-50 dark:bg-[#1a1a1a] border border-blue-300 dark:border-blue-800 flex items-center gap-3">
+          <Bell className="w-5 h-5 text-blue-500 dark:text-blue-400 flex-shrink-0" />
+          <p className="text-sm text-blue-600 dark:text-blue-400">{error}</p>
         </div>
       )}
 
@@ -187,7 +287,7 @@ const CreatePasskeyPage = () => {
         size="md"
         loading={loading}
       >
-        Create a passkey
+        Add passkey
       </Button>
 
       {/* Back */}
@@ -199,7 +299,7 @@ const CreatePasskeyPage = () => {
         onClick={handleBack}
         disabled={loading}
       >
-        Back to Settings
+        Cancel
       </Button>
     </AuthLayout>
   );

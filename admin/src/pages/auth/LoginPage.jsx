@@ -33,8 +33,7 @@ const LoginPage = () => {
   const [mfaCode, setMfaCode] = useState('');
 
   // Passkey state
-  const [showPasskeyLogin, setShowPasskeyLogin] = useState(false);
-  const [passkeyEmail, setPasskeyEmail] = useState('');
+  const [passkeyLoading, setPasskeyLoading] = useState(false);
 
   // Face ID state
   const [showFaceLogin, setShowFaceLogin] = useState(false);
@@ -124,8 +123,8 @@ const LoginPage = () => {
 
   // Initialize Google One Tap
   useEffect(() => {
-    // Skip if MFA, Passkey, or Face Login screens are shown
-    if (mfaRequired || showPasskeyLogin || showFaceLogin) return;
+    // Skip if MFA screen is shown
+    if (mfaRequired) return;
 
     const initializeGoogleOneTap = () => {
       if (window.google?.accounts?.id) {
@@ -162,7 +161,7 @@ const LoginPage = () => {
       // Cleanup
       return () => clearInterval(checkGoogle);
     }
-  }, [handleGoogleOneTapCallback, mfaRequired, showPasskeyLogin, showFaceLogin]);
+  }, [handleGoogleOneTapCallback, mfaRequired]);
 
   const onSubmit = async (data) => {
     setIsLoading(true);
@@ -236,20 +235,15 @@ const LoginPage = () => {
   };
 
   const handlePasskeyLogin = async () => {
-    if (!passkeyEmail || !passkeyEmail.includes('@')) {
-      setApiError('Please enter a valid email address');
-      return;
-    }
-
-    setIsLoading(true);
+    setPasskeyLoading(true);
     setApiError('');
 
     try {
-      // Get authentication options from server
-      const optionsRes = await api.post(API.PASSKEY_AUTH_OPTIONS, { email: passkeyEmail });
+      // Get authentication options (no email — discoverable credentials)
+      const optionsRes = await api.post(API.PASSKEY_AUTH_OPTIONS, {});
       const { options, challenge_id } = optionsRes.data.data || optionsRes.data;
 
-      // Start WebAuthn authentication (v13+ API)
+      // Start WebAuthn authentication — browser shows passkey picker
       const authResp = await startAuthentication({ optionsJSON: options });
 
       // Verify authentication with server (server sets auth cookies)
@@ -281,7 +275,7 @@ const LoginPage = () => {
         setApiError(msg);
       }
     } finally {
-      setIsLoading(false);
+      setPasskeyLoading(false);
     }
   };
 
@@ -549,11 +543,13 @@ const LoginPage = () => {
       <Button
         variant="outline"
         size="md"
-        className="w-full mb-3"
-        onClick={() => setShowPasskeyLogin(true)}
+        className="w-full mb-6"
+        onClick={handlePasskeyLogin}
+        loading={passkeyLoading}
+        disabled={passkeyLoading}
         prefixIcon={() => <Fingerprint className="w-5 h-5" />}
       >
-        Login with Passkey
+        {passkeyLoading ? 'Verifying...' : 'Login with Passkey'}
       </Button>
 
       {/* Face ID Login Button */}

@@ -32,6 +32,7 @@ const API = {
   SESSION_DELETE: "sessions", // append /:id
 
   // Passkey
+  PASSKEY_VERIFY_PASSWORD: "passkey/verify-password",
   PASSKEY_REGISTER_OPTIONS: "passkey/register/options",
   PASSKEY_REGISTER_VERIFY: "passkey/register/verify",
   PASSKEY_AUTH_OPTIONS: "passkey/auth/options",

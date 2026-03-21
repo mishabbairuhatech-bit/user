@@ -20,6 +20,7 @@ import {
   AuthenticatePasskeyOptionsDto,
   AuthenticatePasskeyVerifyDto,
 } from './dto/authenticate-passkey.dto';
+import { VerifyPasswordDto } from './dto/verify-password.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { Public } from '../common/decorators/public.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -30,6 +31,22 @@ import { setAuthCookies } from '../common/utils/cookie.util';
 @Controller('passkey')
 export class PasskeyController {
   constructor(private readonly passkeyService: PasskeyService) {}
+
+  // ── Password verification before passkey registration ──
+
+  @Post('verify-password')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Verify user password before passkey registration' })
+  @ApiResponse({ status: 200, description: 'Password verified successfully.' })
+  @ApiResponse({ status: 401, description: 'Incorrect password.' })
+  async verifyPassword(
+    @CurrentUser() user: RequestUser,
+    @Body() dto: VerifyPasswordDto,
+  ) {
+    return await this.passkeyService.verifyUserPassword(user.id, dto.password);
+  }
 
   // ── Registration (requires auth) ──
 
@@ -66,7 +83,7 @@ export class PasskeyController {
   @Post('auth/options')
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: 10, ttl: 60000 } })
-  @ApiOperation({ summary: 'Get WebAuthn authentication options for a user' })
+  @ApiOperation({ summary: 'Get WebAuthn authentication options (omit email for discoverable credentials)' })
   @ApiResponse({ status: 200, description: 'Authentication challenge and allowed credentials.' })
   @ApiResponse({ status: 404, description: 'User not found or no passkeys registered.' })
   @ApiResponse({ status: 429, description: 'Too many requests.' })

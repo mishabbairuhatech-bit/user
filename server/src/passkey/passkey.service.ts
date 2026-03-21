@@ -8,6 +8,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 import {
   generateRegistrationOptions,
   verifyRegistrationResponse,
@@ -48,6 +49,26 @@ export class PasskeyService {
   ) {
     // Clean expired challenges every 5 minutes
     setInterval(() => this.cleanExpiredChallenges(), 5 * 60 * 1000);
+  }
+
+  async verifyUserPassword(userId: string, password: string): Promise<{ verified: boolean }> {
+    try {
+      const user = await this.usersService.findByIdWithPassword(userId);
+      if (!user) {
+        throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
+      }
+
+      const isValid = await bcrypt.compare(password, user.password_hash);
+      if (!isValid) {
+        throw new UnauthorizedException('Incorrect password.');
+      }
+
+      return { verified: true };
+    } catch (error) {
+      console.error('PasskeyService.verifyUserPassword error:', error);
+      if (error instanceof NotFoundException || error instanceof UnauthorizedException) throw error;
+      throw new InternalServerErrorException('Failed to verify password.');
+    }
   }
 
   async generateRegistrationOpts(userId: string) {
@@ -133,31 +154,49 @@ export class PasskeyService {
     }
   }
 
-  async generateAuthenticationOpts(email: string) {
+  async generateAuthenticationOpts(email?: string) {
     try {
-      const user = await this.usersService.findByEmail(email);
-      if (!user) {
-        throw new NotFoundException(ERROR_MESSAGES.PASSKEY_NOT_FOUND);
+      if (email) {
+        // Email-based flow: find user, restrict to their passkeys
+        const user = await this.usersService.findByEmail(email);
+        if (!user) {
+          throw new NotFoundException(ERROR_MESSAGES.PASSKEY_NOT_FOUND);
+        }
+
+        const passkeys = await this.passkeyRepository.findAll({
+          where: { user_id: user.id },
+        });
+
+        if (passkeys.length === 0) {
+          throw new NotFoundException(ERROR_MESSAGES.PASSKEY_NOT_FOUND);
+        }
+
+        const options = await generateAuthenticationOptions({
+          rpID: this.configService.webauthnRpId,
+          allowCredentials: passkeys.map((pk) => ({
+            id: pk.credential_id,
+            transports: pk.transports as AuthenticatorTransportFuture[],
+          })),
+          userVerification: 'preferred',
+        });
+
+        const challengeId = this.storeChallengeForUser(options.challenge, user.id);
+        return { options, challenge_id: challengeId };
       }
 
-      const passkeys = await this.passkeyRepository.findAll({
-        where: { user_id: user.id },
-      });
-
-      if (passkeys.length === 0) {
-        throw new NotFoundException(ERROR_MESSAGES.PASSKEY_NOT_FOUND);
-      }
-
+      // Discoverable credential flow: no email, browser picks the passkey
       const options = await generateAuthenticationOptions({
         rpID: this.configService.webauthnRpId,
-        allowCredentials: passkeys.map((pk) => ({
-          id: pk.credential_id,
-          transports: pk.transports as AuthenticatorTransportFuture[],
-        })),
-        userVerification: 'preferred',
+        userVerification: 'required',
       });
 
-      const challengeId = this.storeChallengeForUser(options.challenge, user.id);
+      // Store challenge without a known userId
+      const challengeId = `discover_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+      this.challenges.set(challengeId, {
+        challenge: options.challenge,
+        userId: '',
+        expiresAt: Date.now() + 5 * 60 * 1000,
+      });
 
       return { options, challenge_id: challengeId };
     } catch (error) {
@@ -184,13 +223,24 @@ export class PasskeyService {
         throw new BadRequestException(ERROR_MESSAGES.PASSKEY_CHALLENGE_EXPIRED);
       }
 
-      const userId = stored.userId;
-
-      // Find the credential
+      let userId = stored.userId;
       const credentialId = body.id;
-      const passkey = await this.passkeyRepository.findOne({
-        where: { credential_id: credentialId, user_id: userId },
-      });
+
+      // Find the credential — for discoverable flow userId may be empty
+      let passkey;
+      if (userId) {
+        passkey = await this.passkeyRepository.findOne({
+          where: { credential_id: credentialId, user_id: userId },
+        });
+      } else {
+        // Discoverable flow: look up passkey by credential_id across all users
+        passkey = await this.passkeyRepository.findOne({
+          where: { credential_id: credentialId },
+        });
+        if (passkey) {
+          userId = passkey.user_id;
+        }
+      }
 
       if (!passkey) {
         throw new UnauthorizedException(ERROR_MESSAGES.PASSKEY_VERIFY_FAILED);
