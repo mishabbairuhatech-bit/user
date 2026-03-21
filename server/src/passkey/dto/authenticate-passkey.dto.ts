@@ -2,10 +2,10 @@ import { IsEmail, IsNotEmpty, IsObject, IsOptional, IsString, IsNumber } from 'c
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class AuthenticatePasskeyOptionsDto {
-  @ApiProperty({ example: 'user@example.com', description: 'Email address of the account' })
+  @ApiPropertyOptional({ example: 'user@example.com', description: 'Email address (optional — omit for discoverable credential flow)' })
+  @IsOptional()
   @IsEmail({}, { message: 'Please provide a valid email address.' })
-  @IsNotEmpty()
-  email: string;
+  email?: string;
 }
 
 export class AuthenticatePasskeyVerifyDto {

@@ -32,8 +32,7 @@ const LoginPage = () => {
   const [mfaCode, setMfaCode] = useState('');
 
   // Passkey state
-  const [showPasskeyLogin, setShowPasskeyLogin] = useState(false);
-  const [passkeyEmail, setPasskeyEmail] = useState('');
+  const [passkeyLoading, setPasskeyLoading] = useState(false);
 
   // Geolocation state
   const [userLocation, setUserLocation] = useState({ latitude: null, longitude: null });
@@ -118,8 +117,8 @@ const LoginPage = () => {
 
   // Initialize Google One Tap
   useEffect(() => {
-    // Skip if MFA or Passkey screens are shown
-    if (mfaRequired || showPasskeyLogin) return;
+    // Skip if MFA screen is shown
+    if (mfaRequired) return;
 
     const initializeGoogleOneTap = () => {
       if (window.google?.accounts?.id) {
@@ -156,7 +155,7 @@ const LoginPage = () => {
       // Cleanup
       return () => clearInterval(checkGoogle);
     }
-  }, [handleGoogleOneTapCallback, mfaRequired, showPasskeyLogin]);
+  }, [handleGoogleOneTapCallback, mfaRequired]);
 
   const onSubmit = async (data) => {
     setIsLoading(true);
@@ -230,20 +229,15 @@ const LoginPage = () => {
   };
 
   const handlePasskeyLogin = async () => {
-    if (!passkeyEmail || !passkeyEmail.includes('@')) {
-      setApiError('Please enter a valid email address');
-      return;
-    }
-
-    setIsLoading(true);
+    setPasskeyLoading(true);
     setApiError('');
 
     try {
-      // Get authentication options from server
-      const optionsRes = await api.post(API.PASSKEY_AUTH_OPTIONS, { email: passkeyEmail });
+      // Get authentication options (no email — discoverable credentials)
+      const optionsRes = await api.post(API.PASSKEY_AUTH_OPTIONS, {});
       const { options, challenge_id } = optionsRes.data.data || optionsRes.data;
 
-      // Start WebAuthn authentication (v13+ API)
+      // Start WebAuthn authentication — browser shows passkey picker
       const authResp = await startAuthentication({ optionsJSON: options });
 
       // Verify authentication with server (server sets auth cookies)
@@ -275,70 +269,9 @@ const LoginPage = () => {
         setApiError(msg);
       }
     } finally {
-      setIsLoading(false);
+      setPasskeyLoading(false);
     }
   };
-
-  // Show Passkey Login screen
-  if (showPasskeyLogin) {
-    const handlePasskeySubmit = (e) => {
-      e.preventDefault();
-      handlePasskeyLogin();
-    };
-
-    return (
-      <AuthLayout>
-        <div className="mb-8 text-center">
-          <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900/20">
-            <Fingerprint className="w-8 h-8 text-primary-600 dark:text-primary-400" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Use your passkey</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Enter your email to sign in with your device's biometrics, PIN, or security key.
-          </p>
-        </div>
-
-        {apiError && (
-          <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm">
-            {apiError}
-          </div>
-        )}
-
-        <form onSubmit={handlePasskeySubmit} className="space-y-5">
-          <Input
-            label="Email address"
-            type="email"
-            value={passkeyEmail}
-            onChange={(e) => setPasskeyEmail(e.target.value)}
-            placeholder="Enter your email"
-            variant="floating"
-            autoFocus
-          />
-
-          <Button
-            type="submit"
-            className="w-full"
-            size="md"
-            loading={isLoading}
-          >
-            {isLoading ? 'Verifying...' : 'Continue with Passkey'}
-          </Button>
-
-          <button
-            type="button"
-            className="w-full text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 py-2"
-            onClick={() => {
-              setShowPasskeyLogin(false);
-              setPasskeyEmail('');
-              setApiError('');
-            }}
-          >
-            Back to login
-          </button>
-        </form>
-      </AuthLayout>
-    );
-  }
 
   // Show MFA verification screen
   if (mfaRequired) {
@@ -428,10 +361,12 @@ const LoginPage = () => {
         variant="outline"
         size="md"
         className="w-full mb-6"
-        onClick={() => setShowPasskeyLogin(true)}
+        onClick={handlePasskeyLogin}
+        loading={passkeyLoading}
+        disabled={passkeyLoading}
         prefixIcon={() => <Fingerprint className="w-5 h-5" />}
       >
-        Login with Passkey
+        {passkeyLoading ? 'Verifying...' : 'Login with Passkey'}
       </Button>
 
       {/* Divider */}
