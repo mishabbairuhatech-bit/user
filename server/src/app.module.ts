@@ -11,6 +11,7 @@ import { PasswordHistoryModule } from './password-history/password-history.modul
 import { MfaModule } from './mfa/mfa.module';
 import { PasskeyModule } from './passkey/passkey.module';
 import { RolesModule } from './roles/roles.module';
+import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { PermissionsGuard } from './common/guards/permissions.guard';
 
 @Module({
@@ -45,6 +46,10 @@ import { PermissionsGuard } from './common/guards/permissions.guard';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
     },
     {
       provide: APP_GUARD,

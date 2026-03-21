@@ -21,7 +21,6 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { VerifyMfaDto } from './dto/verify-mfa.dto';
 import { GoogleOneTapDto } from './dto/google-one-tap.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { Public } from '../common/decorators/public.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { RequestUser } from '../common/interfaces/jwt-payload.interface';
@@ -136,7 +135,6 @@ export class AuthController {
 
   @Post('change-password')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Change password (authenticated)' })
   @ApiResponse({ status: 200, description: 'Password changed successfully.' })
@@ -154,7 +152,6 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Logout current session' })
   @ApiResponse({ status: 200, description: 'Logged out successfully.' })
@@ -170,7 +167,6 @@ export class AuthController {
 
   @Post('logout-all')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Logout all active sessions' })
   @ApiResponse({ status: 200, description: 'All sessions terminated.' })
@@ -185,7 +181,6 @@ export class AuthController {
   }
 
   @Get('me')
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get current authenticated user profile' })
   @ApiResponse({ status: 200, description: 'User profile returned.' })

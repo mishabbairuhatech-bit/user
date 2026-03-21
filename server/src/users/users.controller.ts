@@ -1,10 +1,9 @@
-import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body, Query, ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AssignRoleDto } from '../roles/dto/assign-role.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RequirePermissions } from '../common/decorators/require-permissions.decorator';
 import { UserById } from '../common/decorators/user-by-id.decorator';
 import { PaginationQueryDto } from '../common/dto';
@@ -12,11 +11,11 @@ import { PaginationQueryDto } from '../common/dto';
 @ApiTags('Users')
 @ApiBearerAuth('access-token')
 @Controller('users')
-@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
   @Get()
+  @RequirePermissions('users:read')
   @ApiOperation({ summary: 'List all users with pagination and search' })
   @ApiResponse({ status: 200, description: 'Paginated list of users.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
@@ -25,6 +24,7 @@ export class UsersController {
   }
 
   @Post()
+  @RequirePermissions('users:create')
   @ApiOperation({ summary: 'Create a new user' })
   @ApiResponse({ status: 201, description: 'User created successfully.' })
   @ApiResponse({ status: 409, description: 'Email already exists.' })
@@ -51,6 +51,7 @@ export class UsersController {
   }
 
   @Get(':id')
+  @RequirePermissions('users:read')
   @ApiOperation({ summary: 'Get user details by ID' })
   @ApiParam({ name: 'id', description: 'User UUID' })
   @ApiResponse({ status: 200, description: 'User details returned.' })

@@ -1,7 +1,9 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AdminLayout } from '@layouts';
 import { LoginPage, ChangePasswordPage, CreatePasskeyPage, ForgotPasswordPage, ResetPasswordPage } from '@pages/auth';
-import { DashboardPage, UIComponentsPage, UsersPage, UserDetailPage, UserCreatePage, SettingsPage, RolesPage, RoleFormPage, RoleCreatePage } from '@/pages/admin';
+import { DashboardPage, UIComponentsPage, UsersPage, UserDetailPage, UserCreatePage, SettingsPage, RolesPage, RoleFormPage, RoleCreatePage, RoleDetailPage } from '@/pages/admin';
+import AccessDeniedPage from '@/pages/AccessDeniedPage';
+import PermissionGate from '@/components/PermissionGate';
 import { POSPage } from '@/pages/pos';
 import { TablePOSPage } from '@/pages/pos/table-view';
 import { MailPage } from '@/pages/mail-portal';
@@ -76,12 +78,14 @@ const AppRoutes = () => {
         }
       />
 
-      {/* POS - Protected, full screen (redirects based on saved view preference) */}
+      {/* POS - Protected, full screen */}
       <Route
         path="/pos"
         element={
           <PrivateRoute>
-            <POSRedirect />
+            <PermissionGate permission="pos:access" fallback={<AccessDeniedPage />}>
+              <POSRedirect />
+            </PermissionGate>
           </PrivateRoute>
         }
       />
@@ -91,7 +95,9 @@ const AppRoutes = () => {
         path="/pos/table"
         element={
           <PrivateRoute>
-            <TablePOSPage />
+            <PermissionGate permission="pos:access" fallback={<AccessDeniedPage />}>
+              <TablePOSPage />
+            </PermissionGate>
           </PrivateRoute>
         }
       />
@@ -101,12 +107,14 @@ const AppRoutes = () => {
         path="/mail"
         element={
           <PrivateRoute>
-            <MailPage />
+            <PermissionGate permission="mail:access" fallback={<AccessDeniedPage />}>
+              <MailPage />
+            </PermissionGate>
           </PrivateRoute>
         }
       />
 
-      {/* Protected Routes */}
+      {/* Protected Admin Routes */}
       <Route
         path="/admin"
         element={
@@ -116,15 +124,58 @@ const AppRoutes = () => {
         }
       >
         <Route index element={<Navigate to="dashboard" replace />} />
-        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="dashboard" element={
+          <PermissionGate permission="dashboard:view" fallback={<AccessDeniedPage />}>
+            <DashboardPage />
+          </PermissionGate>
+        } />
         <Route path="ui-components" element={<UIComponentsPage />} />
-        <Route path="users" element={<UsersPage />} />
-        <Route path="users/create" element={<UserCreatePage />} />
-        <Route path="users/:id" element={<UserDetailPage />} />
-        <Route path="settings" element={<SettingsPage />} />
-        <Route path="roles" element={<RolesPage />} />
-        <Route path="roles/create" element={<RoleCreatePage />} />
-        <Route path="roles/:id/edit" element={<RoleFormPage />} />
+
+        {/* Users - permission gated */}
+        <Route path="users" element={
+          <PermissionGate permission="users:read" fallback={<AccessDeniedPage />}>
+            <UsersPage />
+          </PermissionGate>
+        } />
+        <Route path="users/create" element={
+          <PermissionGate permission="users:create" fallback={<AccessDeniedPage />}>
+            <UserCreatePage />
+          </PermissionGate>
+        } />
+        <Route path="users/:id" element={
+          <PermissionGate permission="users:read" fallback={<AccessDeniedPage />}>
+            <UserDetailPage />
+          </PermissionGate>
+        } />
+
+        {/* Settings - permission gated */}
+        <Route path="settings" element={
+          <PermissionGate permission="settings:read" fallback={<AccessDeniedPage />}>
+            <SettingsPage />
+          </PermissionGate>
+        } />
+
+        {/* Roles - permission gated */}
+        <Route path="roles" element={
+          <PermissionGate permission="roles:read" fallback={<AccessDeniedPage />}>
+            <RolesPage />
+          </PermissionGate>
+        } />
+        <Route path="roles/:id" element={
+          <PermissionGate permission="roles:read" fallback={<AccessDeniedPage />}>
+            <RoleDetailPage />
+          </PermissionGate>
+        } />
+        <Route path="roles/create" element={
+          <PermissionGate permission="roles:create" fallback={<AccessDeniedPage />}>
+            <RoleCreatePage />
+          </PermissionGate>
+        } />
+        <Route path="roles/:id/edit" element={
+          <PermissionGate permission="roles:update" fallback={<AccessDeniedPage />}>
+            <RoleFormPage />
+          </PermissionGate>
+        } />
       </Route>
 
       {/* Redirect root to dashboard if authenticated, otherwise to login */}

@@ -1,16 +1,14 @@
-import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { MfaService } from './mfa.service';
 import { VerifyTotpSetupDto } from './dto/enable-totp.dto';
 import { DisableMfaDto } from './dto/disable-mfa.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { RequestUser } from '../common/interfaces/jwt-payload.interface';
 
 @ApiTags('MFA')
 @ApiBearerAuth('access-token')
 @Controller('mfa')
-@UseGuards(JwtAuthGuard)
 export class MfaController {
   constructor(private readonly mfaService: MfaService) {}
 

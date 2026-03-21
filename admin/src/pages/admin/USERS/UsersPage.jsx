@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Search, Plus, Shield } from 'lucide-react';
 import { PageHeader, Table, Badge, Input, Avatar, Button, SplitterLayout } from '@components/ui';
 import { useToast } from '@components/ui/Toast';
+import usePermission from '@/hooks/usePermission';
 import api from '@services/api';
 import API from '@services/endpoints';
 import QUERY_KEY from '@services/queryKeys';
@@ -15,6 +16,11 @@ const UsersPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const toast = useToast();
+  const { hasPermission } = usePermission();
+
+  const canCreate = hasPermission('users:create');
+  const canAssignRole = hasPermission('roles:assign');
+
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchInput, setSearchInput] = useState('');
@@ -110,6 +116,7 @@ const UsersPage = () => {
   };
 
   const handleAddUser = () => {
+    if (!canCreate) return;
     if (isDesktop) {
       setSelectedUserId(null);
       setShowCreateForm(true);
@@ -192,7 +199,8 @@ const UsersPage = () => {
         </span>
       ),
     },
-    {
+    // Only show role assign action if user has permission
+    ...(canAssignRole ? [{
       key: 'actions',
       header: 'Actions',
       width: '80px',
@@ -223,7 +231,7 @@ const UsersPage = () => {
           </button>
         </div>
       ),
-    },
+    }] : []),
   ];
 
   return (
@@ -234,7 +242,9 @@ const UsersPage = () => {
         breadcrumb={{ items: [{ label: 'Users' }] }}
         sticky
       >
-        <Button size="sm" prefixIcon={Plus} onClick={handleAddUser}>Add User</Button>
+        {canCreate && (
+          <Button size="sm" prefixIcon={Plus} onClick={handleAddUser}>Add User</Button>
+        )}
       </PageHeader>
 
       {/* Filters */}
@@ -278,7 +288,7 @@ const UsersPage = () => {
             />
           }
           rightPanel={
-            (showCreateForm && isDesktop) ? (
+            (showCreateForm && isDesktop && canCreate) ? (
               <div className="h-full bg-white dark:bg-[#121212] rounded-2xl border border-gray-100 dark:border-[#424242] shadow-sm overflow-hidden">
                 <UserCreateForm onClose={() => setShowCreateForm(false)} />
               </div>

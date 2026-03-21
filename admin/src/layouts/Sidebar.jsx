@@ -20,10 +20,11 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '@hooks';
+import usePermission from '@/hooks/usePermission';
 import { Tooltip, Dropdown, ConfirmModal } from '@components/ui';
 
-const menuItems = [
-  { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutGrid },
+const allMenuItems = [
+  { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutGrid, permission: 'dashboard:view' },
   { name: 'Tasks', path: '/admin/tasks', icon: ClipboardList, badge: '12+' },
   { name: 'Calendar', path: '/admin/calendar', icon: Calendar },
   { name: 'Analytics', path: '/admin/analytics', icon: BarChart3 },
@@ -31,21 +32,31 @@ const menuItems = [
   { name: 'UI Components', path: '/admin/ui-components', icon: Palette },
 ];
 
-const userItems = [
-  { name: 'All Users', path: '/admin/users', icon: UsersRound },
+const allUserItems = [
+  { name: 'All Users', path: '/admin/users', icon: UsersRound, permission: 'users:read' },
 ];
 
-const roleItems = [
-  { name: 'Roles & Permissions', path: '/admin/roles', icon: ShieldCheck },
+const allRoleItems = [
+  { name: 'Roles & Permissions', path: '/admin/roles', icon: ShieldCheck, permission: 'roles:read' },
 ];
 
-const generalItems = [
-  { name: 'Settings', path: '/admin/settings', icon: Settings },
+const allGeneralItems = [
+  { name: 'Settings', path: '/admin/settings', icon: Settings, permission: 'settings:read' },
   { name: 'Help', path: '/admin/help', icon: HelpCircle },
 ];
 
 const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) => {
   const { logout, user } = useAuth();
+  const { hasPermission } = usePermission();
+
+  // Filter items based on permissions
+  const filterByPermission = (items) =>
+    items.filter((item) => !item.permission || hasPermission(item.permission));
+
+  const menuItems = filterByPermission(allMenuItems);
+  const userItems = filterByPermission(allUserItems);
+  const roleItems = filterByPermission(allRoleItems);
+  const generalItems = filterByPermission(allGeneralItems);
   const [logoHovered, setLogoHovered] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -193,6 +204,7 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
         </ul>
 
         {/* Users Section */}
+        {userItems.length > 0 && (<>
         {!isCollapsed && (
           <div className="px-4 mb-2">
             <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Users</span>
@@ -239,8 +251,10 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
             );
           })}
         </ul>
+        </>)}
 
         {/* Role Management Section */}
+        {roleItems.length > 0 && (<>
         {!isCollapsed && (
           <div className="px-4 mb-2">
             <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Role Management</span>
@@ -287,6 +301,7 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
             );
           })}
         </ul>
+        </>)}
 
         {/* General Section */}
         {!isCollapsed && (

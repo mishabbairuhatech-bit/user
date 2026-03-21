@@ -33,11 +33,18 @@ const PERMISSIONS_SEED = [
   // Settings
   { module: 'settings', action: 'read', slug: 'settings:read', description: 'View system settings' },
   { module: 'settings', action: 'update', slug: 'settings:update', description: 'Modify system settings' },
+  { module: 'settings', action: 'notifications', slug: 'settings:notifications', description: 'Manage notification preferences' },
+  { module: 'settings', action: 'security', slug: 'settings:security', description: 'Manage security settings' },
+  { module: 'settings', action: 'account', slug: 'settings:account', description: 'Manage account settings' },
 
   // Mail
   { module: 'mail', action: 'access', slug: 'mail:access', description: 'Access the mail portal' },
   { module: 'mail', action: 'send', slug: 'mail:send', description: 'Send emails' },
   { module: 'mail', action: 'manage', slug: 'mail:manage', description: 'Manage mail templates and settings' },
+
+  // Notifications
+  { module: 'notifications', action: 'read', slug: 'notifications:read', description: 'View notifications' },
+  { module: 'notifications', action: 'update', slug: 'notifications:update', description: 'Manage notifications' },
 
   // Dashboard
   { module: 'dashboard', action: 'view', slug: 'dashboard:view', description: 'View the dashboard' },
@@ -61,8 +68,9 @@ const ROLES_SEED = [
       'roles:read',
       'pos:access', 'pos:manage', 'pos:refund', 'pos:hold_bills', 'pos:returns',
       'reports:view', 'reports:export',
-      'settings:read', 'settings:update',
+      'settings:read', 'settings:update', 'settings:notifications', 'settings:security', 'settings:account',
       'mail:access', 'mail:send', 'mail:manage',
+      'notifications:read', 'notifications:update',
       'dashboard:view',
     ],
   },
@@ -75,6 +83,7 @@ const ROLES_SEED = [
       'users:read',
       'pos:access', 'pos:manage', 'pos:refund', 'pos:hold_bills', 'pos:returns',
       'reports:view', 'reports:export',
+      'notifications:read',
       'dashboard:view',
     ],
   },

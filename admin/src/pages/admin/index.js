@@ -7,3 +7,4 @@ export { default as SettingsPage } from './SETTINGS/SettingsPage';
 export { default as RolesPage } from './ROLES/RolesPage';
 export { default as RoleFormPage } from './ROLES/RoleFormPage';
 export { default as RoleCreatePage } from './ROLES/components/RoleCreatePage';
+export { default as RoleDetailPage } from './ROLES/components/RoleDetailPage';

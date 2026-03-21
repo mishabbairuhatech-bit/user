@@ -5,7 +5,6 @@ import {
   Delete,
   Body,
   Param,
-  UseGuards,
   Req,
   Res,
   HttpCode,
@@ -21,7 +20,6 @@ import {
   AuthenticatePasskeyVerifyDto,
 } from './dto/authenticate-passkey.dto';
 import { VerifyPasswordDto } from './dto/verify-password.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { Public } from '../common/decorators/public.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { RequestUser } from '../common/interfaces/jwt-payload.interface';
@@ -36,7 +34,6 @@ export class PasskeyController {
 
   @Post('verify-password')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Verify user password before passkey registration' })
   @ApiResponse({ status: 200, description: 'Password verified successfully.' })
@@ -52,7 +49,6 @@ export class PasskeyController {
 
   @Post('register/options')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get WebAuthn registration options' })
   @ApiResponse({ status: 200, description: 'Registration options for WebAuthn credential creation.' })
@@ -64,7 +60,6 @@ export class PasskeyController {
 
   @Post('register/verify')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Verify WebAuthn registration and store passkey' })
   @ApiResponse({ status: 200, description: 'Passkey registered successfully.' })
@@ -126,7 +121,6 @@ export class PasskeyController {
   // ── Management (requires auth) ──
 
   @Get('list')
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'List all registered passkeys for current user' })
   @ApiResponse({ status: 200, description: 'List of registered passkeys.' })
@@ -137,7 +131,6 @@ export class PasskeyController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Delete a registered passkey' })
   @ApiParam({ name: 'id', description: 'Passkey ID to delete' })

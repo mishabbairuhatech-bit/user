@@ -60,7 +60,7 @@ const AccountSettings = () => {
         <div className="flex-1">
           <h4 className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Role</h4>
           <p className="text-sm text-gray-900 dark:text-white capitalize">
-            {user?.role || 'User'}
+            {user?.role?.name || 'User'}
           </p>
         </div>
       </div>

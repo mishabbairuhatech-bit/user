@@ -5,6 +5,7 @@ import { X, Maximize2, Shield, ShieldCheck, Trash2 } from 'lucide-react';
 import { Badge, Spinner, Button } from '@components/ui';
 import { ConfirmModal } from '@components/ui';
 import { useToast } from '@components/ui/Toast';
+import usePermission from '@/hooks/usePermission';
 import api from '@services/api';
 import API from '@services/endpoints';
 import QUERY_KEY from '@services/queryKeys';
@@ -13,7 +14,11 @@ const RoleDetailPanel = ({ roleId, onClose }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const toast = useToast();
+  const { hasPermission } = usePermission();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const canUpdate = hasPermission('roles:update');
+  const canDelete = hasPermission('roles:delete');
 
   const { data, isLoading } = useQuery({
     queryKey: [QUERY_KEY.ROLES_DETAIL, roleId],
@@ -71,9 +76,9 @@ const RoleDetailPanel = ({ roleId, onClose }) => {
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Role Details</h3>
         <div className="flex items-center gap-1">
           <button
-            onClick={() => navigate(`/admin/roles/${roleId}/edit`)}
+            onClick={() => navigate(`/admin/roles/${roleId}`)}
             className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2a2a2a] transition-colors"
-            title="Edit in full page"
+            title="Expand"
           >
             <Maximize2 size={14} className="text-gray-500" />
           </button>

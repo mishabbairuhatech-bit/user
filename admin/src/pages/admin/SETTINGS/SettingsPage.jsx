@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   Bell,
@@ -6,21 +6,31 @@ import {
   UserCircle,
 } from 'lucide-react';
 import { PageHeader } from '@components/ui';
+import usePermission from '@/hooks/usePermission';
 import SecuritySettings from './SecuritySettings';
 import AccountSettings from './AccountSettings';
 
-const settingsTabs = [
-  { id: 'notifications', label: 'Notifications', icon: Bell },
-  { id: 'security', label: 'Security', icon: Shield },
-  { id: 'account', label: 'Account', icon: UserCircle },
+const allSettingsTabs = [
+  { id: 'notifications', label: 'Notifications', icon: Bell, permission: 'settings:notifications' },
+  { id: 'security', label: 'Security', icon: Shield, permission: 'settings:security' },
+  { id: 'account', label: 'Account', icon: UserCircle, permission: 'settings:account' },
 ];
-
-const validTabIds = settingsTabs.map((t) => t.id);
 
 const SettingsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { hasPermission } = usePermission();
+
+  // Filter tabs based on permissions
+  const settingsTabs = useMemo(
+    () => allSettingsTabs.filter((tab) => !tab.permission || hasPermission(tab.permission)),
+    [hasPermission],
+  );
+
+  const validTabIds = settingsTabs.map((t) => t.id);
   const tabParam = searchParams.get('tab');
-  const activeTab = validTabIds.includes(tabParam) ? tabParam : 'notifications';
+  const activeTab = validTabIds.includes(tabParam) ? tabParam : validTabIds[0] || 'notifications';
+
+  const canUpdate = hasPermission('settings:update');
 
   const setActiveTab = useCallback((tabId) => {
     setSearchParams({ tab: tabId }, { replace: true });
@@ -96,9 +106,9 @@ const SettingsPage = () => {
               </div>
             )}
 
-            {activeTab === 'security' && <SecuritySettings />}
+            {activeTab === 'security' && <SecuritySettings readOnly={!canUpdate} />}
 
-            {activeTab === 'account' && <AccountSettings />}
+            {activeTab === 'account' && <AccountSettings readOnly={!canUpdate} />}
 
           </div>
         </div>

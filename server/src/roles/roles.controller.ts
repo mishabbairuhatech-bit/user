@@ -6,11 +6,9 @@ import {
   Delete,
   Param,
   Body,
-  UseGuards,
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RequirePermissions } from '../common/decorators/require-permissions.decorator';
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -19,14 +17,13 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 @ApiTags('Roles')
 @ApiBearerAuth('access-token')
 @Controller('roles')
-@UseGuards(JwtAuthGuard)
 export class RolesController {
   constructor(private readonly rolesService: RolesService) { }
 
   // ─── Permissions (placed before :id routes to avoid conflict) ──
 
   @Get('permissions/all')
-  // @RequirePermissions('roles:read')
+  @RequirePermissions('roles:read')
   @ApiOperation({ summary: 'List all permissions (flat)' })
   @ApiResponse({ status: 200, description: 'List of all permissions.' })
   findAllPermissions() {
@@ -34,7 +31,7 @@ export class RolesController {
   }
 
   @Get('permissions/grouped')
-  // @RequirePermissions('roles:read')
+  @RequirePermissions('roles:read')
   @ApiOperation({ summary: 'List permissions grouped by module' })
   @ApiResponse({ status: 200, description: 'Permissions grouped by module.' })
   getPermissionsGrouped() {
@@ -44,7 +41,7 @@ export class RolesController {
   // ─── Roles CRUD ───────────────────────────────────────────
 
   @Post()
-  // @RequirePermissions('roles:create')
+  @RequirePermissions('roles:create')
   @ApiOperation({ summary: 'Create a new role' })
   @ApiResponse({ status: 201, description: 'Role created successfully.' })
   @ApiResponse({ status: 400, description: 'Slug already exists or invalid permission IDs.' })
@@ -53,7 +50,7 @@ export class RolesController {
   }
 
   @Get()
-  // @RequirePermissions('roles:read')
+  @RequirePermissions('roles:read')
   @ApiOperation({ summary: 'List all roles with their permissions' })
   @ApiResponse({ status: 200, description: 'List of all roles.' })
   findAll() {
@@ -61,7 +58,7 @@ export class RolesController {
   }
 
   @Get(':id')
-  // @RequirePermissions('roles:read')
+  @RequirePermissions('roles:read')
   @ApiOperation({ summary: 'Get a single role by ID' })
   @ApiParam({ name: 'id', description: 'Role UUID' })
   @ApiResponse({ status: 200, description: 'Role details returned.' })
@@ -71,7 +68,7 @@ export class RolesController {
   }
 
   @Patch(':id')
-  // @RequirePermissions('roles:update')
+  @RequirePermissions('roles:update')
   @ApiOperation({ summary: 'Update a role' })
   @ApiParam({ name: 'id', description: 'Role UUID' })
   @ApiResponse({ status: 200, description: 'Role updated successfully.' })
@@ -82,7 +79,7 @@ export class RolesController {
   }
 
   @Delete(':id')
-  // @RequirePermissions('roles:delete')
+  @RequirePermissions('roles:delete')
   @ApiOperation({ summary: 'Delete a non-system role' })
   @ApiParam({ name: 'id', description: 'Role UUID' })
   @ApiResponse({ status: 200, description: 'Role deleted successfully.' })

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Search, Plus, Shield, ShieldCheck, Lock, Edit, Trash2 } from 'lucide-react';
 import { PageHeader, Table, Badge, Input, Button, SplitterLayout } from '@components/ui';
+import usePermission from '@/hooks/usePermission';
 import api from '@services/api';
 import API from '@services/endpoints';
 import QUERY_KEY from '@services/queryKeys';
@@ -12,12 +13,17 @@ import RoleEditPanel from './components/RoleEditPanel';
 
 const RolesPage = () => {
   const navigate = useNavigate();
+  const { hasPermission } = usePermission();
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedRoleId, setSelectedRoleId] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editRoleId, setEditRoleId] = useState(null);
   const [isDesktop, setIsDesktop] = useState(false);
+
+  const canCreate = hasPermission('roles:create');
+  const canUpdate = hasPermission('roles:update');
+  const canDelete = hasPermission('roles:delete');
 
   useEffect(() => {
     const checkScreen = () => setIsDesktop(window.innerWidth >= 1280);
@@ -55,7 +61,7 @@ const RolesPage = () => {
       setEditRoleId(null);
       setSelectedRoleId(selectedRoleId === row.id ? null : row.id);
     } else {
-      navigate(`/admin/roles/${row.id}/edit`);
+      navigate(`/admin/roles/${row.id}`);
     }
   };
 
@@ -156,7 +162,8 @@ const RolesPage = () => {
         </Badge>
       ),
     },
-    {
+    // Only show actions column if user has edit or delete permission
+    ...(canUpdate || canDelete ? [{
       key: 'actions',
       header: 'Actions',
       width: '120px',
@@ -165,34 +172,38 @@ const RolesPage = () => {
         const isSuperAdmin = row.slug === 'super_admin';
         return (
           <div className="flex items-center gap-2">
-            <button
-              onClick={(e) => { e.stopPropagation(); if (!isSuperAdmin) handleEditRole(row); }}
-              className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                isSuperAdmin
-                  ? 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-300 dark:text-gray-600 cursor-not-allowed'
-                  : 'bg-gray-100 dark:bg-[#2a2a2a] hover:bg-gray-200 dark:hover:bg-[#3a3a3a] text-gray-500 dark:text-gray-400'
-              }`}
-              disabled={isSuperAdmin}
-              title={isSuperAdmin ? 'Super Admin cannot be edited' : 'Edit role'}
-            >
-              <Edit className="w-4 h-4" />
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); }}
-              className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                isSuperAdmin
-                  ? 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-300 dark:text-gray-600 cursor-not-allowed'
-                  : 'bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 dark:text-red-400'
-              }`}
-              disabled={isSuperAdmin}
-              title={isSuperAdmin ? 'Super Admin cannot be deleted' : 'Delete role'}
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+            {canUpdate && (
+              <button
+                onClick={(e) => { e.stopPropagation(); if (!isSuperAdmin) handleEditRole(row); }}
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                  isSuperAdmin
+                    ? 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                    : 'bg-gray-100 dark:bg-[#2a2a2a] hover:bg-gray-200 dark:hover:bg-[#3a3a3a] text-gray-500 dark:text-gray-400'
+                }`}
+                disabled={isSuperAdmin}
+                title={isSuperAdmin ? 'Super Admin cannot be edited' : 'Edit role'}
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+            )}
+            {canDelete && (
+              <button
+                onClick={(e) => { e.stopPropagation(); }}
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                  isSuperAdmin
+                    ? 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                    : 'bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 dark:text-red-400'
+                }`}
+                disabled={isSuperAdmin}
+                title={isSuperAdmin ? 'Super Admin cannot be deleted' : 'Delete role'}
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            )}
           </div>
         );
       },
-    },
+    }] : []),
   ];
 
   return (
@@ -203,7 +214,9 @@ const RolesPage = () => {
         breadcrumb={{ items: [{ label: 'Roles & Permissions' }] }}
         sticky
       >
-        <Button size="sm" prefixIcon={Plus} onClick={handleAddRole}>Create Role</Button>
+        {canCreate && (
+          <Button size="sm" prefixIcon={Plus} onClick={handleAddRole}>Create Role</Button>
+        )}
       </PageHeader>
 
       {/* Filters */}
@@ -237,11 +250,11 @@ const RolesPage = () => {
             />
           }
           rightPanel={
-            (showCreateForm && isDesktop) ? (
+            (showCreateForm && isDesktop && canCreate) ? (
               <div className="h-full bg-white dark:bg-[#121212] rounded-2xl border border-gray-100 dark:border-[#424242] shadow-sm overflow-hidden">
                 <RoleCreateForm onClose={() => setShowCreateForm(false)} />
               </div>
-            ) : (editRoleId && isDesktop) ? (
+            ) : (editRoleId && isDesktop && canUpdate) ? (
               <div className="h-full bg-white dark:bg-[#121212] rounded-2xl border border-gray-100 dark:border-[#424242] shadow-sm overflow-hidden">
                 <RoleEditPanel
                   roleId={editRoleId}
