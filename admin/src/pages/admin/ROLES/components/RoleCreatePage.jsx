@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, ChevronDown, ChevronRight } from 'lucide-react';
 import { PageHeader, Button, Card, Input } from '@components/ui';
@@ -13,24 +14,30 @@ const RoleCreatePage = () => {
   const queryClient = useQueryClient();
   const toast = useToast();
 
-  const [name, setName] = useState('');
-  const [slug, setSlug] = useState('');
-  const [description, setDescription] = useState('');
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
+    defaultValues: {
+      name: '',
+      slug: '',
+      description: '',
+    },
+  });
+
   const [selectedPermissions, setSelectedPermissions] = useState(new Set());
   const [expandedModules, setExpandedModules] = useState(new Set());
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
-  const [errors, setErrors] = useState({});
 
   const { data: permissionsGrouped = {} } = useQuery({
     queryKey: [QUERY_KEY.PERMISSIONS_GROUPED],
     queryFn: () => api.get(API.PERMISSIONS_GROUPED).then((res) => res.data.data || res.data),
   });
 
+  const nameValue = watch('name');
+
   useEffect(() => {
-    if (!slugManuallyEdited && name) {
-      setSlug(name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, ''));
+    if (!slugManuallyEdited && nameValue) {
+      setValue('slug', nameValue.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, ''));
     }
-  }, [name, slugManuallyEdited]);
+  }, [nameValue, slugManuallyEdited, setValue]);
 
   const moduleNames = useMemo(() => Object.keys(permissionsGrouped).sort(), [permissionsGrouped]);
 
@@ -63,14 +70,6 @@ const RoleCreatePage = () => {
     });
   };
 
-  const validate = () => {
-    const errs = {};
-    if (!name.trim()) errs.name = 'Name is required';
-    if (!slug.trim()) errs.slug = 'Slug is required';
-    setErrors(errs);
-    return Object.keys(errs).length === 0;
-  };
-
   const mutation = useMutation({
     mutationFn: (data) => api.post(API.ROLES_CREATE, data),
     onSuccess: () => {
@@ -84,13 +83,11 @@ const RoleCreatePage = () => {
     },
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+  const onSubmit = (data) => {
     mutation.mutate({
-      name: name.trim(),
-      slug: slug.trim(),
-      description: description.trim() || undefined,
+      name: data.name.trim(),
+      slug: data.slug.trim(),
+      description: data.description.trim() || undefined,
       permission_ids: Array.from(selectedPermissions),
     });
   };
@@ -115,28 +112,30 @@ const RoleCreatePage = () => {
 
       <Card>
         <Card.Body>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
                 label="Name"
+                required
                 placeholder="e.g. Manager"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                error={errors.name}
+                error={errors.name?.message}
+                {...register('name', { required: 'Name is required' })}
               />
               <Input
                 label="Slug"
+                required
                 placeholder="e.g. manager"
-                value={slug}
-                onChange={(e) => { setSlug(e.target.value); setSlugManuallyEdited(true); }}
-                error={errors.slug}
+                error={errors.slug?.message}
+                {...register('slug', {
+                  required: 'Slug is required',
+                  onChange: () => setSlugManuallyEdited(true),
+                })}
               />
             </div>
             <Input
               label="Description"
               placeholder="What is this role for?"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              {...register('description')}
             />
 
             {/* Permissions Picker */}

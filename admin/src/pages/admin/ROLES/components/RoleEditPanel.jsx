@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { X, Maximize2 } from 'lucide-react';
 import { Input, Button, Spinner, Collapse, Checkbox } from '@components/ui';
@@ -13,11 +14,15 @@ const RoleEditPanel = ({ roleId, onClose }) => {
   const queryClient = useQueryClient();
   const toast = useToast();
 
-  const [name, setName] = useState('');
-  const [slug, setSlug] = useState('');
-  const [description, setDescription] = useState('');
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+    defaultValues: {
+      name: '',
+      slug: '',
+      description: '',
+    },
+  });
+
   const [selectedPermissions, setSelectedPermissions] = useState(new Set());
-  const [errors, setErrors] = useState({});
 
   const { data: existingRole, isLoading: roleLoading } = useQuery({
     queryKey: [QUERY_KEY.ROLES_DETAIL, roleId],
@@ -32,12 +37,14 @@ const RoleEditPanel = ({ roleId, onClose }) => {
 
   useEffect(() => {
     if (existingRole) {
-      setName(existingRole.name);
-      setSlug(existingRole.slug);
-      setDescription(existingRole.description || '');
+      reset({
+        name: existingRole.name,
+        slug: existingRole.slug,
+        description: existingRole.description || '',
+      });
       setSelectedPermissions(new Set(existingRole.permissions?.map((p) => p.id) || []));
     }
-  }, [existingRole]);
+  }, [existingRole, reset]);
 
   const moduleNames = useMemo(() => Object.keys(permissionsGrouped).sort(), [permissionsGrouped]);
 
@@ -61,14 +68,6 @@ const RoleEditPanel = ({ roleId, onClose }) => {
     });
   };
 
-  const validate = () => {
-    const errs = {};
-    if (!name.trim()) errs.name = 'Name is required';
-    if (!slug.trim()) errs.slug = 'Slug is required';
-    setErrors(errs);
-    return Object.keys(errs).length === 0;
-  };
-
   const mutation = useMutation({
     mutationFn: (data) => api.patch(`${API.ROLES_UPDATE}/${roleId}`, data),
     onSuccess: () => {
@@ -83,13 +82,11 @@ const RoleEditPanel = ({ roleId, onClose }) => {
     },
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+  const onSubmit = (data) => {
     mutation.mutate({
-      name: name.trim(),
-      slug: slug.trim(),
-      description: description.trim() || undefined,
+      name: data.name.trim(),
+      slug: data.slug.trim(),
+      description: data.description.trim() || undefined,
       permission_ids: Array.from(selectedPermissions),
     });
   };
@@ -126,32 +123,31 @@ const RoleEditPanel = ({ roleId, onClose }) => {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col min-h-0">
         <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-4">
           <div className="space-y-3">
             <Input
               label="Name"
+              required
               placeholder="e.g. Manager"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              error={errors.name}
+              error={errors.name?.message}
               size="sm"
+              {...register('name', { required: 'Name is required' })}
             />
             <Input
               label="Slug"
+              required
               placeholder="e.g. manager"
-              value={slug}
-              onChange={(e) => setSlug(e.target.value)}
-              error={errors.slug}
+              error={errors.slug?.message}
               size="sm"
               disabled={existingRole?.is_system}
+              {...register('slug', { required: 'Slug is required' })}
             />
             <Input
               label="Description"
               placeholder="What is this role for?"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
               size="sm"
+              {...register('description')}
             />
 
             {/* Permissions Picker */}

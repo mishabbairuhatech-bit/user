@@ -29,9 +29,12 @@ const Select = forwardRef(({
   onChange,
   placeholder = 'Select an option',
   error,
+  required = false,
   disabled = false,
   clearable = true,
   searchable = false,
+  onSearch,
+  loading = false,
   size = 'md',
   className = '',
   ...props
@@ -43,11 +46,14 @@ const Select = forwardRef(({
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef(null);
   const inputRef = useRef(null);
+  const debounceRef = useRef(null);
 
   const sizes = sizeClasses[size] || sizeClasses.md;
   const selectedOption = options.find(opt => opt.value === value);
 
-  const filteredOptions = searchable
+  // When onSearch is provided, use server-side search (no client filter)
+  // When onSearch is NOT provided, filter client-side
+  const filteredOptions = (searchable && !onSearch)
     ? options.filter(opt =>
         opt.label.toLowerCase().includes(searchTerm.toLowerCase())
       )
@@ -79,7 +85,10 @@ const Select = forwardRef(({
     if (isOpen && searchable && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [isOpen, searchable]);
+    if (isOpen && onSearch) {
+      onSearch('');
+    }
+  }, [isOpen]);
 
   const handleSelect = (option) => {
     onChange(option.value);
@@ -105,14 +114,14 @@ const Select = forwardRef(({
     <div className="w-full" ref={containerRef}>
       {label && (
         <label className={`block font-medium text-black dark:text-[rgba(255,255,255,0.85)] mb-1 ${sizes.label}`}>
-          {label}
+          {label}{required && <span className="text-red-500 ml-0.5">*</span>}
         </label>
       )}
       <div
         ref={ref}
         className={`
           relative w-full border rounded-xl shadow-sm cursor-pointer
-          bg-white dark:bg-[#121212]
+          bg-white dark:bg-[#121212] flex items-center justify-between
           ${sizes.input}
           ${disabled ? 'bg-gray-100 dark:bg-[#2a2a2a] cursor-not-allowed' : ''}
           ${error ? 'border-red-500 focus-within:ring-red-500 focus-within:border-red-500' : 'border-gray-300 dark:border-[#424242] focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500'}
@@ -121,37 +130,42 @@ const Select = forwardRef(({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         {...props}
       >
-        <div className="flex items-center justify-between">
-          {isOpen && searchable ? (
-            <input
-              ref={inputRef}
-              type="text"
-              className="flex-1 outline-none bg-transparent"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onClick={(e) => e.stopPropagation()}
-              placeholder={selectedOption ? selectedOption.label : placeholder}
+        {isOpen && searchable ? (
+          <input
+            ref={inputRef}
+            type="text"
+            className="flex-1 outline-none bg-transparent"
+            value={searchTerm}
+            onChange={(e) => {
+              const val = e.target.value;
+              setSearchTerm(val);
+              if (onSearch) {
+                clearTimeout(debounceRef.current);
+                debounceRef.current = setTimeout(() => onSearch(val), 400);
+              }
+            }}
+            onKeyDown={handleKeyDown}
+            onClick={(e) => e.stopPropagation()}
+            placeholder={selectedOption ? selectedOption.label : placeholder}
+          />
+        ) : (
+          <span className={selectedOption ? 'text-black dark:text-[rgba(255,255,255,0.85)]' : 'text-gray-400'}>
+            {selectedOption ? selectedOption.label : placeholder}
+          </span>
+        )}
+        <div
+          className={`relative flex items-center justify-center ${sizes.iconWrapper}`}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          {clearable && selectedOption && !disabled && isHovered ? (
+            <CircleX
+              className={`${sizes.icon} text-gray-400 cursor-pointer`}
+              onClick={handleClear}
             />
           ) : (
-            <span className={selectedOption ? 'text-black dark:text-[rgba(255,255,255,0.85)]' : 'text-gray-400'}>
-              {selectedOption ? selectedOption.label : placeholder}
-            </span>
+            <ChevronDown className={`${sizes.icon} text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
           )}
-          <div
-            className={`relative flex items-center justify-center ${sizes.iconWrapper}`}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-          >
-            {clearable && selectedOption && !disabled && isHovered ? (
-              <CircleX
-                className={`${sizes.icon} text-gray-400 cursor-pointer`}
-                onClick={handleClear}
-              />
-            ) : (
-              <ChevronDown className={`${sizes.icon} text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-            )}
-          </div>
         </div>
 
         {isOpen && !disabled && (
@@ -165,8 +179,10 @@ const Select = forwardRef(({
               }
             `}</style>
             <div className="hide-scrollbar">
-              {filteredOptions.length === 0 ? (
-                <div className="px-3 py-2 text-gray-500 text-sm">No options found</div>
+              {loading ? (
+                <div className="px-3 py-3 text-gray-400 text-sm text-center">Searching...</div>
+              ) : filteredOptions.length === 0 ? (
+                <div className="px-3 py-2 text-gray-500 text-sm">{searchTerm ? 'No results found' : 'No options'}</div>
               ) : (
                 filteredOptions.map((option) => (
                   <div

@@ -1,13 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useForm } from 'react-hook-form';
-import { ArrowUpRight, Shield, Key, Fingerprint } from 'lucide-react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { AuthLayout } from '@layouts';
-import { Button, Input, Checkbox } from '@components/ui';
+import { Button, Checkbox, Input } from '@components/ui';
 import { useAuth } from '@hooks';
+import { AuthLayout } from '@layouts';
 import api from '@services/api';
 import API from '@services/endpoints';
 import { startAuthentication } from '@simplewebauthn/browser';
+import { Fingerprint, Shield } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 // Google Icon Component
 const GoogleIcon = () => (

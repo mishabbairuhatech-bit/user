@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm, Controller } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Maximize2 } from 'lucide-react';
 import { Input, Button, Select, MultiSelect } from '@components/ui';
@@ -37,23 +37,23 @@ const languageOptions = [
   { value: 'hi', label: 'Hindi' },
 ];
 
-const initialForm = {
-  first_name: '',
-  last_name: '',
-  email: '',
-  password: '',
-  phone: '',
-  timezone: 'UTC',
-  language: ['en'],
-  role_id: '',
-};
-
 const UserCreateForm = ({ onClose }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const toast = useToast();
-  const [form, setForm] = useState(initialForm);
-  const [errors, setErrors] = useState({});
+
+  const { register, handleSubmit, control, formState: { errors }, setError } = useForm({
+    defaultValues: {
+      first_name: '',
+      last_name: '',
+      email: '',
+      password: '',
+      phone: '',
+      timezone: 'UTC',
+      language: ['en'],
+      role_id: '',
+    },
+  });
 
   const { data: roles = [] } = useQuery({
     queryKey: [QUERY_KEY.ROLES_LIST],
@@ -65,25 +65,6 @@ const UserCreateForm = ({ onClose }) => {
 
   const roleOptions = roles.map((r) => ({ value: r.id, label: r.name }));
 
-  const handleChange = (field) => (e) => {
-    setForm((prev) => ({ ...prev, [field]: e.target.value }));
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
-    }
-  };
-
-  const validate = () => {
-    const errs = {};
-    if (!form.first_name.trim()) errs.first_name = 'First name is required';
-    if (!form.last_name.trim()) errs.last_name = 'Last name is required';
-    if (!form.email.trim()) errs.email = 'Email is required';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = 'Invalid email address';
-    if (!form.password) errs.password = 'Password is required';
-    else if (form.password.length < 8) errs.password = 'Password must be at least 8 characters';
-    setErrors(errs);
-    return Object.keys(errs).length === 0;
-  };
-
   const mutation = useMutation({
     mutationFn: (data) => api.post(API.USERS_CREATE, data),
     onSuccess: () => {
@@ -94,27 +75,24 @@ const UserCreateForm = ({ onClose }) => {
     onError: (err) => {
       const message = err.response?.data?.message || 'Failed to create user';
       if (err.response?.status === 409) {
-        setErrors((prev) => ({ ...prev, email: message }));
+        setError('email', { message });
       } else {
         toast.error(message);
       }
     },
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!validate()) return;
-
+  const onSubmit = (data) => {
     const payload = {
-      first_name: form.first_name.trim(),
-      last_name: form.last_name.trim(),
-      email: form.email.trim(),
-      password: form.password,
+      first_name: data.first_name.trim(),
+      last_name: data.last_name.trim(),
+      email: data.email.trim(),
+      password: data.password,
     };
-    if (form.phone.trim()) payload.phone = form.phone.trim();
-    if (form.timezone) payload.timezone = form.timezone;
-    if (form.language && form.language.length > 0) payload.language = form.language[0];
-    if (form.role_id) payload.role_id = form.role_id;
+    if (data.phone.trim()) payload.phone = data.phone.trim();
+    if (data.timezone) payload.timezone = data.timezone;
+    if (data.language && data.language.length > 0) payload.language = data.language[0];
+    if (data.role_id) payload.role_id = data.role_id;
 
     mutation.mutate(payload);
   };
@@ -134,77 +112,103 @@ const UserCreateForm = ({ onClose }) => {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col min-h-0">
         <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-4">
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-2">
               <Input
                 label="First Name"
+                required
                 placeholder="John"
-                value={form.first_name}
-                onChange={handleChange('first_name')}
-                error={errors.first_name}
+                error={errors.first_name?.message}
                 size="sm"
+                {...register('first_name', { required: 'First name is required' })}
               />
               <Input
                 label="Last Name"
+                required
                 placeholder="Doe"
-                value={form.last_name}
-                onChange={handleChange('last_name')}
-                error={errors.last_name}
+                error={errors.last_name?.message}
                 size="sm"
+                {...register('last_name', { required: 'Last name is required' })}
               />
             </div>
             <Input
               label="Email"
+              required
               type="email"
               placeholder="john@example.com"
-              value={form.email}
-              onChange={handleChange('email')}
-              error={errors.email}
+              error={errors.email?.message}
               size="sm"
+              {...register('email', {
+                required: 'Email is required',
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: 'Invalid email address',
+                },
+              })}
             />
             <Input
               label="Password"
+              required
               type="password"
               placeholder="Min 8 characters"
-              value={form.password}
-              onChange={handleChange('password')}
-              error={errors.password}
+              error={errors.password?.message}
               size="sm"
+              {...register('password', {
+                required: 'Password is required',
+                minLength: { value: 8, message: 'Password must be at least 8 characters' },
+              })}
             />
             <Input
               label="Phone"
               placeholder="+1234567890"
-              value={form.phone}
-              onChange={handleChange('phone')}
-              error={errors.phone}
+              error={errors.phone?.message}
               size="sm"
+              {...register('phone')}
             />
-            <Select
-              label="Role"
-              options={roleOptions}
-              value={form.role_id}
-              onChange={(val) => setForm((prev) => ({ ...prev, role_id: val }))}
-              placeholder="Select a role"
-              size="sm"
+            <Controller
+              name="role_id"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  label="Role"
+                  options={roleOptions}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="Select a role"
+                  size="sm"
+                />
+              )}
             />
             <div className="grid grid-cols-2 gap-2">
-              <Select
-                label="Timezone"
-                options={timezoneOptions}
-                value={form.timezone}
-                onChange={(val) => setForm((prev) => ({ ...prev, timezone: val }))}
-                error={errors.timezone}
-                size="sm"
+              <Controller
+                name="timezone"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    label="Timezone"
+                    options={timezoneOptions}
+                    value={field.value}
+                    onChange={field.onChange}
+                    error={errors.timezone?.message}
+                    size="sm"
+                  />
+                )}
               />
-              <MultiSelect
-                label="Language"
-                options={languageOptions}
-                value={form.language}
-                onChange={(val) => setForm((prev) => ({ ...prev, language: val }))}
-                error={errors.language}
-                size="sm"
+              <Controller
+                name="language"
+                control={control}
+                render={({ field }) => (
+                  <MultiSelect
+                    label="Language"
+                    options={languageOptions}
+                    value={field.value}
+                    onChange={field.onChange}
+                    error={errors.language?.message}
+                    size="sm"
+                  />
+                )}
               />
             </div>
           </div>

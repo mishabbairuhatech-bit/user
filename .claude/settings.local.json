@@ -21,7 +21,17 @@
       "Bash(kill 4339)",
       "Bash(pkill -f \"ts-node src/main.ts\")",
       "Bash(pkill -f nodemon)",
-      "Bash(npx ts-node:*)"
+      "Bash(npx ts-node:*)",
+      "Bash(find /Users/bairuhatechllp/Desktop/Projects/user/admin/src/pages/admin/ROLES -type f -name *.jsx -o -name *.js)",
+      "Bash(find /Users/bairuhatechllp/Desktop/Projects/user/admin/src/pages/admin/USERS -type f -name *.jsx -o -name *.js)",
+      "Bash(grep -rn \"vendor-all\\\\|customer-all\\\\|customer-all-for\" /Users/bairuhatechllp/Desktop/Projects/user/admin/src/pages/admin/ --include=*.jsx)",
+      "Bash(grep -rn type=\"\"date\"\" /Users/bairuhatechllp/Desktop/Projects/user/admin/src/pages/admin/ --include=*.jsx)",
+      "Bash(xargs sed:*)",
+      "Bash(grep -rn 'limit: 500' /Users/bairuhatechllp/Desktop/Projects/user/admin/src/pages/ --include=*.jsx --include=*.js)",
+      "Bash(ls:*)",
+      "Bash(grep -l \"useForm\\\\|react-hook-form\" /Users/bairuhatechllp/Desktop/Projects/user/admin/src/pages/admin/INVENTORY/components/*.jsx /Users/bairuhatechllp/Desktop/Projects/user/admin/src/pages/admin/SALES/components/*.jsx /Users/bairuhatechllp/Desktop/Projects/user/admin/src/pages/admin/PURCHASES/components/*.jsx /Users/bairuhatechllp/Desktop/Projects/user/admin/src/pages/admin/BANKING/components/*.jsx /Users/bairuhatechllp/Desktop/Projects/user/admin/src/pages/admin/USERS/components/*.jsx /Users/bairuhatechllp/Desktop/Projects/user/admin/src/pages/admin/ROLES/components/*.jsx /Users/bairuhatechllp/Desktop/Projects/user/admin/src/pages/admin/ROLES/*.jsx)",
+      "Bash(grep -rl react-hook-form /Users/bairuhatechllp/Desktop/Projects/user/admin/src/pages/admin/ --include=*.jsx)",
+      "Bash(xargs -I{} basename {})"
     ]
   }
 }

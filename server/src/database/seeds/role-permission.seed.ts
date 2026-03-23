@@ -19,8 +19,42 @@ const PERMISSIONS_SEED = [
   { module: 'roles', action: 'delete', slug: 'roles:delete', description: 'Delete roles' },
   { module: 'roles', action: 'assign', slug: 'roles:assign', description: 'Assign roles to users' },
 
+  // Inventory
+  { module: 'inventory', action: 'read', slug: 'inventory:read', description: 'View products, categories, stock' },
+  { module: 'inventory', action: 'create', slug: 'inventory:create', description: 'Add products, categories, stock adjustments' },
+  { module: 'inventory', action: 'update', slug: 'inventory:update', description: 'Edit products, categories' },
+  { module: 'inventory', action: 'delete', slug: 'inventory:delete', description: 'Delete categories' },
+
+  // Sales
+  { module: 'sales', action: 'read', slug: 'sales:read', description: 'View invoices, customers, credit notes' },
+  { module: 'sales', action: 'create', slug: 'sales:create', description: 'Create invoices, credit notes, quotations' },
+  { module: 'sales', action: 'update', slug: 'sales:update', description: 'Edit invoices, quotations' },
+  { module: 'sales', action: 'cancel', slug: 'sales:cancel', description: 'Cancel sales invoices' },
+
+  // Purchases
+  { module: 'purchases', action: 'read', slug: 'purchases:read', description: 'View purchase bills, vendors, debit notes' },
+  { module: 'purchases', action: 'create', slug: 'purchases:create', description: 'Create purchase bills, debit notes, POs' },
+  { module: 'purchases', action: 'update', slug: 'purchases:update', description: 'Edit purchase bills' },
+  { module: 'purchases', action: 'cancel', slug: 'purchases:cancel', description: 'Cancel purchase bills' },
+
+  // Accounting
+  { module: 'accounting', action: 'read', slug: 'accounting:read', description: 'View chart of accounts, journal entries, reports' },
+  { module: 'accounting', action: 'create', slug: 'accounting:create', description: 'Create ledger accounts, journal entries, financial years' },
+  { module: 'accounting', action: 'update', slug: 'accounting:update', description: 'Edit accounts, cancel journal entries' },
+
+  // Banking
+  { module: 'banking', action: 'read', slug: 'banking:read', description: 'View bank accounts, transactions' },
+  { module: 'banking', action: 'create', slug: 'banking:create', description: 'Create payments, receipts, bank accounts' },
+  { module: 'banking', action: 'reconcile', slug: 'banking:reconcile', description: 'Reconcile bank transactions' },
+
+  // Tax
+  { module: 'tax', action: 'read', slug: 'tax:read', description: 'View tax rates, GST reports, business settings' },
+  { module: 'tax', action: 'update', slug: 'tax:update', description: 'Manage tax rates and business settings' },
+
   // POS
   { module: 'pos', action: 'access', slug: 'pos:access', description: 'Access the POS terminal' },
+  { module: 'pos', action: 'manage_terminals', slug: 'pos:manage_terminals', description: 'Manage POS terminals' },
+  { module: 'pos', action: 'view_reports', slug: 'pos:view_reports', description: 'View POS daily sales reports' },
   { module: 'pos', action: 'manage', slug: 'pos:manage', description: 'Manage POS configuration' },
   { module: 'pos', action: 'refund', slug: 'pos:refund', description: 'Process refunds' },
   { module: 'pos', action: 'hold_bills', slug: 'pos:hold_bills', description: 'Hold and resume bills' },
@@ -29,6 +63,10 @@ const PERMISSIONS_SEED = [
   // Reports
   { module: 'reports', action: 'view', slug: 'reports:view', description: 'View reports' },
   { module: 'reports', action: 'export', slug: 'reports:export', description: 'Export reports to file' },
+
+  // Business Settings
+  { module: 'business_settings', action: 'read', slug: 'business_settings:read', description: 'View business settings' },
+  { module: 'business_settings', action: 'update', slug: 'business_settings:update', description: 'Update business settings' },
 
   // Settings
   { module: 'settings', action: 'read', slug: 'settings:read', description: 'View system settings' },
@@ -66,11 +104,35 @@ const ROLES_SEED = [
     permissionSlugs: [
       'users:create', 'users:read', 'users:update', 'users:delete',
       'roles:read',
-      'pos:access', 'pos:manage', 'pos:refund', 'pos:hold_bills', 'pos:returns',
+      'inventory:read', 'inventory:create', 'inventory:update', 'inventory:delete',
+      'sales:read', 'sales:create', 'sales:update', 'sales:cancel',
+      'purchases:read', 'purchases:create', 'purchases:update', 'purchases:cancel',
+      'accounting:read', 'accounting:create', 'accounting:update',
+      'banking:read', 'banking:create', 'banking:reconcile',
+      'tax:read', 'tax:update',
+      'pos:access', 'pos:manage', 'pos:manage_terminals', 'pos:view_reports', 'pos:refund', 'pos:hold_bills', 'pos:returns',
       'reports:view', 'reports:export',
+      'business_settings:read', 'business_settings:update',
       'settings:read', 'settings:update', 'settings:notifications', 'settings:security', 'settings:account',
       'mail:access', 'mail:send', 'mail:manage',
       'notifications:read', 'notifications:update',
+      'dashboard:view',
+    ],
+  },
+  {
+    name: 'Accountant',
+    slug: 'accountant',
+    description: 'Full access to accounting, tax, banking, sales, and purchases',
+    is_system: false,
+    permissionSlugs: [
+      'inventory:read',
+      'sales:read', 'sales:create', 'sales:update', 'sales:cancel',
+      'purchases:read', 'purchases:create', 'purchases:update', 'purchases:cancel',
+      'accounting:read', 'accounting:create', 'accounting:update',
+      'banking:read', 'banking:create', 'banking:reconcile',
+      'tax:read', 'tax:update',
+      'reports:view', 'reports:export',
+      'business_settings:read',
       'dashboard:view',
     ],
   },
@@ -81,9 +143,28 @@ const ROLES_SEED = [
     is_system: false,
     permissionSlugs: [
       'users:read',
-      'pos:access', 'pos:manage', 'pos:refund', 'pos:hold_bills', 'pos:returns',
+      'inventory:read', 'inventory:create', 'inventory:update',
+      'sales:read', 'sales:create',
+      'purchases:read', 'purchases:create',
+      'accounting:read',
+      'banking:read', 'banking:create',
+      'tax:read',
+      'pos:access', 'pos:manage', 'pos:view_reports', 'pos:refund', 'pos:hold_bills', 'pos:returns',
       'reports:view', 'reports:export',
       'notifications:read',
+      'dashboard:view',
+    ],
+  },
+  {
+    name: 'Salesperson',
+    slug: 'salesperson',
+    description: 'Sales invoices, customers, and POS access',
+    is_system: false,
+    permissionSlugs: [
+      'inventory:read',
+      'sales:read', 'sales:create',
+      'pos:access', 'pos:hold_bills',
+      'banking:read',
       'dashboard:view',
     ],
   },
@@ -93,6 +174,7 @@ const ROLES_SEED = [
     description: 'Basic POS access for frontline staff',
     is_system: false,
     permissionSlugs: [
+      'inventory:read',
       'pos:access', 'pos:hold_bills',
       'dashboard:view',
     ],

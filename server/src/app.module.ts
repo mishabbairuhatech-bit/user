@@ -11,6 +11,15 @@ import { PasswordHistoryModule } from './password-history/password-history.modul
 import { MfaModule } from './mfa/mfa.module';
 import { PasskeyModule } from './passkey/passkey.module';
 import { RolesModule } from './roles/roles.module';
+import { AccountingModule } from './accounting/accounting.module';
+import { TaxModule } from './tax/tax.module';
+import { InventoryModule } from './inventory/inventory.module';
+import { PartiesModule } from './parties/parties.module';
+import { BankingModule } from './banking/banking.module';
+import { PurchasesModule } from './purchases/purchases.module';
+import { SalesModule } from './sales/sales.module';
+import { PosModule } from './pos/pos.module';
+import { ReportsModule } from './reports/reports.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { PermissionsGuard } from './common/guards/permissions.guard';
 
@@ -41,6 +50,15 @@ import { PermissionsGuard } from './common/guards/permissions.guard';
     MfaModule,
     PasskeyModule,
     RolesModule,
+    AccountingModule,
+    TaxModule,
+    InventoryModule,
+    PartiesModule,
+    BankingModule,
+    PurchasesModule,
+    SalesModule,
+    PosModule,
+    ReportsModule,
   ],
   providers: [
     {

@@ -56,6 +56,69 @@ const API = {
   ROLES_DELETE: "roles", // append /:id
   PERMISSIONS_ALL: "roles/permissions/all",
   PERMISSIONS_GROUPED: "roles/permissions/grouped",
+
+  // Accounting
+  ACCOUNT_GROUPS: "accounting/account-groups",
+  LEDGER_ACCOUNTS: "accounting/ledger-accounts",
+  JOURNAL_ENTRIES: "accounting/journal-entries",
+  FINANCIAL_YEARS: "accounting/financial-years",
+  TRIAL_BALANCE: "accounting/reports/trial-balance",
+  PROFIT_AND_LOSS: "accounting/reports/profit-and-loss",
+  BALANCE_SHEET: "accounting/reports/balance-sheet",
+
+  // Tax
+  TAX_RATES: "tax/rates",
+  BUSINESS_SETTINGS: "tax/business-settings",
+  GST_SUMMARY: "tax/gst-summary",
+  GSTR1: "tax/gstr1",
+  GSTR3B: "tax/gstr3b",
+
+  // Inventory
+  CATEGORIES: "inventory/categories",
+  UNITS: "inventory/units",
+  HSN_CODES: "inventory/hsn-codes",
+  PRODUCTS: "inventory/products",
+  PRODUCTS_BARCODE: "inventory/products/barcode",
+  PRODUCTS_LOW_STOCK: "inventory/products/low-stock",
+  STOCK_ADJUSTMENTS: "inventory/stock-adjustments",
+
+  // Parties
+  PARTIES: "parties",
+
+  // Sales
+  SALES_INVOICES: "sales/invoices",
+  CREDIT_NOTES: "sales/credit-notes",
+  QUOTATIONS: "sales/quotations",
+
+  // Purchases
+  PURCHASE_BILLS: "purchases/bills",
+  DEBIT_NOTES: "purchases/debit-notes",
+  PURCHASE_ORDERS: "purchases/orders",
+
+  // POS
+  POS_TERMINALS: "pos/terminals",
+  POS_SESSIONS: "pos/sessions",
+  POS_SESSIONS_ACTIVE: "pos/sessions/active",
+  POS_FINALIZE: "pos/finalize",
+  POS_HOLD: "pos/hold",
+  POS_HELD_BILLS: "pos/held-bills",
+  POS_RETURN: "pos/return",
+  POS_DAILY_SALES: "pos/daily-sales",
+
+  // Banking
+  BANK_ACCOUNTS: "banking/accounts",
+  PAYMENTS: "banking/payments",
+  RECEIPTS: "banking/receipts",
+  PAYMENT_RECEIPTS: "banking/payment-receipts",
+  BANK_TRANSFER: "banking/transfer",
+  BANK_RECONCILIATION: "banking/reconciliation",
+
+  // Reports & Exports
+  DASHBOARD_SUMMARY: "reports/dashboard",
+  EXPORT_SALES_INVOICES: "reports/export/sales-invoices",
+  EXPORT_PURCHASE_BILLS: "reports/export/purchase-bills",
+  EXPORT_PRODUCTS: "reports/export/products",
+  EXPORT_PARTIES: "reports/export/parties",
 };
 
 export default API;

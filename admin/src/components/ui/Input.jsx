@@ -1,33 +1,40 @@
 import { forwardRef, useState } from 'react';
-import { Eye, EyeOff, Plus, Minus } from 'lucide-react';
+import { Eye, EyeOff, ChevronUp, ChevronDown } from 'lucide-react';
 
 const sizeClasses = {
   sm: {
-    input: 'px-2 py-1.5 text-xs min-h-[32px]',
+    input: 'px-2 py-1.5 text-xs',
     label: 'text-[10px]',
     icon: 'w-3.5 h-3.5',
     iconWrapper: 'px-1.5',
     error: 'text-[10px]',
+    stepperIcon: 'w-3 h-3',
+    stepperPx: 'px-1',
   },
   md: {
-    input: 'px-3 py-2 text-sm min-h-[38px]',
+    input: 'px-3 py-2 text-sm',
     label: 'text-xs',
     icon: 'w-4 h-4',
     iconWrapper: 'px-2',
     error: 'text-[11px]',
+    stepperIcon: 'w-3.5 h-3.5',
+    stepperPx: 'px-1.5',
   },
   lg: {
-    input: 'px-4 py-2.5 text-base min-h-[46px]',
+    input: 'px-4 py-2.5 text-base',
     label: 'text-sm',
     icon: 'w-5 h-5',
     iconWrapper: 'px-2.5',
     error: 'text-xs',
+    stepperIcon: 'w-4 h-4',
+    stepperPx: 'px-2',
   }
 };
 
 const Input = forwardRef(({
   label,
   error,
+  required = false,
   type = 'text',
   size = 'md',
   variant = 'default',
@@ -63,6 +70,17 @@ const Input = forwardRef(({
     const currentValue = parseFloat(value) || 0;
     const newValue = min !== undefined ? Math.max(currentValue - step, min) : currentValue - step;
     onChange?.({ target: { value: newValue } });
+  };
+
+  const handleKeyDown = (e) => {
+    if (!isNumber) return;
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      handleIncrement();
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      handleDecrement();
+    }
   };
 
   const togglePassword = () => {
@@ -110,7 +128,7 @@ const Input = forwardRef(({
                 ${error ? 'peer-focus:text-red-500 peer-[:not(:placeholder-shown)]:text-red-500' : 'peer-[:not(:placeholder-shown)]:text-gray-500 peer-[:not(:placeholder-shown)]:dark:text-gray-400'}
               `}
             >
-              {label}
+              {label}{required && <span className="text-red-500 ml-0.5">*</span>}
             </label>
           )}
 
@@ -147,30 +165,19 @@ const Input = forwardRef(({
     <div className="w-full">
       {label && (
         <label className={`block font-medium text-black dark:text-[rgba(255,255,255,0.85)] mb-1 ${sizes.label}`}>
-          {label}
+          {label}{required && <span className="text-red-500 ml-0.5">*</span>}
         </label>
       )}
       <div
         className={`
           w-full border rounded-xl shadow-sm
-          bg-white dark:bg-[#121212] flex items-center
+          bg-white dark:bg-[#121212] flex items-center relative group/number
           ${sizes.input}
           ${disabled ? 'bg-gray-100 dark:bg-[#2a2a2a] cursor-not-allowed' : ''}
           ${error ? 'border-red-500 focus-within:ring-red-500 focus-within:border-red-500' : 'border-gray-300 dark:border-[#424242] focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500'}
           ${className}
         `}
       >
-        {isNumber && (
-          <button
-            type="button"
-            className={`flex items-center justify-center ${sizes.iconWrapper} hover:bg-gray-100 rounded-l-xl ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-            onClick={handleDecrement}
-            disabled={disabled}
-          >
-            <Minus className={`${sizes.icon} text-gray-500`} />
-          </button>
-        )}
-
         {PrefixIcon && (
           <div className={`flex items-center justify-center ${sizes.iconWrapper}`}>
             <PrefixIcon className={`${sizes.icon} text-gray-400`} />
@@ -188,13 +195,13 @@ const Input = forwardRef(({
           type={isNumber ? 'text' : inputType}
           value={value}
           onChange={onChange}
+          onKeyDown={handleKeyDown}
           disabled={disabled}
           className={`
             flex-1 outline-none bg-transparent
             placeholder-gray-400 dark:placeholder-gray-500
             text-black dark:text-[rgba(255,255,255,0.85)]
             disabled:cursor-not-allowed
-            ${isNumber ? 'text-center' : ''}
           `}
           {...props}
         />
@@ -214,7 +221,7 @@ const Input = forwardRef(({
         {isPassword && (
           <button
             type="button"
-            className={`flex items-center justify-center ${sizes.iconWrapper} hover:bg-gray-100 rounded-r-xl cursor-pointer`}
+            className={`flex items-center justify-center ${sizes.iconWrapper} hover:bg-gray-100 dark:hover:bg-[#2a2a2a] rounded-r-xl cursor-pointer`}
             onClick={togglePassword}
           >
             {showPassword ? (
@@ -225,15 +232,25 @@ const Input = forwardRef(({
           </button>
         )}
 
-        {isNumber && (
-          <button
-            type="button"
-            className={`flex items-center justify-center ${sizes.iconWrapper} hover:bg-gray-100 rounded-r-xl ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-            onClick={handleIncrement}
-            disabled={disabled}
-          >
-            <Plus className={`${sizes.icon} text-gray-500`} />
-          </button>
+        {isNumber && !disabled && (
+          <div className="absolute right-0 top-0 bottom-0 flex flex-col border-l border-gray-300 dark:border-[#424242] rounded-r-xl overflow-hidden opacity-0 group-hover/number:opacity-100 focus-within:opacity-100 transition-opacity">
+            <button
+              type="button"
+              className={`flex-1 flex items-center justify-center ${sizes.stepperPx} hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors cursor-pointer border-b border-gray-300 dark:border-[#424242] group/btn`}
+              onClick={handleIncrement}
+              tabIndex={-1}
+            >
+              <ChevronUp className={`${sizes.stepperIcon} text-gray-500 dark:text-[rgba(255,255,255,0.45)] group-hover/btn:text-primary-600 dark:group-hover/btn:text-primary-400 transition-colors`} />
+            </button>
+            <button
+              type="button"
+              className={`flex-1 flex items-center justify-center ${sizes.stepperPx} hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors cursor-pointer group/btn`}
+              onClick={handleDecrement}
+              tabIndex={-1}
+            >
+              <ChevronDown className={`${sizes.stepperIcon} text-gray-500 dark:text-[rgba(255,255,255,0.45)] group-hover/btn:text-primary-600 dark:group-hover/btn:text-primary-400 transition-colors`} />
+            </button>
+          </div>
         )}
       </div>
       {error && (

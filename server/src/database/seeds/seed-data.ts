@@ -230,3 +230,100 @@ export const SEED_USERS = [
     email_verified: true,
   },
 ];
+
+// ─── Accounting Seed Data ──────────────────────────────────
+
+/**
+ * Account Groups — hierarchical chart of accounts structure.
+ * Each child references its parent's `name` (resolved at seed time).
+ */
+export const SEED_ACCOUNT_GROUPS = [
+  // Root groups
+  { name: 'Assets', nature: 'assets', parent: null, is_system: true, sequence: 1 },
+  { name: 'Liabilities', nature: 'liabilities', parent: null, is_system: true, sequence: 2 },
+  { name: 'Income', nature: 'income', parent: null, is_system: true, sequence: 3 },
+  { name: 'Expenses', nature: 'expense', parent: null, is_system: true, sequence: 4 },
+  { name: 'Equity', nature: 'equity', parent: null, is_system: true, sequence: 5 },
+
+  // Assets sub-groups
+  { name: 'Current Assets', nature: 'assets', parent: 'Assets', is_system: true, sequence: 1 },
+  { name: 'Fixed Assets', nature: 'assets', parent: 'Assets', is_system: true, sequence: 2 },
+  { name: 'Cash & Bank', nature: 'assets', parent: 'Current Assets', is_system: true, sequence: 1 },
+  { name: 'Sundry Debtors', nature: 'assets', parent: 'Current Assets', is_system: true, sequence: 2 },
+  { name: 'Inventory', nature: 'assets', parent: 'Current Assets', is_system: true, sequence: 3 },
+  { name: 'GST Input Credit', nature: 'assets', parent: 'Current Assets', is_system: true, sequence: 4 },
+
+  // Liabilities sub-groups
+  { name: 'Current Liabilities', nature: 'liabilities', parent: 'Liabilities', is_system: true, sequence: 1 },
+  { name: 'Long-term Liabilities', nature: 'liabilities', parent: 'Liabilities', is_system: true, sequence: 2 },
+  { name: 'Sundry Creditors', nature: 'liabilities', parent: 'Current Liabilities', is_system: true, sequence: 1 },
+  { name: 'GST Output Liability', nature: 'liabilities', parent: 'Current Liabilities', is_system: true, sequence: 2 },
+  { name: 'Duties & Taxes', nature: 'liabilities', parent: 'Current Liabilities', is_system: true, sequence: 3 },
+  { name: 'Other Current Liabilities', nature: 'liabilities', parent: 'Current Liabilities', is_system: true, sequence: 4 },
+
+  // Income sub-groups
+  { name: 'Direct Income', nature: 'income', parent: 'Income', is_system: true, sequence: 1 },
+  { name: 'Indirect Income', nature: 'income', parent: 'Income', is_system: true, sequence: 2 },
+
+  // Expense sub-groups
+  { name: 'Direct Expenses', nature: 'expense', parent: 'Expenses', is_system: true, sequence: 1 },
+  { name: 'Indirect Expenses', nature: 'expense', parent: 'Expenses', is_system: true, sequence: 2 },
+
+  // Equity sub-groups
+  { name: 'Capital Account', nature: 'equity', parent: 'Equity', is_system: true, sequence: 1 },
+  { name: 'Reserves & Surplus', nature: 'equity', parent: 'Equity', is_system: true, sequence: 2 },
+];
+
+/**
+ * System Ledger Accounts — auto-created, referenced by transaction modules.
+ * `group` refers to the account group name from SEED_ACCOUNT_GROUPS.
+ */
+export const SEED_LEDGER_ACCOUNTS = [
+  { name: 'Cash in Hand', group: 'Cash & Bank', is_system: true },
+  { name: 'Sales Account', group: 'Direct Income', is_system: true },
+  { name: 'Purchase Account', group: 'Direct Expenses', is_system: true },
+  { name: 'CGST Input', group: 'GST Input Credit', is_system: true },
+  { name: 'SGST Input', group: 'GST Input Credit', is_system: true },
+  { name: 'IGST Input', group: 'GST Input Credit', is_system: true },
+  { name: 'CGST Output', group: 'GST Output Liability', is_system: true },
+  { name: 'SGST Output', group: 'GST Output Liability', is_system: true },
+  { name: 'IGST Output', group: 'GST Output Liability', is_system: true },
+  { name: 'Discount Allowed', group: 'Indirect Expenses', is_system: true },
+  { name: 'Discount Received', group: 'Indirect Income', is_system: true },
+  { name: 'Round Off', group: 'Indirect Expenses', is_system: true },
+  { name: 'Stock-in-Hand', group: 'Inventory', is_system: true },
+  { name: 'Stock Adjustment', group: 'Indirect Expenses', is_system: true },
+];
+
+// ─── Tax Seed Data ──────────────────────────────────
+
+// ─── Inventory Seed Data ──────────────────────────────────
+
+export const SEED_UNITS = [
+  { name: 'Pieces', short_name: 'PCS' },
+  { name: 'Kilograms', short_name: 'KG' },
+  { name: 'Grams', short_name: 'G' },
+  { name: 'Liters', short_name: 'LTR' },
+  { name: 'Milliliters', short_name: 'ML' },
+  { name: 'Meters', short_name: 'MTR' },
+  { name: 'Centimeters', short_name: 'CM' },
+  { name: 'Box', short_name: 'BOX' },
+  { name: 'Pack', short_name: 'PCK' },
+  { name: 'Dozen', short_name: 'DZN' },
+  { name: 'Pair', short_name: 'PR' },
+  { name: 'Set', short_name: 'SET' },
+  { name: 'Bag', short_name: 'BAG' },
+  { name: 'Bottle', short_name: 'BTL' },
+  { name: 'Roll', short_name: 'ROL' },
+  { name: 'Square Feet', short_name: 'SQF' },
+  { name: 'Square Meters', short_name: 'SQM' },
+  { name: 'Numbers', short_name: 'NOS' },
+];
+
+export const SEED_TAX_RATES = [
+  { name: 'Exempt', rate: 0, cgst_rate: 0, sgst_rate: 0, igst_rate: 0, cess_rate: 0 },
+  { name: 'GST 5%', rate: 5, cgst_rate: 2.5, sgst_rate: 2.5, igst_rate: 5, cess_rate: 0 },
+  { name: 'GST 12%', rate: 12, cgst_rate: 6, sgst_rate: 6, igst_rate: 12, cess_rate: 0 },
+  { name: 'GST 18%', rate: 18, cgst_rate: 9, sgst_rate: 9, igst_rate: 18, cess_rate: 0 },
+  { name: 'GST 28%', rate: 28, cgst_rate: 14, sgst_rate: 14, igst_rate: 28, cess_rate: 0 },
+];

@@ -18,6 +18,23 @@ import {
   ChevronRight,
   LogOut,
   ShieldCheck,
+  BookOpen,
+  BookMarked,
+  Scale,
+  TrendingUp,
+  PieChart,
+  Percent,
+  Calculator,
+  Package,
+  FolderTree,
+  Ruler,
+  FileText,
+  Receipt,
+  Truck,
+  Building2,
+  ArrowUpRight,
+  ArrowDownLeft,
+  CheckSquare,
 } from 'lucide-react';
 import { useAuth } from '@hooks';
 import usePermission from '@/hooks/usePermission';
@@ -36,6 +53,48 @@ const allRoleItems = [
   { name: 'Roles & Permissions', path: '/admin/roles', icon: ShieldCheck, permission: 'roles:read' },
 ];
 
+const allSalesItems = [
+  { name: 'Invoices', path: '/admin/sales/invoices', icon: FileText, permission: 'sales:read' },
+  { name: 'Customers', path: '/admin/sales/customers', icon: Users, permission: 'sales:read' },
+  { name: 'Credit Notes', path: '/admin/sales/credit-notes', icon: Receipt, permission: 'sales:read' },
+  { name: 'Quotations', path: '/admin/sales/quotations', icon: ClipboardList, permission: 'sales:read' },
+];
+
+const allPurchaseItems = [
+  { name: 'Bills', path: '/admin/purchases/bills', icon: Receipt, permission: 'purchases:read' },
+  { name: 'Vendors', path: '/admin/purchases/vendors', icon: Truck, permission: 'purchases:read' },
+  { name: 'Debit Notes', path: '/admin/purchases/debit-notes', icon: FileText, permission: 'purchases:read' },
+  { name: 'Purchase Orders', path: '/admin/purchases/orders', icon: ClipboardList, permission: 'purchases:read' },
+];
+
+const allBankingItems = [
+  { name: 'Bank Accounts', path: '/admin/banking/accounts', icon: Building2, permission: 'banking:read' },
+  { name: 'Payments', path: '/admin/banking/payments', icon: ArrowUpRight, permission: 'banking:create' },
+  { name: 'Receipts', path: '/admin/banking/receipts', icon: ArrowDownLeft, permission: 'banking:create' },
+];
+
+const allInventoryItems = [
+  { name: 'Products', path: '/admin/inventory/products', icon: Package, permission: 'inventory:read' },
+  { name: 'Categories', path: '/admin/inventory/categories', icon: FolderTree, permission: 'inventory:read' },
+  { name: 'Stock Adjustments', path: '/admin/inventory/stock-adjustments', icon: ClipboardList, permission: 'inventory:create' },
+  { name: 'Units', path: '/admin/inventory/units', icon: Ruler, permission: 'inventory:read' },
+];
+
+const allAccountingItems = [
+  { name: 'Chart of Accounts', path: '/admin/accounting/chart-of-accounts', icon: BookOpen, permission: 'accounting:read' },
+  { name: 'Journal Entries', path: '/admin/accounting/journal-entries', icon: BookMarked, permission: 'accounting:read' },
+  { name: 'Trial Balance', path: '/admin/accounting/trial-balance', icon: Scale, permission: 'accounting:read' },
+  { name: 'Profit & Loss', path: '/admin/accounting/profit-and-loss', icon: TrendingUp, permission: 'accounting:read' },
+  { name: 'Balance Sheet', path: '/admin/accounting/balance-sheet', icon: PieChart, permission: 'accounting:read' },
+];
+
+const allTaxItems = [
+  { name: 'Tax Rates', path: '/admin/tax/rates', icon: Percent, permission: 'tax:read' },
+  { name: 'GST Summary', path: '/admin/tax/gst-summary', icon: Calculator, permission: 'tax:read' },
+  { name: 'GSTR-1', path: '/admin/tax/gstr1', icon: FileText, permission: 'tax:read' },
+  { name: 'GSTR-3B', path: '/admin/tax/gstr3b', icon: Receipt, permission: 'tax:read' },
+];
+
 const allGeneralItems = [
   { name: 'Settings', path: '/admin/settings', icon: Settings, permission: 'settings:read' },
   { name: 'Help', path: '/admin/help', icon: HelpCircle },
@@ -52,6 +111,12 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
   const menuItems = filterByPermission(allMenuItems);
   const userItems = filterByPermission(allUserItems);
   const roleItems = filterByPermission(allRoleItems);
+  const salesItems = filterByPermission(allSalesItems);
+  const purchaseItems = filterByPermission(allPurchaseItems);
+  const bankingItems = filterByPermission(allBankingItems);
+  const inventoryItems = filterByPermission(allInventoryItems);
+  const accountingItems = filterByPermission(allAccountingItems);
+  const taxItems = filterByPermission(allTaxItems);
   const generalItems = filterByPermission(allGeneralItems);
   const [logoHovered, setLogoHovered] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -293,6 +358,168 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, isTablet, onCloseMobile }) =
                   ) : (
                     link
                   )}
+                </li>
+              );
+            })}
+          </ul>
+        </>)}
+
+        {/* Inventory Section */}
+        {inventoryItems.length > 0 && (<>
+          {!isCollapsed && (
+            <div className="px-4 mb-2">
+              <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Inventory</span>
+            </div>
+          )}
+          <ul className={`space-y-0.5 ${isCollapsed ? 'px-0.5 flex flex-col items-center' : 'px-2'} mb-4`}>
+            {inventoryItems.map((item) => {
+              const link = (
+                <NavLink
+                  to={item.path}
+                  onClick={handleMobileNavClick}
+                  className={({ isActive }) =>
+                    `flex items-center ${isCollapsed ? 'justify-center w-8 h-8' : 'gap-3 px-3 py-2 w-full'} rounded-lg transition-colors ${isActive
+                      ? 'bg-gray-100 dark:bg-[#2a2a2a] text-primary-700 dark:text-primary-400 font-medium'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <item.icon size={18} strokeWidth={isActive ? 2 : 1.5} className="flex-shrink-0" />
+                      {!isCollapsed && <span className="text-sm flex-1">{item.name}</span>}
+                    </>
+                  )}
+                </NavLink>
+              );
+              return (
+                <li key={item.path}>
+                  {isCollapsed ? <Tooltip content={item.name} position="right">{link}</Tooltip> : link}
+                </li>
+              );
+            })}
+          </ul>
+        </>)}
+
+        {/* Sales Section */}
+        {salesItems.length > 0 && (<>
+          {!isCollapsed && (
+            <div className="px-4 mb-2">
+              <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Sales</span>
+            </div>
+          )}
+          <ul className={`space-y-0.5 ${isCollapsed ? 'px-0.5 flex flex-col items-center' : 'px-2'} mb-4`}>
+            {salesItems.map((item) => {
+              const link = (<NavLink to={item.path} onClick={handleMobileNavClick} className={({ isActive }) => `flex items-center ${isCollapsed ? 'justify-center w-8 h-8' : 'gap-3 px-3 py-2 w-full'} rounded-lg transition-colors ${isActive ? 'bg-gray-100 dark:bg-[#2a2a2a] text-primary-700 dark:text-primary-400 font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'}`}>
+                {({ isActive }) => (<><item.icon size={18} strokeWidth={isActive ? 2 : 1.5} className="flex-shrink-0" />{!isCollapsed && <span className="text-sm flex-1">{item.name}</span>}</>)}
+              </NavLink>);
+              return <li key={item.path}>{isCollapsed ? <Tooltip content={item.name} position="right">{link}</Tooltip> : link}</li>;
+            })}
+          </ul>
+        </>)}
+
+        {/* Purchases Section */}
+        {purchaseItems.length > 0 && (<>
+          {!isCollapsed && (
+            <div className="px-4 mb-2">
+              <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Purchases</span>
+            </div>
+          )}
+          <ul className={`space-y-0.5 ${isCollapsed ? 'px-0.5 flex flex-col items-center' : 'px-2'} mb-4`}>
+            {purchaseItems.map((item) => {
+              const link = (<NavLink to={item.path} onClick={handleMobileNavClick} className={({ isActive }) => `flex items-center ${isCollapsed ? 'justify-center w-8 h-8' : 'gap-3 px-3 py-2 w-full'} rounded-lg transition-colors ${isActive ? 'bg-gray-100 dark:bg-[#2a2a2a] text-primary-700 dark:text-primary-400 font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'}`}>
+                {({ isActive }) => (<><item.icon size={18} strokeWidth={isActive ? 2 : 1.5} className="flex-shrink-0" />{!isCollapsed && <span className="text-sm flex-1">{item.name}</span>}</>)}
+              </NavLink>);
+              return <li key={item.path}>{isCollapsed ? <Tooltip content={item.name} position="right">{link}</Tooltip> : link}</li>;
+            })}
+          </ul>
+        </>)}
+
+        {/* Banking Section */}
+        {bankingItems.length > 0 && (<>
+          {!isCollapsed && (
+            <div className="px-4 mb-2">
+              <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Banking</span>
+            </div>
+          )}
+          <ul className={`space-y-0.5 ${isCollapsed ? 'px-0.5 flex flex-col items-center' : 'px-2'} mb-4`}>
+            {bankingItems.map((item) => {
+              const link = (<NavLink to={item.path} onClick={handleMobileNavClick} className={({ isActive }) => `flex items-center ${isCollapsed ? 'justify-center w-8 h-8' : 'gap-3 px-3 py-2 w-full'} rounded-lg transition-colors ${isActive ? 'bg-gray-100 dark:bg-[#2a2a2a] text-primary-700 dark:text-primary-400 font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'}`}>
+                {({ isActive }) => (<><item.icon size={18} strokeWidth={isActive ? 2 : 1.5} className="flex-shrink-0" />{!isCollapsed && <span className="text-sm flex-1">{item.name}</span>}</>)}
+              </NavLink>);
+              return <li key={item.path}>{isCollapsed ? <Tooltip content={item.name} position="right">{link}</Tooltip> : link}</li>;
+            })}
+          </ul>
+        </>)}
+
+        {/* Accounting Section */}
+        {accountingItems.length > 0 && (<>
+          {!isCollapsed && (
+            <div className="px-4 mb-2">
+              <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Accounting</span>
+            </div>
+          )}
+          <ul className={`space-y-0.5 ${isCollapsed ? 'px-0.5 flex flex-col items-center' : 'px-2'} mb-4`}>
+            {accountingItems.map((item) => {
+              const link = (
+                <NavLink
+                  to={item.path}
+                  onClick={handleMobileNavClick}
+                  className={({ isActive }) =>
+                    `flex items-center ${isCollapsed ? 'justify-center w-8 h-8' : 'gap-3 px-3 py-2 w-full'} rounded-lg transition-colors ${isActive
+                      ? 'bg-gray-100 dark:bg-[#2a2a2a] text-primary-700 dark:text-primary-400 font-medium'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <item.icon size={18} strokeWidth={isActive ? 2 : 1.5} className="flex-shrink-0" />
+                      {!isCollapsed && <span className="text-sm flex-1">{item.name}</span>}
+                    </>
+                  )}
+                </NavLink>
+              );
+              return (
+                <li key={item.path}>
+                  {isCollapsed ? <Tooltip content={item.name} position="right">{link}</Tooltip> : link}
+                </li>
+              );
+            })}
+          </ul>
+        </>)}
+
+        {/* Tax Section */}
+        {taxItems.length > 0 && (<>
+          {!isCollapsed && (
+            <div className="px-4 mb-2">
+              <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Tax / GST</span>
+            </div>
+          )}
+          <ul className={`space-y-0.5 ${isCollapsed ? 'px-0.5 flex flex-col items-center' : 'px-2'} mb-4`}>
+            {taxItems.map((item) => {
+              const link = (
+                <NavLink
+                  to={item.path}
+                  onClick={handleMobileNavClick}
+                  className={({ isActive }) =>
+                    `flex items-center ${isCollapsed ? 'justify-center w-8 h-8' : 'gap-3 px-3 py-2 w-full'} rounded-lg transition-colors ${isActive
+                      ? 'bg-gray-100 dark:bg-[#2a2a2a] text-primary-700 dark:text-primary-400 font-medium'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <item.icon size={18} strokeWidth={isActive ? 2 : 1.5} className="flex-shrink-0" />
+                      {!isCollapsed && <span className="text-sm flex-1">{item.name}</span>}
+                    </>
+                  )}
+                </NavLink>
+              );
+              return (
+                <li key={item.path}>
+                  {isCollapsed ? <Tooltip content={item.name} position="right">{link}</Tooltip> : link}
                 </li>
               );
             })}

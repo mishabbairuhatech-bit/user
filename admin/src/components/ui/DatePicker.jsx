@@ -13,18 +13,45 @@ const sizeClasses = {
     label: 'text-[10px]',
     icon: 'w-3.5 h-3.5',
     iconWrapper: 'w-4 h-4',
+    calendar: 'w-[220px] p-2',
+    calendarHeader: 'mb-2',
+    calendarTitle: 'text-[10px]',
+    calendarNav: 'w-3.5 h-3.5',
+    calendarNavBtn: 'p-0.5',
+    dayLabel: 'text-[8px] py-0.5',
+    dayCell: 'w-5 h-5 text-[9px]',
+    todaySection: 'mt-2 pt-2',
+    todayText: 'text-[9px]',
   },
   md: {
     input: 'px-3 py-2 text-sm',
     label: 'text-xs',
     icon: 'w-4 h-4',
     iconWrapper: 'w-5 h-5',
+    calendar: 'w-[280px] p-3',
+    calendarHeader: 'mb-3',
+    calendarTitle: 'text-xs',
+    calendarNav: 'w-4 h-4',
+    calendarNavBtn: 'p-1',
+    dayLabel: 'text-[10px] py-1',
+    dayCell: 'w-7 h-7 text-[11px]',
+    todaySection: 'mt-3 pt-3',
+    todayText: 'text-[11px]',
   },
   lg: {
     input: 'px-4 py-2.5 text-base',
     label: 'text-sm',
     icon: 'w-5 h-5',
     iconWrapper: 'w-6 h-6',
+    calendar: 'w-[320px] p-4',
+    calendarHeader: 'mb-3',
+    calendarTitle: 'text-sm',
+    calendarNav: 'w-5 h-5',
+    calendarNavBtn: 'p-1',
+    dayLabel: 'text-xs py-1',
+    dayCell: 'w-9 h-9 text-xs',
+    todaySection: 'mt-3 pt-3',
+    todayText: 'text-xs',
   }
 };
 
@@ -34,6 +61,7 @@ const DatePicker = forwardRef(({
   onChange,
   placeholder = 'Select date',
   error,
+  required = false,
   disabled = false,
   clearable = true,
   minDate = null,
@@ -171,14 +199,14 @@ const DatePicker = forwardRef(({
     <div className="w-full" ref={containerRef}>
       {label && (
         <label className={`block font-medium text-black dark:text-[rgba(255,255,255,0.85)] mb-1 ${sizes.label}`}>
-          {label}
+          {label}{required && <span className="text-red-500 ml-0.5">*</span>}
         </label>
       )}
       <div
         ref={ref}
         className={`
           relative w-full border rounded-xl shadow-sm cursor-pointer
-          bg-white dark:bg-[#121212]
+          bg-white dark:bg-[#121212] flex items-center justify-between
           ${sizes.input}
           ${disabled ? 'bg-gray-100 dark:bg-[#2a2a2a] cursor-not-allowed' : ''}
           ${error ? 'border-red-500 focus-within:ring-red-500 focus-within:border-red-500' : 'border-gray-300 dark:border-[#424242] focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500'}
@@ -187,57 +215,55 @@ const DatePicker = forwardRef(({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         {...props}
       >
-        <div className="flex items-center justify-between">
-          <span className={value ? 'text-black dark:text-[rgba(255,255,255,0.85)]' : 'text-gray-400'}>
-            {value ? formatDate(value) : placeholder}
-          </span>
-          <div
-            className={`relative flex items-center justify-center ${sizes.iconWrapper}`}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-          >
-            {clearable && value && !disabled && isHovered ? (
-              <CircleX
-                className={`${sizes.icon} text-gray-400 cursor-pointer`}
-                onClick={handleClear}
-              />
-            ) : (
-              <CalendarDays className={`${sizes.icon} text-gray-400`} />
-            )}
-          </div>
+        <span className={value ? 'text-black dark:text-[rgba(255,255,255,0.85)]' : 'text-gray-400'}>
+          {value ? formatDate(value) : placeholder}
+        </span>
+        <div
+          className={`relative flex items-center justify-center ${sizes.iconWrapper}`}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          {clearable && value && !disabled && isHovered ? (
+            <CircleX
+              className={`${sizes.icon} text-gray-400 cursor-pointer`}
+              onClick={handleClear}
+            />
+          ) : (
+            <CalendarDays className={`${sizes.icon} text-gray-400`} />
+          )}
         </div>
 
         {isOpen && !disabled && (
-          <div className={`absolute z-50 top-full mt-1 bg-white dark:bg-[#121212] border border-gray-200 dark:border-[#424242] rounded-xl shadow-xl p-3 w-[280px] ${alignRight ? "right-0" : "left-0"}`}>
-            <div className="flex items-center justify-between mb-3">
+          <div className={`absolute z-50 top-full mt-1 bg-white dark:bg-[#121212] border border-gray-200 dark:border-[#424242] rounded-xl shadow-xl ${sizes.calendar} ${alignRight ? "right-0" : "left-0"}`}>
+            <div className={`flex items-center justify-between ${sizes.calendarHeader}`}>
               <button
                 type="button"
-                className="p-1 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] rounded"
+                className={`${sizes.calendarNavBtn} hover:bg-gray-100 dark:hover:bg-[#2a2a2a] rounded`}
                 onClick={(e) => { e.stopPropagation(); handlePrevMonth(); }}
               >
-                <ChevronLeft className="w-4 h-4 text-black dark:text-[rgba(255,255,255,0.85)]" />
+                <ChevronLeft className={`${sizes.calendarNav} text-black dark:text-[rgba(255,255,255,0.85)]`} />
               </button>
-              <span className="font-medium text-xs text-black dark:text-[rgba(255,255,255,0.85)]">
+              <span className={`font-medium ${sizes.calendarTitle} text-black dark:text-[rgba(255,255,255,0.85)]`}>
                 {MONTHS[viewDate.getMonth()]} {viewDate.getFullYear()}
               </span>
               <button
                 type="button"
-                className="p-1 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] rounded"
+                className={`${sizes.calendarNavBtn} hover:bg-gray-100 dark:hover:bg-[#2a2a2a] rounded`}
                 onClick={(e) => { e.stopPropagation(); handleNextMonth(); }}
               >
-                <ChevronRight className="w-4 h-4 text-black dark:text-[rgba(255,255,255,0.85)]" />
+                <ChevronRight className={`${sizes.calendarNav} text-black dark:text-[rgba(255,255,255,0.85)]`} />
               </button>
             </div>
 
-            <div className="grid grid-cols-7 gap-1 mb-2">
+            <div className="grid grid-cols-7 gap-0.5 mb-1">
               {DAYS.map(day => (
-                <div key={day} className="text-center text-[10px] font-medium text-black dark:text-[rgba(255,255,255,0.65)] py-1">
+                <div key={day} className={`text-center ${sizes.dayLabel} font-medium text-black dark:text-[rgba(255,255,255,0.65)]`}>
                   {day}
                 </div>
               ))}
             </div>
 
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-7 gap-0.5">
               {days.map((day, index) => {
                 const isDisabled = isDateDisabled(day.date) || !day.isCurrentMonth;
                 return (
@@ -245,7 +271,7 @@ const DatePicker = forwardRef(({
                     key={index}
                     type="button"
                     className={`
-                      w-7 h-7 aspect-square text-[11px] rounded-full flex items-center justify-center
+                      ${sizes.dayCell} aspect-square rounded-full flex items-center justify-center
                       ${!day.isCurrentMonth ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed' : isSelected(day.date) ? '' : 'text-black dark:text-[rgba(255,255,255,0.85)]'}
                       ${isToday(day.date) && !isSelected(day.date) && day.isCurrentMonth ? 'border border-primary-500 text-primary-600 dark:text-primary-400 font-medium' : ''}
                       ${isSelected(day.date) && day.isCurrentMonth ? 'bg-primary-600 !text-white font-semibold' : ''}
@@ -261,10 +287,10 @@ const DatePicker = forwardRef(({
               })}
             </div>
 
-            <div className="mt-3 pt-3 border-t border-gray-100 dark:border-[#424242]">
+            <div className={`${sizes.todaySection} border-t border-gray-100 dark:border-[#424242]`}>
               <button
                 type="button"
-                className="w-full text-[11px] text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
+                className={`w-full ${sizes.todayText} text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium`}
                 onClick={(e) => { e.stopPropagation(); handleSelectDate(new Date()); }}
               >
                 Today
